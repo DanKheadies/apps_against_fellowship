@@ -1,6 +1,47 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:flutter_localizations/flutter_localizations.dart';
+// import 'package:flutter_translate/flutter_translate.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+// import 'package:logging/logging.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/config/config.dart';
+import 'package:apps_against_fellowship/firebase_options.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
+// import 'package:apps_against_fellowship/simple_bloc_observer.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // TODO (?)
+  // App Preferences
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  HydratedBloc.storage = await HydratedStorage.build(
+    storageDirectory: kIsWeb
+        ? HydratedStorage.webStorageDirectory
+        : await getTemporaryDirectory(),
+  );
+
+  // TODO: is logger needed (?)
+  // Setup logger
+  // Logger.root.level = Level.ALL;
+  // Logger.root.onRecord.listen((LogRecord rec) {
+  //   print('${rec.level.name}: ${rec.time}: ${rec.message}');
+  // });
+
+  // TODO (?)
+  // Setup Push Notifications
+
+  // Bloc.observer = SimpleBlocObserver(); // Same as LoggingBlocDelegate
+
   runApp(const MyApp());
 }
 
@@ -9,60 +50,42 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => DatabaseRepository(),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        RepositoryProvider(
+          create: (context) => StorageRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => AuthRepository(
+            databaseRepository: context.read<DatabaseRepository>(),
+          ),
+        ),
+      ],
+      // TODO:
+      // 2) Themes; w/ state
+      // 3) Locales
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => AuthBloc(
+              authRepository: context.read<AuthRepository>(),
+              databaseRepository: context.read<DatabaseRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => UserBloc(
+              databaseRepository: context.read<DatabaseRepository>(),
+            ),
+          ),
+        ],
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          // theme: state == Brightness.dark ? darkTheme() : lightTheme(),
+          routerConfig: goRouter,
+        ),
       ),
     );
   }
