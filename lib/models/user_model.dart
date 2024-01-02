@@ -43,31 +43,43 @@ class User extends Equatable {
 
   factory User.fromSnapshot(DocumentSnapshot snap) {
     dynamic data = snap.data();
+    DateTime updatedTime = data['updatedAt'] != null
+        ? (data['updatedAt'] as Timestamp).toDate()
+        : DateTime.now();
 
     return User(
       acceptedTerms: data['acceptedTerms'] ?? false,
       avatarUrl: data['avatarUrl'] ?? '',
       id: snap.id,
-      // id: json['id'] ?? '', // alt
       name: data['name'] ?? '',
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      updatedAt: updatedTime,
     );
   }
 
-  factory User.fromJson(
-    Map<String, dynamic> json,
-    // remove this array for alt
-    [
-    String? id,
-  ]) {
+  factory User.fromJson(Map<String, dynamic> json) {
+    DateTime updatedTime = json['updatedAt'] != null
+        // ? (json['updatedAt'] as Timestamp).toDate()
+        ? DateTime.parse(json['updatedAt'])
+        : DateTime.now();
+
     return User(
       acceptedTerms: json['acceptedTerms'] ?? false,
       avatarUrl: json['avatarUrl'] ?? '',
-      id: id ?? '',
-      // id: json['id'] ?? '', // alt
+      id: json['id'] ?? '',
       name: json['name'] ?? '',
-      updatedAt: DateTime.parse(json['updatedAt']),
+      // updatedAt: DateTime.parse(json['updatedAt']),
+      updatedAt: updatedTime,
     );
+  }
+
+  Map<String, dynamic> toSnap() {
+    return {
+      'acceptedTerms': acceptedTerms,
+      'avatarUrl': avatarUrl,
+      'id': id,
+      'name': name,
+      'updatedAt': updatedAt?.toUtc(),
+    };
   }
 
   Map<String, dynamic> toJson() {
@@ -75,9 +87,8 @@ class User extends Equatable {
       'acceptedTerms': acceptedTerms,
       'avatarUrl': avatarUrl,
       'id': id,
-      // remove id for alt
       'name': name,
-      'updatedAt': updatedAt.toString(),
+      'updatedAt': updatedAt?.toString(),
     };
   }
 

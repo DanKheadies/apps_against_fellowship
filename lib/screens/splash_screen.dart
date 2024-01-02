@@ -30,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    print('init splash');
+    // print('init splash');
 
     aniCont = AnimationController(
       vsync: this,
@@ -46,17 +46,19 @@ class _SplashScreenState extends State<SplashScreen>
 
   void decideRoute(
     BuildContext context,
-    AuthState state,
+    AuthState authState,
+    UserState userState,
   ) {
-    if (state.status == AuthStatus.unauthenticated ||
-        state.status == AuthStatus.unknown) {
+    if (authState.status == AuthStatus.unauthenticated ||
+        authState.status == AuthStatus.unknown) {
       print('to sign in');
       context.goNamed('signIn');
-    } else if (state.status == AuthStatus.authenticated &&
-        state.user!.acceptedTerms) {
+    } else if (authState.status == AuthStatus.authenticated &&
+        !userState.user.acceptedTerms) {
       print('to tos');
+      // print(state.user);
       context.goNamed('tos');
-    } else if (state.status == AuthStatus.authenticated) {
+    } else if (authState.status == AuthStatus.authenticated) {
       print('to home');
       context.goNamed('home');
     } else {
@@ -73,37 +75,41 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    print('build splash');
+    // print('build splash');
     return Title(
       title: 'Apps Against Fellowship',
       color: Colors.purple, // TODO: does what?
       child: Scaffold(
         body: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
-            print('splash: $state');
-            return InkWell(
-              onTap: () => decideRoute(context, state),
-              child: Center(
-                child: Center(
-                  child: Lottie.asset(
-                    'assets/images/splash/${files[fileIndex]}.json',
-                    controller: aniCont,
-                    onLoaded: (composition) {
-                      aniCont
-                        ..duration = fileIndex == 0
-                            ? composition.duration * 2
-                            : composition.duration
-                        ..forward();
-                      navTimer = Timer(
-                        fileIndex == 0
-                            ? composition.duration * 2
-                            : composition.duration,
-                        () => decideRoute(context, state),
-                      );
-                    },
+          builder: (context, authState) {
+            // print('splash: $state');
+            return BlocBuilder<UserBloc, UserState>(
+              builder: (context, userState) {
+                return InkWell(
+                  onTap: () => decideRoute(context, authState, userState),
+                  child: Center(
+                    child: Center(
+                      child: Lottie.asset(
+                        'assets/images/splash/${files[fileIndex]}.json',
+                        controller: aniCont,
+                        onLoaded: (composition) {
+                          aniCont
+                            ..duration = fileIndex == 0
+                                ? composition.duration * 2
+                                : composition.duration
+                            ..forward();
+                          navTimer = Timer(
+                            fileIndex == 0
+                                ? composition.duration * 2
+                                : composition.duration,
+                            () => decideRoute(context, authState, userState),
+                          );
+                        },
+                      ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         ),

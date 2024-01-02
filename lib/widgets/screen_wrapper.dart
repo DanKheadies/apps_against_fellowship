@@ -6,11 +6,13 @@ import 'package:apps_against_fellowship/blocs/blocs.dart';
 // import 'package:apps_against_fellowship/config/config.dart';
 
 class ScreenWrapper extends StatefulWidget {
+  final List<Widget>? actions;
   final String screen;
   final Widget child;
 
   const ScreenWrapper({
     super.key,
+    this.actions,
     required this.child,
     required this.screen,
   });
@@ -20,13 +22,13 @@ class ScreenWrapper extends StatefulWidget {
 }
 
 class _ScreenWrapperState extends State<ScreenWrapper> {
-  @override
-  void initState() {
-    super.initState();
-    print('init screen wrapper');
-    var derp = context.read<UserBloc>().state;
-    print('derp: $derp');
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   print('init screen wrapper');
+  //   var derp = context.read<UserBloc>().state;
+  //   print('derp: $derp');
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +52,7 @@ class _ScreenWrapperState extends State<ScreenWrapper> {
         child: Scaffold(
           appBar: AppBar(
             title: Text(widget.screen),
+            actions: widget.actions,
           ),
           body: widget.child,
         ),

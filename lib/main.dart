@@ -70,14 +70,15 @@ class MyApp extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) => AuthBloc(
-              authRepository: context.read<AuthRepository>(),
+            create: (context) => UserBloc(
               databaseRepository: context.read<DatabaseRepository>(),
             ),
           ),
           BlocProvider(
-            create: (context) => UserBloc(
+            create: (context) => AuthBloc(
+              authRepository: context.read<AuthRepository>(),
               databaseRepository: context.read<DatabaseRepository>(),
+              userBloc: context.read<UserBloc>(),
             ),
           ),
         ],

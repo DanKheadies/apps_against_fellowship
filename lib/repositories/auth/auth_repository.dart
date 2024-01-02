@@ -14,6 +14,18 @@ class AuthRepository extends BaseAuthRepository {
         _databaseRepository = databaseRepository;
 
   @override
+  auth.User? getUser() {
+    try {
+      final currentUser = _firebaseAuth.currentUser;
+      // print('current user: $currentUser');
+      return currentUser;
+    } catch (err) {
+      print('get user err: $err');
+      throw Exception(err);
+    }
+  }
+
+  @override
   Stream<auth.User?> get user => _firebaseAuth.userChanges();
 
   @override

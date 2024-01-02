@@ -63,7 +63,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
     return _firebaseFirestore
         .collection('users')
         .doc(user.id)
-        .update(user.toJson());
+        .update(user.toSnap());
   }
 
   @override

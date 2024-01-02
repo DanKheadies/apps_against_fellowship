@@ -41,9 +41,11 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     );
 
     try {
-      await _databaseRepository.updateUser(
-        user: updatedUser,
-      );
+      if (event.user != User.emptyUser) {
+        await _databaseRepository.updateUser(
+          user: updatedUser,
+        );
+      }
 
       emit(
         state.copyWith(
@@ -64,15 +66,15 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
 
   @override
   UserState? fromJson(Map<String, dynamic> json) {
-    print('user bloc hydrated fromJson');
-    print(json);
+    // print('user bloc hydrated fromJson');
+    // print(json);
     return UserState.fromJson(json);
   }
 
   @override
   Map<String, dynamic>? toJson(UserState state) {
-    print('user bloc hydrated toJson');
-    print(state);
+    // print('user bloc hydrated toJson');
+    // print(state);
     return state.toJson();
   }
 }

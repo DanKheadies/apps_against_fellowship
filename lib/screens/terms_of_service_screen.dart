@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:go_router/go_router.dart';
 
 class TermsOfServiceScreen extends StatelessWidget {
   const TermsOfServiceScreen({super.key});
@@ -36,6 +37,14 @@ class TermsOfServiceScreen extends StatelessWidget {
                           ),
                         ),
                       );
+                  // context.read<AuthBloc>().add(
+                  //       UpdateAuthsUser(
+                  //         user: state.user.copyWith(
+                  //           acceptedTerms: true,
+                  //         ),
+                  //       ),
+                  //     );
+                  context.goNamed('home');
                 },
                 child: const Text('I Agree'),
               ),

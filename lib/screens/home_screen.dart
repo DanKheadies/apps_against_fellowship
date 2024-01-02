@@ -10,6 +10,18 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScreenWrapper(
       screen: 'Home',
+      actions: [
+        IconButton(
+          onPressed: () {
+            context.read<AuthBloc>().add(
+                  SignOut(),
+                );
+          },
+          icon: const Icon(
+            Icons.exit_to_app,
+          ),
+        ),
+      ],
       child: BlocBuilder<UserBloc, UserState>(
         builder: (context, state) {
           if (state.userStatus == UserStatus.initial ||
@@ -31,13 +43,22 @@ class HomeScreen extends StatelessWidget {
                 Switch(
                   value: state.user.acceptedTerms,
                   activeColor: Colors.red,
-                  onChanged: (value) => context.read<UserBloc>().add(
-                        UpdateUser(
-                          user: state.user.copyWith(
-                            acceptedTerms: value,
+                  onChanged: (value) {
+                    context.read<UserBloc>().add(
+                          UpdateUser(
+                            user: state.user.copyWith(
+                              acceptedTerms: value,
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                    // context.read<AuthBloc>().add(
+                    //       UpdateAuthsUser(
+                    //         user: state.user.copyWith(
+                    //           acceptedTerms: value,
+                    //         ),
+                    //       ),
+                    //     );
+                  },
                 ),
                 const SizedBox(
                   height: 50,
