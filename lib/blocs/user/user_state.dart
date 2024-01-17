@@ -33,7 +33,6 @@ class UserState extends Equatable {
   }
 
   factory UserState.fromJson(Map<String, dynamic> json) {
-    // print('user state fromJson');
     return UserState(
       user: User.fromJson(json['user']),
       userStatus: UserStatus.values.firstWhere(
@@ -43,9 +42,10 @@ class UserState extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    // print('user state toJson');
     return {
-      'user': user.toJson(),
+      'user': user.toJson(
+        isFirebase: false,
+      ),
       'userStatus': userStatus.name,
     };
   }

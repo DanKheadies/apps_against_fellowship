@@ -35,7 +35,7 @@ class StorageRepository extends BaseStorageRepository {
             bytes,
           )
           .then(
-            (snap) => DatabaseRepository().updateUserPicture(
+            (snap) => UserRepository().updateUserPicture(
               bucket: bucket,
               imageName: imageName,
               user: user,

@@ -37,13 +37,6 @@ class TermsOfServiceScreen extends StatelessWidget {
                           ),
                         ),
                       );
-                  // context.read<AuthBloc>().add(
-                  //       UpdateAuthsUser(
-                  //         user: state.user.copyWith(
-                  //           acceptedTerms: true,
-                  //         ),
-                  //       ),
-                  //     );
                   context.goNamed('home');
                 },
                 child: const Text('I Agree'),

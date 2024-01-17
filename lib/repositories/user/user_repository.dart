@@ -3,10 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 
-class DatabaseRepository extends BaseDatabaseRepository {
+class UserRepository extends BaseUserRepository {
   final FirebaseFirestore _firebaseFirestore;
 
-  DatabaseRepository({
+  UserRepository({
     FirebaseFirestore? firebaseFirestore,
   }) : _firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
 
@@ -52,7 +52,10 @@ class DatabaseRepository extends BaseDatabaseRepository {
       await _firebaseFirestore
           .collection('users')
           .doc(user.id)
-          .set(user.toJson());
+          // .set(user.toSnap());
+          .set(user.toJson(
+            isFirebase: true,
+          ));
     }
   }
 
@@ -63,7 +66,10 @@ class DatabaseRepository extends BaseDatabaseRepository {
     return _firebaseFirestore
         .collection('users')
         .doc(user.id)
-        .update(user.toSnap());
+        // .update(user.toSnap());
+        .set(user.toJson(
+          isFirebase: true,
+        ));
   }
 
   @override

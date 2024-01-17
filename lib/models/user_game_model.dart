@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class UserGame extends Equatable {
-  final DateTime joinedAt;
+  final DateTime? joinedAt;
   // final GameState gameState;
   final String gid;
   final String id;
@@ -11,11 +11,11 @@ class UserGame extends Equatable {
     // required this.gameState,
     required this.gid,
     required this.id,
-    required this.joinedAt,
+    this.joinedAt,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         // gameState,
         gid,
         id,
@@ -38,22 +38,38 @@ class UserGame extends Equatable {
 
   factory UserGame.fromSnapshot(DocumentSnapshot snap) {
     dynamic data = snap.data();
+    DateTime joined = data['joinedAt'] != null
+        ? (data['joinedAt'] as Timestamp).toDate()
+        : DateTime.now();
 
     return UserGame(
       // gameState: data['gameState'] ?? GameState.emptyGame,
       gid: data['gid'] ?? '',
       id: snap.id,
-      joinedAt: (data['joinedAt'] as Timestamp).toDate(),
+      joinedAt: joined,
     );
   }
 
   factory UserGame.fromJson(Map<String, dynamic> json) {
+    DateTime joined = json['joinedAt'] != null
+        ? (json['joinedAt'] as Timestamp).toDate()
+        : DateTime.now();
+
     return UserGame(
       // gameState: json['gameState'] ?? GameState.emptyGame,
       gid: json['gid'] ?? '',
       id: json['id'] ?? '',
-      joinedAt: (json['joinedAt'] as Timestamp).toDate(),
+      joinedAt: joined,
     );
+  }
+
+  Map<String, dynamic> toSnap() {
+    return {
+      // 'gameState': gameState,
+      'gid': gid,
+      'id': id,
+      'joinedAt': joinedAt?.toUtc(),
+    };
   }
 
   Map<String, dynamic> toJson() {
@@ -65,10 +81,10 @@ class UserGame extends Equatable {
     };
   }
 
-  static final emptyUserGame = UserGame(
+  static const emptyUserGame = UserGame(
     // gameState: GameState.emptyGame,
     gid: '',
     id: '',
-    joinedAt: DateTime.now(),
+    // joinedAt: DateTime.now(),
   );
 }

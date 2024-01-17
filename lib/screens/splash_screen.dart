@@ -30,7 +30,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    // print('init splash');
 
     aniCont = AnimationController(
       vsync: this,
@@ -56,7 +55,6 @@ class _SplashScreenState extends State<SplashScreen>
     } else if (authState.status == AuthStatus.authenticated &&
         !userState.user.acceptedTerms) {
       print('to tos');
-      // print(state.user);
       context.goNamed('tos');
     } else if (authState.status == AuthStatus.authenticated) {
       print('to home');
@@ -75,14 +73,12 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    // print('build splash');
     return Title(
       title: 'Apps Against Fellowship',
       color: Colors.purple, // TODO: does what?
       child: Scaffold(
         body: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, authState) {
-            // print('splash: $state');
             return BlocBuilder<UserBloc, UserState>(
               builder: (context, userState) {
                 return InkWell(

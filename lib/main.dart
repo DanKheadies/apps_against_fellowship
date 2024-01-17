@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_localizations/flutter_localizations.dart';
 // import 'package:flutter_translate/flutter_translate.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-// import 'package:logging/logging.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
@@ -19,6 +19,7 @@ Future<void> main() async {
 
   // TODO (?)
   // App Preferences
+  // Update: nah use as Hydrated User Bloc
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -31,11 +32,16 @@ Future<void> main() async {
   );
 
   // TODO: is logger needed (?)
+  // Update: helps print "prettier" log entries; not necessary but N2H
   // Setup logger
   // Logger.root.level = Level.ALL;
+  Logger.level = Level.all;
   // Logger.root.onRecord.listen((LogRecord rec) {
   //   print('${rec.level.name}: ${rec.time}: ${rec.message}');
   // });
+  Logger.addLogListener((rec) {
+    print('${rec.level.name}: ${rec.time}: ${rec.message}');
+  });
 
   // TODO (?)
   // Setup Push Notifications
@@ -53,14 +59,14 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          create: (context) => DatabaseRepository(),
+          create: (context) => UserRepository(),
         ),
         RepositoryProvider(
           create: (context) => StorageRepository(),
         ),
         RepositoryProvider(
           create: (context) => AuthRepository(
-            databaseRepository: context.read<DatabaseRepository>(),
+            userRepository: context.read<UserRepository>(),
           ),
         ),
       ],
@@ -71,21 +77,30 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) => UserBloc(
-              databaseRepository: context.read<DatabaseRepository>(),
+              userRepository: context.read<UserRepository>(),
             ),
           ),
           BlocProvider(
             create: (context) => AuthBloc(
               authRepository: context.read<AuthRepository>(),
-              databaseRepository: context.read<DatabaseRepository>(),
               userBloc: context.read<UserBloc>(),
+              userRepository: context.read<UserRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => HomeBloc(
+              userRepository: context.read<UserRepository>(),
             ),
           ),
         ],
-        child: MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          // theme: state == Brightness.dark ? darkTheme() : lightTheme(),
-          routerConfig: goRouter,
+        child: BlocBuilder<UserBloc, UserState>(
+          builder: (context, state) {
+            return MaterialApp.router(
+              debugShowCheckedModeBanner: false,
+              routerConfig: goRouter,
+              theme: state.user.isDarkTheme ? darkTheme() : lightTheme(),
+            );
+          },
         ),
       ),
     );

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 import 'package:apps_against_fellowship/models/models.dart';
@@ -5,19 +7,18 @@ import 'package:apps_against_fellowship/repositories/repositories.dart';
 
 class AuthRepository extends BaseAuthRepository {
   final auth.FirebaseAuth _firebaseAuth;
-  final DatabaseRepository _databaseRepository;
+  final UserRepository _userRepository;
 
   AuthRepository({
     auth.FirebaseAuth? firebaseAuth,
-    required DatabaseRepository databaseRepository,
+    required UserRepository userRepository,
   })  : _firebaseAuth = firebaseAuth ?? auth.FirebaseAuth.instance,
-        _databaseRepository = databaseRepository;
+        _userRepository = userRepository;
 
   @override
   auth.User? getUser() {
     try {
       final currentUser = _firebaseAuth.currentUser;
-      // print('current user: $currentUser');
       return currentUser;
     } catch (err) {
       print('get user err: $err');
@@ -63,6 +64,45 @@ class AuthRepository extends BaseAuthRepository {
   }
 
   @override
+  // Future<auth.User?> loginWithGoogle({
+  Future<void> loginWithGoogle({
+    required String email,
+    required String password,
+  }) async {
+    print('TODO: google sign in');
+    // try {
+    //   final userCredentials = await _firebaseAuth.(
+    //     email: email,
+    //     password: password,
+    //   );
+    //   return userCredentials.user;
+    // } catch (err) {
+    //   print('login error: $err');
+    //   throw Exception(err);
+    // }
+  }
+
+  @override
+  Future<auth.User?> registerAnonymous() async {
+    try {
+      final anonCredentials = await _firebaseAuth.signInAnonymously();
+
+      await _userRepository.createUser(
+        user: User.emptyUser.copyWith(
+          id: anonCredentials.user!.uid,
+          name: 'Anon y Mus',
+          updatedAt: anonCredentials.user!.metadata.creationTime,
+        ),
+      );
+
+      return anonCredentials.user;
+    } catch (err) {
+      print('register anon err: $err');
+      throw Exception(err);
+    }
+  }
+
+  @override
   Future<auth.User?> registerUser({
     required String email,
     required String password,
@@ -75,7 +115,7 @@ class AuthRepository extends BaseAuthRepository {
         password: password,
       );
 
-      await _databaseRepository.createUser(
+      await _userRepository.createUser(
         user: User.emptyUser.copyWith(
           id: userCredentials.user!.uid,
           name: name ?? '',

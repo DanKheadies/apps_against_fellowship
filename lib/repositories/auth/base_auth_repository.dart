@@ -13,6 +13,11 @@ abstract class BaseAuthRepository {
     required String email,
     required String password,
   });
+  Future<void> loginWithGoogle({
+    required String email,
+    required String password,
+  });
+  Future<auth.User?> registerAnonymous();
   Future<auth.User?> registerUser({
     required String email,
     required String password,

@@ -1,11 +1,6 @@
-// import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-// import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-// import 'package:logging/logging.dart';
-// import 'package:meta/meta.dart';
 
-// import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 
@@ -13,22 +8,33 @@ part 'user_event.dart';
 part 'user_state.dart';
 
 class UserBloc extends HydratedBloc<UserEvent, UserState> {
-  final DatabaseRepository _databaseRepository;
+  final UserRepository _userRepository;
 
   UserBloc({
-    required DatabaseRepository databaseRepository,
-  })  : _databaseRepository = databaseRepository,
+    required UserRepository userRepository,
+  })  : _userRepository = userRepository,
         super(const UserState()) {
+    on<ClearUser>(_onClearUser);
     on<UpdateUser>(_onUpdateUser);
+  }
+
+  void _onClearUser(
+    ClearUser event,
+    Emitter<UserState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        user: User.emptyUser,
+        userStatus: UserStatus.initial,
+      ),
+    );
   }
 
   void _onUpdateUser(
     UpdateUser event,
     Emitter<UserState> emit,
   ) async {
-    if (state.userStatus == UserStatus.loading) {
-      return;
-    }
+    if (state.userStatus == UserStatus.loading) return;
 
     emit(
       state.copyWith(
@@ -42,10 +48,12 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
 
     try {
       if (event.user != User.emptyUser) {
-        await _databaseRepository.updateUser(
+        await _userRepository.updateUser(
           user: updatedUser,
         );
       }
+
+      // TODO: update homebloc
 
       emit(
         state.copyWith(
@@ -66,15 +74,11 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
 
   @override
   UserState? fromJson(Map<String, dynamic> json) {
-    // print('user bloc hydrated fromJson');
-    // print(json);
     return UserState.fromJson(json);
   }
 
   @override
   Map<String, dynamic>? toJson(UserState state) {
-    // print('user bloc hydrated toJson');
-    // print(state);
     return state.toJson();
   }
 }

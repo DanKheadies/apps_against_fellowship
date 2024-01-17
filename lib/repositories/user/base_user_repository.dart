@@ -2,7 +2,7 @@
 
 import 'package:apps_against_fellowship/models/models.dart';
 
-abstract class BaseDatabaseRepository {
+abstract class BaseUserRepository {
   Future<String> getPhotoUrl({
     required String userId,
   });

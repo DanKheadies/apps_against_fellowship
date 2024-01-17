@@ -1,13 +1,6 @@
-// import 'dart:async';
-
 import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-// import 'package:apps_against_fellowship/blocs/blocs.dart';
-// import 'package:apps_against_fellowship/cubits/cubits.dart';
-// import 'package:apps_against_fellowship/models/models.dart';
-// import 'package:apps_against_fellowship/repositories/database/database_repository.dart';
 import 'package:apps_against_fellowship/screens/screens.dart';
 
 final GoRouter goRouter = GoRouter(
@@ -40,7 +33,6 @@ final GoRouter goRouter = GoRouter(
       redirect: (context, state) => newRedirect(
         context,
         state,
-        // false,
       ),
     ),
     GoRoute(
@@ -58,7 +50,6 @@ final GoRouter goRouter = GoRouter(
       redirect: (context, state) => newRedirect(
         context,
         state,
-        // false,
       ),
     ),
     GoRoute(
@@ -76,7 +67,6 @@ final GoRouter goRouter = GoRouter(
       redirect: (context, state) => newRedirect(
         context,
         state,
-        // true,
       ),
     ),
   ],
@@ -95,7 +85,6 @@ final GoRouter goRouter = GoRouter(
 String newRedirect(
   BuildContext context,
   GoRouterState state,
-  // bool needsAdmin,
 ) {
   print('is currently going to: ${state.uri}');
 

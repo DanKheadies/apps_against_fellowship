@@ -3,15 +3,23 @@ import 'package:equatable/equatable.dart';
 
 class User extends Equatable {
   final bool acceptedTerms;
+  final bool isDarkTheme;
   final DateTime? updatedAt;
   final String avatarUrl;
   final String id;
   final String name;
+  // final bool developerPackEnabled;
+  // final bool isDarkMode;
+  // final int playerLimit;
+  // final int prizesToWin;
+  // final String deviceId;
+  // final String pushToken;
 
   const User({
     required this.acceptedTerms,
     required this.avatarUrl,
     required this.id,
+    required this.isDarkTheme,
     required this.name,
     this.updatedAt,
   });
@@ -21,12 +29,14 @@ class User extends Equatable {
         acceptedTerms,
         avatarUrl,
         id,
+        isDarkTheme,
         name,
         updatedAt,
       ];
 
   User copyWith({
     bool? acceptedTerms,
+    bool? isDarkTheme,
     DateTime? updatedAt,
     String? avatarUrl,
     String? id,
@@ -36,8 +46,24 @@ class User extends Equatable {
       acceptedTerms: acceptedTerms ?? this.acceptedTerms,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       id: id ?? this.id,
+      isDarkTheme: isDarkTheme ?? this.isDarkTheme,
       name: name ?? this.name,
       updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    DateTime updatedTime = json['updatedAt'] != null
+        ? DateTime.parse(json['updatedAt'])
+        : DateTime.now();
+
+    return User(
+      acceptedTerms: json['acceptedTerms'] ?? false,
+      avatarUrl: json['avatarUrl'] ?? '',
+      id: json['id'] ?? '',
+      isDarkTheme: json['isDarkTheme'] ?? false,
+      name: json['name'] ?? '',
+      updatedAt: updatedTime,
     );
   }
 
@@ -51,53 +77,32 @@ class User extends Equatable {
       acceptedTerms: data['acceptedTerms'] ?? false,
       avatarUrl: data['avatarUrl'] ?? '',
       id: snap.id,
+      isDarkTheme: data['isDarkTheme'] ?? false,
       name: data['name'] ?? '',
       updatedAt: updatedTime,
     );
   }
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    DateTime updatedTime = json['updatedAt'] != null
-        // ? (json['updatedAt'] as Timestamp).toDate()
-        ? DateTime.parse(json['updatedAt'])
-        : DateTime.now();
+  Map<String, dynamic> toJson({
+    required bool isFirebase,
+  }) {
+    DateTime updatedDT = updatedAt ?? DateTime.now();
 
-    return User(
-      acceptedTerms: json['acceptedTerms'] ?? false,
-      avatarUrl: json['avatarUrl'] ?? '',
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-      // updatedAt: DateTime.parse(json['updatedAt']),
-      updatedAt: updatedTime,
-    );
-  }
-
-  Map<String, dynamic> toSnap() {
     return {
       'acceptedTerms': acceptedTerms,
       'avatarUrl': avatarUrl,
       'id': id,
+      'isDarkTheme': isDarkTheme,
       'name': name,
-      'updatedAt': updatedAt?.toUtc(),
+      'updatedAt': isFirebase ? updatedDT.toUtc() : updatedDT.toString(),
     };
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'acceptedTerms': acceptedTerms,
-      'avatarUrl': avatarUrl,
-      'id': id,
-      'name': name,
-      'updatedAt': updatedAt?.toString(),
-    };
-  }
-
-  // static final emptyUser = User(
   static const emptyUser = User(
     acceptedTerms: false,
     avatarUrl: '',
     id: '',
+    isDarkTheme: false,
     name: '',
-    // updatedAt: DateTime.now(),
   );
 }
