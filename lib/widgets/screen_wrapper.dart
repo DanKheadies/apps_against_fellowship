@@ -5,8 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 
 class ScreenWrapper extends StatelessWidget {
-  final bool hideAppBar;
+  final bool? hideAppBar;
   final List<Widget>? actions;
+  final String? goBack;
   final String screen;
   final Widget child;
 
@@ -15,6 +16,7 @@ class ScreenWrapper extends StatelessWidget {
     required this.child,
     required this.screen,
     this.actions,
+    this.goBack = '',
     this.hideAppBar = false,
   });
 
@@ -38,11 +40,21 @@ class ScreenWrapper extends StatelessWidget {
         title: screen,
         color: Colors.red,
         child: Scaffold(
-          appBar: hideAppBar
+          appBar: hideAppBar!
               ? null
               : AppBar(
                   title: Text(screen),
                   actions: actions,
+                  leading: goBack! != ''
+                      ? IconButton(
+                          icon: const Icon(
+                            Icons.chevron_left,
+                          ),
+                          onPressed: () {
+                            context.goNamed(goBack!);
+                          },
+                        )
+                      : const SizedBox(),
                 ),
           body: child,
         ),

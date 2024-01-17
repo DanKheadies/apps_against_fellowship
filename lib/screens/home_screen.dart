@@ -201,63 +201,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      // child: BlocBuilder<UserBloc, UserState>(
-      //   builder: (context, state) {
-      //     if (state.userStatus == UserStatus.initial ||
-      //         state.userStatus == UserStatus.loading) {
-      //       return const Center(
-      //         child: CircularProgressIndicator(),
-      //       );
-      //     }
-      //     if (state.userStatus == UserStatus.loaded) {
-      //       return Column(
-      //         mainAxisSize: MainAxisSize.max,
-      //         mainAxisAlignment: MainAxisAlignment.center,
-      //         children: [
-      //           const Text('Home'),
-      //           const SizedBox(
-      //             height: 50,
-      //             width: double.infinity,
-      //           ),
-      //           Switch(
-      //             value: state.user.acceptedTerms,
-      //             activeColor: Colors.red,
-      //             onChanged: (value) {
-      //               context.read<UserBloc>().add(
-      //                     UpdateUser(
-      //                       user: state.user.copyWith(
-      //                         acceptedTerms: value,
-      //                       ),
-      //                     ),
-      //                   );
-      //             },
-      //           ),
-      //           const SizedBox(
-      //             height: 50,
-      //             width: double.infinity,
-      //           ),
-      //           TextButton(
-      //             onPressed: () {
-      //               context.read<AuthBloc>().add(
-      //                     SignOut(),
-      //                   );
-      //             },
-      //             child: const Text('Sign Out'),
-      //           ),
-      //         ],
-      //       );
-      //     }
-      //     if (state.userStatus == UserStatus.error) {
-      //       return const Center(
-      //         child: Text('There was an error.'),
-      //       );
-      //     } else {
-      //       return const Center(
-      //         child: Text('Something went wrong.'),
-      //       );
-      //     }
-      //   },
-      // ),
     );
   }
 }

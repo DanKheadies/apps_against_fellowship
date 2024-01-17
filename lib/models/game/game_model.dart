@@ -26,8 +26,8 @@ extension GameStatusExt on GameStatus {
 }
 
 class Game extends Equatable {
-  static const _prizesToWin = 7;
-  static const _playerLimit = 30;
+  static const initPrizesToWin = 7;
+  static const initPlayerLimit = 30;
 
   final bool draw2Pick3Enabled;
   final bool pick2Enabled;
@@ -52,8 +52,8 @@ class Game extends Equatable {
     this.draw2Pick3Enabled = true,
     this.judgeRotation,
     this.pick2Enabled = true,
-    this.playerLimit = _playerLimit,
-    this.prizesToWin = _prizesToWin,
+    this.playerLimit = initPlayerLimit,
+    this.prizesToWin = initPrizesToWin,
     this.round = 1,
     this.turn,
     this.winner,
@@ -130,8 +130,8 @@ class Game extends Equatable {
       judgeRotation: judgeRotationList,
       ownerId: json['ownerId'] ?? '',
       pick2Enabled: json['pick2Enabled'] ?? true,
-      playerLimit: json['playerLimit'] ?? _playerLimit,
-      prizesToWin: json['prizesToWin'] ?? _prizesToWin,
+      playerLimit: json['playerLimit'] ?? initPlayerLimit,
+      prizesToWin: json['prizesToWin'] ?? initPrizesToWin,
       round: json['round'] ?? 1,
       turn: json['turn'] ?? Turn.emptyTurn,
       winner: json['winner'] ?? '',
@@ -171,8 +171,8 @@ class Game extends Equatable {
     id: '',
     ownerId: '',
     pick2Enabled: true,
-    playerLimit: _playerLimit,
-    prizesToWin: _prizesToWin,
+    playerLimit: initPlayerLimit,
+    prizesToWin: initPrizesToWin,
     round: 1,
   );
 }

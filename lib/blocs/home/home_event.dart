@@ -22,10 +22,10 @@ class JoinedGamesUpdated extends HomeEvent {
       ];
 }
 
-class UserUpdated extends HomeEvent {
+class UserUpdatedViaHome extends HomeEvent {
   final User user;
 
-  const UserUpdated({
+  const UserUpdatedViaHome({
     required this.user,
   });
 

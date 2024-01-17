@@ -57,27 +57,27 @@ const aafText = TextTheme(
   //   // lineHeight: 20,
   // ),
   // // heading small
-  // titleMedium: TextStyle(
-  //   color: neutral100,
-  //   fontFamily: 'Inter',
-  //   fontSize: 14,
-  //   fontWeight: FontWeight.w600,
-  //   // lineHeight: 18,
-  // ),
+  titleMedium: TextStyle(
+    // color: neutral100,
+    // fontFamily: 'Inter',
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    // lineHeight: 18,
+  ),
   // // heading xsmall
-  // titleSmall: TextStyle(
-  //   color: neutral100,
-  //   fontFamily: 'Inter',
-  //   fontSize: 12,
-  //   // lineHeight: 16,
-  // ),
+  titleSmall: TextStyle(
+    // color: neutral100,
+    // fontFamily: 'Inter',
+    fontSize: 12,
+    // lineHeight: 16,
+  ),
   // // paragraph large
-  // bodyLarge: TextStyle(
-  //   color: neutral100,
-  //   fontFamily: 'Inter',
-  //   fontSize: 16,
-  //   // lineHeight: 20,
-  // ),
+  bodyLarge: TextStyle(
+    // color: neutral100,
+    // fontFamily: 'Inter',
+    fontSize: 16,
+    // lineHeight: 20,
+  ),
   // // paragraph medium
   // bodyMedium: TextStyle(
   //   color: neutral100,
@@ -122,6 +122,9 @@ ThemeData lightTheme() {
       // surfaceVariant: pcNeutral300,
       // surfaceTint: pcNeutral200,
       surface: surface,
+      onSurface: Colors.white, // colorOnCard
+      onSurfaceVariant: Colors.white54, // secondaryColorOnCard
+      surfaceVariant: Colors.white38, // tertiaryColorOnCard
     ),
     appBarTheme: const AppBarTheme(
       color: surfaceDark,
@@ -129,6 +132,8 @@ ThemeData lightTheme() {
     bottomAppBarTheme: const BottomAppBarTheme(
       color: surfaceDark,
     ),
+    // cardColor: Colors.white,
+    cardColor: Colors.grey[700],
     iconTheme: const IconThemeData(
       color: Colors.white,
     ),
@@ -156,6 +161,9 @@ ThemeData darkTheme() {
       error: error,
       background: Colors.grey[700],
       surface: surface,
+      onSurface: Colors.black87,
+      onSurfaceVariant: Colors.black38,
+      surfaceVariant: Colors.black26,
     ),
     appBarTheme: const AppBarTheme(
       color: surface,
@@ -163,6 +171,7 @@ ThemeData darkTheme() {
     bottomAppBarTheme: const BottomAppBarTheme(
       color: surface,
     ),
+    cardColor: Colors.grey[700],
     snackBarTheme: SnackBarThemeData(
       actionTextColor: primary,
       backgroundColor: surfaceDark,

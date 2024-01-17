@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/config/config.dart';
 import 'package:apps_against_fellowship/firebase_options.dart';
+import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 // import 'package:apps_against_fellowship/simple_bloc_observer.dart';
 
@@ -85,6 +86,11 @@ class MyApp extends StatelessWidget {
               authRepository: context.read<AuthRepository>(),
               userBloc: context.read<UserBloc>(),
               userRepository: context.read<UserRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => GameBloc(
+              initialGame: Game.emptyGame,
             ),
           ),
           BlocProvider(

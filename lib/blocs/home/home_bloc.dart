@@ -25,7 +25,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         super(HomeState.loading()) {
     on<HomeStarted>(_onHomeStarted);
     on<JoinedGamesUpdated>(_onJoinedGamesUpdated);
-    on<UserUpdated>(_onUserUpdated);
+    on<UserUpdatedViaHome>(_onUserUpdatedViaHome);
     on<LeaveGame>(_onLeaveGame);
     on<JoinGame>(_onJoinGame);
 
@@ -60,8 +60,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
   }
 
-  void _onUserUpdated(
-    UserUpdated event,
+  void _onUserUpdatedViaHome(
+    UserUpdatedViaHome event,
     Emitter<HomeState> emit,
   ) {
     emit(
