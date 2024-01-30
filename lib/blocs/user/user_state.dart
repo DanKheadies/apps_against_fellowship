@@ -5,6 +5,7 @@ enum UserStatus {
   initial,
   loaded,
   loading,
+  photoUpload,
 }
 
 class UserState extends Equatable {

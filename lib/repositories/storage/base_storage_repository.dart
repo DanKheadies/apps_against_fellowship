@@ -8,10 +8,12 @@ abstract class BaseStorageRepository {
     required String imageName,
     required String bucket,
   });
-  Future<void> uploadImage({
+  Future<String> uploadImage({
     required User user,
     required Uint8List bytes,
     required String imageName,
-    required String bucket,
+  });
+  Future<void> removeProfileImage({
+    required String url,
   });
 }

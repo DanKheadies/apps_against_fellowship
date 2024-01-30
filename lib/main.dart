@@ -78,6 +78,7 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) => UserBloc(
+              storageRepository: context.read<StorageRepository>(),
               userRepository: context.read<UserRepository>(),
             ),
           ),

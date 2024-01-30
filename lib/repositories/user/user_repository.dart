@@ -25,6 +25,32 @@ class UserRepository extends BaseUserRepository {
   }
 
   @override
+  Future<String> updateUserPicture({
+    required String imageName,
+    required String bucket,
+    required User user,
+  }) async {
+    print('update user picture');
+    String downloadUrl = await StorageRepository().getDatabaseUrl(
+      bucket: bucket,
+      imageName: imageName,
+      user: user,
+    );
+    print('succes?');
+
+    try {
+      await _firebaseFirestore.collection('users').doc(user.id).update({
+        'avatarUrl': downloadUrl,
+      });
+
+      return downloadUrl;
+    } catch (err) {
+      print('err updating user picture: $err');
+      throw Exception(err);
+    }
+  }
+
+  @override
   Future<User> getUser({
     required String userId,
   }) async {
@@ -70,24 +96,6 @@ class UserRepository extends BaseUserRepository {
         .set(user.toJson(
           isFirebase: true,
         ));
-  }
-
-  @override
-  Future<void> updateUserPicture({
-    required String imageName,
-    required String bucket,
-    required User user,
-  }) async {
-    String downloadUrl = await StorageRepository().getDatabaseUrl(
-      bucket: bucket,
-      imageName: imageName,
-      user: user,
-    );
-
-    return _firebaseFirestore.collection('users').doc(user.id).update({
-      // 'photoUrl': FieldValue.arrayUnion([downloadUrl]),
-      'avatarUrl': downloadUrl,
-    });
   }
 
   // @override

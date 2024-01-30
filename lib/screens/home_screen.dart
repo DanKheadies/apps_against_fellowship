@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:go_router/go_router.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 // import 'package:apps_against_fellowship/config/config.dart';
@@ -76,22 +76,23 @@ class HomeScreen extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(
                   bottom: 10,
-                  top: 50,
+                  top: 60,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
+                      width: double.infinity,
                       margin: const EdgeInsets.only(
                         left: 24,
                         right: 24,
                       ),
                       child: Text(
                         // TODO: convert for internationalization
-                        'Apps Against\nFellowship',
+                        'Apps Against Fellowship',
                         style:
                             Theme.of(context).textTheme.headlineLarge!.copyWith(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.surface,
                                 ),
                       ),
                     ),
@@ -108,17 +109,11 @@ class HomeScreen extends StatelessWidget {
                         runSpacing: 16,
                         children: [
                           const SettingsWidget(),
-                          UserWidget(
-                            state: state,
-                            onTap: () {
-                              // Analytics > action profile
-                              context.goNamed('profile');
-                            },
-                          ),
+                          const UserWidget(),
                           HomeOutlineButton(
                             icon: Icon(
                               Icons.gamepad,
-                              color: Theme.of(context).colorScheme.onPrimary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             text: 'New Game',
                             onTap: state.joiningGame == ''
@@ -149,7 +144,8 @@ class HomeScreen extends StatelessWidget {
                                   .textTheme
                                   .displayMedium!
                                   .copyWith(
-                                    color: Colors.white70,
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
                                     fontSize: 24,
                                   ),
                             ),
@@ -160,9 +156,10 @@ class HomeScreen extends StatelessWidget {
                             margin: const EdgeInsets.only(
                               left: 16,
                             ),
-                            child: const Divider(
+                            child: Divider(
                               height: 1,
-                              color: Colors.white12,
+                              // color: Colors.white12,
+                              color: Theme.of(context).colorScheme.surface,
                             ),
                           )
                         : const SizedBox(),
@@ -185,15 +182,15 @@ class HomeScreen extends StatelessWidget {
                             ),
                           )
                         : const SizedBox(),
-                    const SizedBox(height: 50),
-                    TextButton(
-                      onPressed: () {
-                        context.read<AuthBloc>().add(
-                              SignOut(),
-                            );
-                      },
-                      child: const Text('Sign Out'),
-                    ),
+                    // const SizedBox(height: 50),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     context.read<AuthBloc>().add(
+                    //           SignOut(),
+                    //         );
+                    //   },
+                    //   child: const Text('Sign Out'),
+                    // ),
                   ],
                 ),
               );

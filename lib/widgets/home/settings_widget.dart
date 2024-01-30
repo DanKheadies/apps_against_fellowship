@@ -11,7 +11,7 @@ class SettingsWidget extends StatelessWidget {
     return HomeOutlineButton(
       icon: Icon(
         Icons.settings,
-        color: Theme.of(context).colorScheme.onPrimary,
+        color: Theme.of(context).colorScheme.primary,
       ),
       text: 'Settings',
       onTap: () {

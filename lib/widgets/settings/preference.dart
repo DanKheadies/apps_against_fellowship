@@ -26,8 +26,7 @@ class Preference extends StatelessWidget {
       title: Text(
         title,
         style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              color:
-                  titleColor ?? Theme.of(context).colorScheme.onSurfaceVariant,
+              color: titleColor ?? Theme.of(context).colorScheme.primary,
               fontWeight: titleWeight ?? FontWeight.normal,
             ),
       ),
@@ -35,7 +34,7 @@ class Preference extends StatelessWidget {
           ? Text(
               subtitle!,
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    color: Theme.of(context).colorScheme.surface,
                   ),
             )
           : null,

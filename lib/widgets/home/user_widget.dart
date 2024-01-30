@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:go_router/go_router.dart';
 
 class UserWidget extends StatelessWidget {
-  final HomeState state;
-  final VoidCallback onTap;
+  const UserWidget({super.key});
 
-  const UserWidget({
-    super.key,
-    required this.onTap,
-    required this.state,
-  });
-
-  Widget buildErrorIcon() {
-    return const SizedBox(
+  Widget buildErrorIcon(BuildContext context) {
+    return SizedBox(
       width: 24,
       height: 24,
       child: CircleAvatar(
-        backgroundColor: Colors.redAccent,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         radius: 12,
         child: Icon(
           Icons.no_accounts_outlined,
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           size: 20,
         ),
       ),
@@ -33,11 +28,16 @@ class UserWidget extends StatelessWidget {
     return const SizedBox(
       width: 24,
       height: 24,
-      child: CircularProgressIndicator(),
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 
-  Widget buildUserIcon(BuildContext context) {
+  Widget buildUserIcon(
+    BuildContext context,
+    UserState state,
+  ) {
     return SizedBox(
       width: 24,
       height: 24,
@@ -53,19 +53,30 @@ class UserWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HomeOutlineButton(
-      icon: state.isLoading
-          ? buildLoadingIcon()
-          : state.error != ''
-              ? buildErrorIcon()
-              : buildUserIcon(context),
-      text: state.isLoading
-          ? 'Loading...'
-          : state.error != ''
-              ? 'Uh oh!'
-              : state.user.name,
-      textColor: Colors.white,
-      onTap: onTap,
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (context, state) {
+        if (state.userStatus == UserStatus.initial ||
+            state.userStatus == UserStatus.loading) {
+          return HomeOutlineButton(
+            icon: buildLoadingIcon(),
+            text: 'Loading...',
+          );
+        }
+        if (state.userStatus == UserStatus.loaded) {
+          return HomeOutlineButton(
+            icon: buildUserIcon(context, state),
+            text: state.user.name != '' ? state.user.name : 'You',
+            onTap: () {
+              context.goNamed('profile');
+            },
+          );
+        } else {
+          return HomeOutlineButton(
+            icon: buildErrorIcon(context),
+            text: 'Uh oh!',
+          );
+        }
+      },
     );
   }
 }

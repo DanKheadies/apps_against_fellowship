@@ -97,19 +97,24 @@ class User extends Equatable {
         ? (data['updatedAt'] as Timestamp).toDate()
         : DateTime.now();
 
-    return User.fromJson(data).copyWith(
-      id: snap.id,
-      updatedAt: updatedTime,
-    );
-
-    // return User(
-    //   acceptedTerms: data['acceptedTerms'] ?? false,
-    //   avatarUrl: data['avatarUrl'] ?? '',
+    // return User.fromJson(data).copyWith(
     //   id: snap.id,
-    //   isDarkTheme: data['isDarkTheme'] ?? false,
-    //   name: data['name'] ?? '',
     //   updatedAt: updatedTime,
     // );
+
+    return User(
+      acceptedTerms: data['acceptedTerms'] ?? false,
+      avatarUrl: data['avatarUrl'] ?? '',
+      developerPackEnabled: data['developerPackEnabled'] ?? false,
+      deviceId: data['deviceId'] ?? '',
+      id: snap.id,
+      isDarkTheme: data['isDarkTheme'] ?? false,
+      name: data['name'] ?? '',
+      playerLimit: data['playerLimit'] ?? 0,
+      prizesToWin: data['prizesToWin'] ?? 0,
+      pushToken: data['pushToken'] ?? '',
+      updatedAt: updatedTime,
+    );
   }
 
   Map<String, dynamic> toJson({

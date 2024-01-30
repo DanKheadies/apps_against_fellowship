@@ -16,18 +16,17 @@ class UserPreference extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
-        // print('user state: $state');
         return ListTile(
           title: Text(
-            state.user.name != '' ? state.user.name : 'Loading...',
+            state.user.name != '' ? state.user.name : 'You',
             style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
           ),
           onTap: onTap != null ? () => onTap!(state.user) : null,
           leading: CircleAvatar(
             backgroundColor: state.user.avatarUrl != ''
-                ? Colors.black12
+                ? Theme.of(context).cardColor
                 : Theme.of(context).colorScheme.primary,
             backgroundImage: state.user.avatarUrl != ''
                 ? NetworkImage(state.user.avatarUrl)
@@ -35,9 +34,9 @@ class UserPreference extends StatelessWidget {
             radius: 20,
             child: state.user.avatarUrl != ''
                 ? null
-                : const Icon(
+                : Icon(
                     Icons.person,
-                    color: Colors.black87,
+                    color: Theme.of(context).colorScheme.background,
                   ),
           ),
         );

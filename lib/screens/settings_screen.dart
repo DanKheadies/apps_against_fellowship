@@ -38,6 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             content: Text(
               'Are you sure you want to delete your account? This is permenant and cannot be undone.',
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -61,6 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 onPressed: () {
+                  // TODO: actually delete the account (Auth, Firebase, & Storage)
                   Navigator.of(context).pop(true);
                 },
               ),
@@ -73,10 +75,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       // Analytics > setting - delete account
       try {
         // await authRepository.deleteAccount();
+
         authBloc.add(
           SignOut(),
         );
-        // TODO: verify that ScreenWrapper navigates
       } catch (err) {
         print('settings delete err: $err');
         if (err is PlatformException) {
@@ -86,7 +88,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           //   email: email,
           //   password: password,
           // );
+
           // await authRepository.deleteAccount();
+
           authBloc.add(
             SignOut(),
           );
@@ -99,11 +103,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> signOut(BuildContext context) async {
     var authBloc = context.read<AuthBloc>();
     var authRepository = context.read<AuthRepository>();
+
     await authRepository.signOut();
+
     authBloc.add(
       SignOut(),
     );
-    // TODO: verify that ScreenWrapper navigates
   }
 
   @override
@@ -111,7 +116,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ScreenWrapper(
       screen: 'Settings',
       // hideAppBar: true,
-      goBack: 'home',
+      goBackTo: 'home',
       child: ListView(
         children: [
           PreferenceCategory(
@@ -124,10 +129,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               Preference(
+                title: 'Theme',
+                subtitle: context.read<UserBloc>().state.user.isDarkTheme
+                    ? 'Dark'
+                    : 'Light',
+                icon: Icon(
+                  context.read<UserBloc>().state.user.isDarkTheme
+                      ? Icons.dark_mode
+                      : Icons.light_mode,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                onTap: () => context.read<UserBloc>().add(
+                      const UpdateTheme(
+                        updateFirebase: true,
+                      ),
+                    ),
+              ),
+              Preference(
                 title: 'Sign Out',
                 icon: Icon(
                   Icons.logout,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () => signOut(context),
               ),
@@ -150,7 +172,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Privacy Policy',
                 icon: Icon(
                   Icons.shield_outlined,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
                   // Analytics > settings - privacy policy
@@ -161,7 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Terms of Service',
                 icon: Icon(
                   Icons.format_align_left,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
                   // Analytics > settings - terms of service
@@ -172,7 +194,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Open Source Licenses',
                 icon: Icon(
                   Icons.source_outlined,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
                   // Analytics > settings - open source licenses
@@ -189,7 +211,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: 'Provide feedback on issues or improvements',
                 icon: Icon(
                   Icons.face,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
                   // Analytics > settings - feedback
@@ -201,7 +223,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: 'Checkout the source code on GitHub!',
                 icon: Icon(
                   Icons.code,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
                   // Analytics > settings - contribute
@@ -209,10 +231,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
               Preference(
-                title: 'Built by the Fellowship of the Apps',
+                title: 'Built by the 52inc & DTFun',
                 icon: Icon(
                   Icons.people,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
                   // Analytics > settings - author
@@ -262,8 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           title: 'Version',
                           icon: Icon(
                             Icons.developer_mode,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           subtitle: packageInfo != null
                               ? '${packageInfo.version}+${packageInfo.buildNumber}'
@@ -288,8 +309,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               'Clear out the preferences to their default state',
                           icon: Icon(
                             Icons.restore,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           onTap: () {
                             context.read<UserBloc>().add(
@@ -325,8 +345,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             state.user.developerPackEnabled
                                 ? Icons.developer_board
                                 : Icons.developer_board_off,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                         ),
                       ],
@@ -346,12 +365,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onTap: () {
                     print('TODO: go to cards against humanity');
                   },
-                  child: const SizedBox(
+                  child: SizedBox(
                     child: Text(
                       'All CAH or "Cards Against Humanity" question and answer text are licensed under Creative Commons BY-NC-SA 4.0 by the owner Cards Against Humanity, LLC. This application is NOT official, produced, endorsed or supported by Cards Against Humanity, LLC.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white60,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                     ),
                   ),

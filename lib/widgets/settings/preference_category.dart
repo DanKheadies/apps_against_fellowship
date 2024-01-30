@@ -25,7 +25,7 @@ class PreferenceCategory extends StatelessWidget {
       child: Material(
         elevation: 4,
         borderRadius: BorderRadius.circular(8),
-        color: Theme.of(context).cardColor,
+        color: Theme.of(context).colorScheme.background,
         child: Padding(
           padding: const EdgeInsets.only(
             bottom: 8,

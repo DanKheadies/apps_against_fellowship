@@ -28,8 +28,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<UserUpdatedViaHome>(_onUserUpdatedViaHome);
     on<LeaveGame>(_onLeaveGame);
     on<JoinGame>(_onJoinGame);
-
-    print('home bloc g2g');
   }
 
   void _onHomeStarted(

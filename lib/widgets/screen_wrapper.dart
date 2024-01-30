@@ -7,7 +7,7 @@ import 'package:apps_against_fellowship/blocs/blocs.dart';
 class ScreenWrapper extends StatelessWidget {
   final bool? hideAppBar;
   final List<Widget>? actions;
-  final String? goBack;
+  final String? goBackTo;
   final String screen;
   final Widget child;
 
@@ -16,7 +16,7 @@ class ScreenWrapper extends StatelessWidget {
     required this.child,
     required this.screen,
     this.actions,
-    this.goBack = '',
+    this.goBackTo = '',
     this.hideAppBar = false,
   });
 
@@ -38,25 +38,40 @@ class ScreenWrapper extends StatelessWidget {
       },
       child: Title(
         title: screen,
-        color: Colors.red,
+        color: Colors.purpleAccent,
         child: Scaffold(
           appBar: hideAppBar!
               ? null
               : AppBar(
-                  title: Text(screen),
+                  title: Text(
+                    screen,
+                    style: const TextStyle().copyWith(
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+                  ),
                   actions: actions,
-                  leading: goBack! != ''
+                  leading: goBackTo! != ''
                       ? IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.chevron_left,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           onPressed: () {
-                            context.goNamed(goBack!);
+                            context.goNamed(goBackTo!);
                           },
                         )
                       : const SizedBox(),
                 ),
-          body: child,
+          body: InkWell(
+            onLongPress: () {
+              context.read<UserBloc>().add(
+                    const UpdateTheme(
+                      updateFirebase: false,
+                    ),
+                  );
+            },
+            child: child, // TODO: clean up
+          ),
         ),
       ),
     );

@@ -6,6 +6,11 @@ abstract class BaseUserRepository {
   Future<String> getPhotoUrl({
     required String userId,
   });
+  Future<String> updateUserPicture({
+    required String imageName,
+    required String bucket,
+    required User user,
+  });
   Future<User> getUser({
     required String userId,
   });
@@ -13,11 +18,6 @@ abstract class BaseUserRepository {
     required User user,
   });
   Future<void> updateUser({
-    required User user,
-  });
-  Future<void> updateUserPicture({
-    required String imageName,
-    required String bucket,
     required User user,
   });
   // Stream<User> getUserStream({

@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 // Color neutral100 = const Color(0xFF1e1e1f);
 const primary = Color(0xFFAB47BC);
 const primaryDark = Color(0xFF790e8b);
-const primaryVariant = Color(0xFFdf78ef);
+const primaryLight = Color(0xFFdf78ef);
+// const primaryVariant = Color(0xFFdf78ef);
+
 const colorOnPrimary = Color(0xFFFFFFFF);
 const colorOnPrimaryVariant = Color(0xDD000000);
 
@@ -23,160 +25,111 @@ const error = Color(0xFFFF5252);
 const addPhotoBackground = Color(0xFF666666);
 const addPhotoForeground = Colors.white70;
 
-const aafText = TextTheme(
-  // heading xxlarge
-  headlineLarge: TextStyle(
-    color: surface,
-    // fontFamily: 'Inter',
-    fontSize: 48,
-    fontWeight: FontWeight.bold,
-    // lineHeight: 48,
-  ),
-  // // heading xlarge
-  // headlineMedium: TextStyle(
-  //   color: neutral100,
-  //   fontFamily: 'Inter',
-  //   fontSize: 28,
-  //   fontWeight: FontWeight.w600,
-  //   // lineHeight: 36,
-  // ),
-  // // heading large
-  // headlineSmall: TextStyle(
-  //   color: neutral100,
-  //   fontFamily: 'Inter',
-  //   fontSize: 20,
-  //   fontWeight: FontWeight.w600,
-  //   // lineHeight: 24,
-  // ),
-  // // heading medium
-  // titleLarge: TextStyle(
-  //   color: neutral100,
-  //   fontFamily: 'Inter',
-  //   fontSize: 16,
-  //   fontWeight: FontWeight.w600,
-  //   // lineHeight: 20,
-  // ),
-  // // heading small
-  titleMedium: TextStyle(
-    // color: neutral100,
-    // fontFamily: 'Inter',
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    // lineHeight: 18,
-  ),
-  // // heading xsmall
-  titleSmall: TextStyle(
-    // color: neutral100,
-    // fontFamily: 'Inter',
-    fontSize: 12,
-    // lineHeight: 16,
-  ),
-  // // paragraph large
-  bodyLarge: TextStyle(
-    // color: neutral100,
-    // fontFamily: 'Inter',
-    fontSize: 16,
-    // lineHeight: 20,
-  ),
-  // // paragraph medium
-  // bodyMedium: TextStyle(
-  //   color: neutral100,
-  //   fontFamily: 'Inter',
-  //   fontSize: 14,
-  //   // lineHeight: 18,
-  // ),
-  // // paragraph small
-  // bodySmall: TextStyle(
-  //   color: neutral100,
-  //   fontFamily: 'Inter',
-  //   fontSize: 12,
-  //   // lineHeight: 16,
-  // ),
-);
+const black = Color(0xFF3C3C3C);
+const blackNight = Color(0xFF303030);
+const blackUltimate = Color(0xFF000000);
+
+const white = Color(0xFFF2F2F2);
+const whiteBright = Color(0xFFFCFCFC);
+const whiteUltimate = Color(0xFFFFFFFF);
 
 ThemeData lightTheme() {
   return ThemeData.light().copyWith(
-    scaffoldBackgroundColor: surface,
+    appBarTheme: const AppBarTheme(
+      actionsIconTheme: IconThemeData(
+        color: primary,
+      ),
+      backgroundColor: white,
+    ),
+    bottomAppBarTheme: const BottomAppBarTheme(
+      color: white,
+    ),
+    canvasColor: white,
+    cardColor: whiteBright,
     colorScheme: const ColorScheme.light().copyWith(
       brightness: Brightness.light,
       primary: primary,
-      onPrimary: primaryVariant,
-      primaryContainer: primaryDark,
-      // onPrimaryContainer: pcPrimaryLight,
-      secondary: primary,
-      // onSecondary: pcSecondaryVeryLight,
-      // secondaryContainer: pcSecondaryDark,
-      // onSecondaryContainer: pcSecondaryLight,
-      tertiary: Colors.white38,
-      tertiaryContainer: Colors.white70,
-      onTertiary: Colors.grey[700],
-      // onTertiaryContainer: pcInfoVeryLight,
+      onPrimary: primaryDark,
+      primaryContainer: primaryLight,
       error: error,
-      // errorContainer: pcErrorVeryLight,
-      // onError: pcWarningBase,
-      // onErrorContainer: pcWarningVeryLight,
-      background: Colors.white,
-      // onBackground: pcNeutral600,
-      // onSurfaceVariant: pcNeutral500,
-      // onSurface: pcNeutral400,
-      // surfaceVariant: pcNeutral300,
-      // surfaceTint: pcNeutral200,
-      surface: surface,
-      onSurface: Colors.white, // colorOnCard
-      onSurfaceVariant: Colors.white54, // secondaryColorOnCard
-      surfaceVariant: Colors.white38, // tertiaryColorOnCard
+      background: white,
+      onBackground: whiteBright,
+      surface: black,
+      onSurface: blackNight,
     ),
-    appBarTheme: const AppBarTheme(
-      color: surfaceDark,
-    ),
-    bottomAppBarTheme: const BottomAppBarTheme(
-      color: surfaceDark,
-    ),
-    // cardColor: Colors.white,
-    cardColor: Colors.grey[700],
     iconTheme: const IconThemeData(
-      color: Colors.white,
+      color: primary,
     ),
+    primaryColor: primary,
+    scaffoldBackgroundColor: whiteBright,
     snackBarTheme: SnackBarThemeData(
       actionTextColor: primary,
-      backgroundColor: surfaceLight,
-      contentTextStyle: aafText.titleMedium,
-      disabledActionTextColor: Colors.white30,
+      backgroundColor: blackUltimate,
+      contentTextStyle: Typography.material2018(platform: defaultTargetPlatform)
+          .englishLike
+          .titleMedium,
     ),
-    textTheme: aafText,
+    textTheme: Typography.material2018(platform: defaultTargetPlatform).white,
   );
 }
 
 ThemeData darkTheme() {
   return ThemeData.dark().copyWith(
-    colorScheme: const ColorScheme.dark().copyWith(
-      brightness: Brightness.dark,
-      primary: primaryVariant,
-      onPrimary: primaryDark,
-      primaryContainer: primaryVariant,
-      secondary: primaryVariant,
-      tertiary: Colors.white38,
-      tertiaryContainer: Colors.white70,
-      onTertiary: Colors.grey[700],
-      error: error,
-      background: Colors.grey[700],
-      surface: surface,
-      onSurface: Colors.black87,
-      onSurfaceVariant: Colors.black38,
-      surfaceVariant: Colors.black26,
-    ),
     appBarTheme: const AppBarTheme(
-      color: surface,
+      actionsIconTheme: IconThemeData(
+        color: primaryLight,
+      ),
+      backgroundColor: black,
     ),
     bottomAppBarTheme: const BottomAppBarTheme(
-      color: surface,
+      color: black,
     ),
-    cardColor: Colors.grey[700],
+    canvasColor: black,
+    cardColor: blackNight,
+    colorScheme: const ColorScheme.dark().copyWith(
+      brightness: Brightness.dark,
+      primary: primaryLight,
+      onPrimary: primary,
+      primaryContainer: primaryDark,
+      error: error,
+      background: black,
+      onBackground: blackNight,
+      surface: white,
+      onSurface: whiteBright,
+    ),
+    iconTheme: const IconThemeData(
+      color: primaryLight,
+    ),
+    primaryColor: primaryLight,
+    scaffoldBackgroundColor: blackNight,
     snackBarTheme: SnackBarThemeData(
-      actionTextColor: primary,
-      backgroundColor: surfaceDark,
-      contentTextStyle: aafText.titleMedium,
-      disabledActionTextColor: Colors.white30,
+      actionTextColor: primaryLight,
+      backgroundColor: whiteUltimate,
+      contentTextStyle: Typography.material2018(platform: defaultTargetPlatform)
+          .englishLike
+          .titleMedium,
     ),
+    textTheme: Typography.material2018(platform: defaultTargetPlatform).black,
   );
+}
+
+extension TextAppearanceExt on BuildContext {
+  TextStyle cardTextStyle(Color textColor) {
+    final base = Theme.of(this).textTheme.headlineSmall;
+    final screenWidth = MediaQuery.of(this).size.width;
+
+    double? fontSize = base!.fontSize;
+    if (screenWidth > 360 && screenWidth <= 400) {
+      fontSize = 20.0; // headline6
+    } else if (screenWidth > 300 && screenWidth <= 360) {
+      fontSize = 18.0; // subtitle1
+    } else if (screenWidth <= 300) {
+      fontSize = 16.0;
+    }
+
+    return base.copyWith(
+      color: textColor,
+      fontSize: fontSize,
+    );
+  }
 }
