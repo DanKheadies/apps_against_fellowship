@@ -16,7 +16,7 @@ class ClearSubmitting extends GameEvent {}
 class DownvotePrompt extends GameEvent {}
 
 class DownvotesUpdated extends GameEvent {
-  final List<Player> downvotes;
+  final List<String> downvotes;
 
   const DownvotesUpdated({
     required this.downvotes,

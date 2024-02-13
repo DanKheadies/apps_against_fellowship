@@ -36,6 +36,23 @@ final GoRouter goRouter = GoRouter(
       ),
     ),
     GoRoute(
+      path: '/game',
+      name: 'game',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const CreateGameScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      ),
+      redirect: (context, state) => newRedirect(
+        context,
+        state,
+      ),
+    ),
+    GoRoute(
       path: '/home',
       name: 'home',
       pageBuilder: (context, state) => CustomTransitionPage(
@@ -70,11 +87,11 @@ final GoRouter goRouter = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/signIn',
-      name: 'signIn',
+      path: '/settings',
+      name: 'settings',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: const SignInScreen(),
+        child: const SettingsScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(
           opacity: animation,
@@ -87,11 +104,11 @@ final GoRouter goRouter = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/settings',
-      name: 'settings',
+      path: '/signIn',
+      name: 'signIn',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: const SettingsScreen(),
+        child: const SignInScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(
           opacity: animation,

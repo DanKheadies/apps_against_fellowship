@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
@@ -21,6 +22,7 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
         _userRepository = userRepository,
         super(const UserState()) {
     on<ClearUser>(_onClearUser);
+    on<CreateDeviceId>(_onCreateDeviceId);
     on<DeleteProfilePhoto>(_onDeleteProfilePhoto);
     on<UpdateTheme>(_onUpdateTheme);
     on<UpdateUser>(_onUpdateUser);
@@ -35,6 +37,20 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
       state.copyWith(
         user: User.emptyUser,
         userStatus: UserStatus.initial,
+      ),
+    );
+  }
+
+  void _onCreateDeviceId(
+    CreateDeviceId event,
+    Emitter<UserState> emit,
+  ) {
+    // TODO: update firebase (?)
+    emit(
+      state.copyWith(
+        user: state.user.copyWith(
+          deviceId: const Uuid().v4(),
+        ),
       ),
     );
   }

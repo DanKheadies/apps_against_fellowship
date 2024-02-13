@@ -146,6 +146,12 @@ class Game extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
+    // TODO: is this the right route for a complex list (?); List<CustomModel>
+    // var judgeRotationList = [];
+    // for (var judgePos in judgeRotation!) {
+    //   judgeRotationList.add(judgePos.toJson());
+    // }
+
     return {
       'cardSets': cardSets,
       'draw2Pick3Enabled': draw2Pick3Enabled,

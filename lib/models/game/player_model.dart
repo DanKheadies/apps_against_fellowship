@@ -96,14 +96,29 @@ class Player extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
+    // TODO: is this the right route for a complex list (?); List<CustomModel>
+    var handList = [];
+    var prizesList = [];
+
+    if (hand != null) {
+      for (var card in hand!) {
+        handList.add(card.toJson());
+      }
+    }
+    if (prizes != null) {
+      for (var card in prizes!) {
+        prizesList.add(card.toJson());
+      }
+    }
+
     return {
       'avatarUrl': avatarUrl,
-      'hand': hand,
+      'hand': handList,
       'id': id,
       'isInactive': isInactive,
       'isRandoCardrissian': isRandoCardrissian,
       'name': name,
-      'prizes': prizes,
+      'prizes': prizesList,
     };
   }
 

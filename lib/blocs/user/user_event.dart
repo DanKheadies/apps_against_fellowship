@@ -9,6 +9,8 @@ abstract class UserEvent extends Equatable {
 
 class ClearUser extends UserEvent {}
 
+class CreateDeviceId extends UserEvent {}
+
 class DeleteProfilePhoto extends UserEvent {}
 
 class UpdateTheme extends UserEvent {

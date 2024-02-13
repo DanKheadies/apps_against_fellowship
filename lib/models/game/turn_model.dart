@@ -58,6 +58,8 @@ class Turn extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
+    // TODO: the right route for a map like responses
+
     return {
       'judgeId': judgeId,
       'promptCard': promptCard.toJson(),

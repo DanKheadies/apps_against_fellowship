@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class CardSet extends Equatable {
-  final int prompt;
+  final int prompts;
   final int responses;
   final String id;
   final String name;
@@ -10,7 +10,7 @@ class CardSet extends Equatable {
   const CardSet({
     required this.id,
     required this.name,
-    required this.prompt,
+    required this.prompts,
     required this.responses,
     required this.source,
   });
@@ -19,13 +19,13 @@ class CardSet extends Equatable {
   List<Object> get props => [
         id,
         name,
-        prompt,
+        prompts,
         responses,
         source,
       ];
 
   CardSet copyWith({
-    int? prompt,
+    int? prompts,
     int? responses,
     String? id,
     String? name,
@@ -34,7 +34,7 @@ class CardSet extends Equatable {
     return CardSet(
       id: id ?? this.id,
       name: name ?? this.name,
-      prompt: prompt ?? this.prompt,
+      prompts: prompts ?? this.prompts,
       responses: responses ?? this.responses,
       source: source ?? this.source,
     );
@@ -44,7 +44,7 @@ class CardSet extends Equatable {
     return CardSet(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
-      prompt: json['prompt'] ?? 0,
+      prompts: json['prompts'] ?? 0,
       responses: json['responses'] ?? 0,
       source: json['source'] ?? '',
     );
@@ -56,7 +56,7 @@ class CardSet extends Equatable {
     return {
       'id': id,
       'name': name,
-      'prompt': prompt,
+      'prompts': prompts,
       'responses': responses,
       'source': source,
     };
@@ -65,7 +65,7 @@ class CardSet extends Equatable {
   static const emptyCardSet = CardSet(
     id: '',
     name: '',
-    prompt: 0,
+    prompts: 0,
     responses: 0,
     source: '',
   );

@@ -1,4 +1,4 @@
-export 'create_game_screen.dart';
+export 'game/screens.dart';
 export 'error_screen.dart';
 export 'home_screen.dart';
 export 'profile_screen.dart';

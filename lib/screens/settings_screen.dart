@@ -382,14 +382,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: GestureDetector(
                     onTap: () {
                       print('TODO: go to CC');
+                      // https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
                     },
-                    // child: Image.asset(
-                    //   'cc.png',
-                    //   width: 96,
-                    // ),
-                    child: const Icon(
-                      Icons.copyright,
+                    child: Image.asset(
+                      'assets/cc_by_nc_sa.png',
+                      width: 96,
                     ),
+                    // child: const Icon(
+                    //   Icons.copyright,
+                    // ),
                   ),
                 ),
               ],

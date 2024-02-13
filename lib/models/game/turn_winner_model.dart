@@ -110,14 +110,22 @@ class TurnWinner extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
+    // TODO: the right route for a map like responses
+    // TODO: is this the right route for a complex list (?); List<CustomModel>
+    var responseList = [];
+
+    for (var card in response) {
+      responseList.add(card.toJson());
+    }
+
     return {
       'isRandoCardrissian': isRandoCardrissian,
       'playerAvatarUrl': playerAvatarUrl,
       'playerId': playerId,
       'playerName': playerName,
       'promptCard': promptCard.toJson(),
-      'response': response,
-      'responses': responses,
+      'response': responseList,
+      'responses': responses, // TODO
     };
   }
 

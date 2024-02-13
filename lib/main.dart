@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/config/config.dart';
+import 'package:apps_against_fellowship/cubits/cubits.dart';
 import 'package:apps_against_fellowship/firebase_options.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
@@ -57,57 +58,75 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider(
-          create: (context) => UserRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => StorageRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => AuthRepository(
-            userRepository: context.read<UserRepository>(),
-          ),
-        ),
-      ],
-      // TODO:
-      // 2) Themes; w/ state
-      // 3) Locales
-      child: MultiBlocProvider(
+    return BlocProvider(
+      create: (context) => CardCacheCubit(),
+      child: MultiRepositoryProvider(
         providers: [
-          BlocProvider(
-            create: (context) => UserBloc(
-              storageRepository: context.read<StorageRepository>(),
+          RepositoryProvider(
+            create: (context) => UserRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => StorageRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => GameRepository(
               userRepository: context.read<UserRepository>(),
             ),
           ),
-          BlocProvider(
-            create: (context) => AuthBloc(
-              authRepository: context.read<AuthRepository>(),
-              userBloc: context.read<UserBloc>(),
-              userRepository: context.read<UserRepository>(),
+          RepositoryProvider(
+            create: (context) => DevicesRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => CardsRepository(
+              // cardCache: context.read<CardCacheState>(),
+              cardCache: context.read<CardCacheCubit>(),
             ),
           ),
-          BlocProvider(
-            create: (context) => GameBloc(
-              initialGame: Game.emptyGame,
-            ),
-          ),
-          BlocProvider(
-            create: (context) => HomeBloc(
+          RepositoryProvider(
+            create: (context) => AuthRepository(
               userRepository: context.read<UserRepository>(),
             ),
           ),
         ],
-        child: BlocBuilder<UserBloc, UserState>(
-          builder: (context, state) {
-            return MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              routerConfig: goRouter,
-              theme: state.user.isDarkTheme ? darkTheme() : lightTheme(),
-            );
-          },
+        // TODO:
+        // 3) Locales
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => UserBloc(
+                storageRepository: context.read<StorageRepository>(),
+                userRepository: context.read<UserRepository>(),
+              ),
+            ),
+            BlocProvider(
+              create: (context) => AuthBloc(
+                authRepository: context.read<AuthRepository>(),
+                userBloc: context.read<UserBloc>(),
+                userRepository: context.read<UserRepository>(),
+              ),
+            ),
+            BlocProvider(
+              create: (context) => GameBloc(
+                authRepository: context.read<AuthRepository>(),
+                gameRepository: context.read<GameRepository>(),
+                initialGame: Game.emptyGame,
+              ),
+            ),
+            BlocProvider(
+              create: (context) => HomeBloc(
+                userRepository: context.read<UserRepository>(),
+              ),
+            ),
+          ],
+          child: BlocBuilder<UserBloc, UserState>(
+            builder: (context, state) {
+              return MaterialApp.router(
+                debugShowCheckedModeBanner: false,
+                routerConfig: goRouter,
+                theme: state.user.isDarkTheme ? darkTheme() : lightTheme(),
+              );
+            },
+          ),
         ),
       ),
     );
