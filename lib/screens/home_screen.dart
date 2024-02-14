@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:go_router/go_router.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 // import 'package:apps_against_fellowship/config/config.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
+// import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -28,9 +29,10 @@ class HomeScreen extends StatelessWidget {
       // ],
       child: BlocProvider(
         create: (context) => HomeBloc(
-          // gameRepository: context.read<GameRepository>(),
-          userRepository: context.read<UserRepository>(),
-        )..add(HomeStarted()),
+            // gameRepository: context.read<GameRepository>(),
+            // userRepository: context.read<UserRepository>(),
+            )
+          ..add(HomeStarted()),
         child: MultiBlocListener(
           listeners: [
             // Error Listener
@@ -112,7 +114,7 @@ class HomeScreen extends StatelessWidget {
                           const UserWidget(),
                           HomeOutlineButton(
                             icon: Icon(
-                              Icons.gamepad,
+                              MdiIcons.gamepad,
                               color: Theme.of(context).colorScheme.primary,
                             ),
                             text: 'New Game',

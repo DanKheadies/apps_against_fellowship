@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
@@ -76,9 +77,9 @@ class PastGame extends StatelessWidget {
         children: [
           Container(
             margin: const EdgeInsets.only(left: 16),
-            child: const Icon(
-              Icons.delete_outline,
-              color: Colors.white,
+            child: Icon(
+              MdiIcons.deleteEmpty,
+              color: Theme.of(context).colorScheme.background,
             ),
           ),
           const Expanded(
@@ -86,9 +87,9 @@ class PastGame extends StatelessWidget {
           ),
           Container(
             margin: const EdgeInsets.only(right: 16),
-            child: const Icon(
-              Icons.delete_outline,
-              color: Colors.white,
+            child: Icon(
+              MdiIcons.deleteEmpty,
+              color: Theme.of(context).colorScheme.background,
             ),
           ),
         ],

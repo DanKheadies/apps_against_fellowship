@@ -110,12 +110,13 @@ class MyApp extends StatelessWidget {
                 authRepository: context.read<AuthRepository>(),
                 gameRepository: context.read<GameRepository>(),
                 initialGame: Game.emptyGame,
+                userBloc: context.read<UserBloc>(),
               ),
             ),
             BlocProvider(
               create: (context) => HomeBloc(
-                userRepository: context.read<UserRepository>(),
-              ),
+                  // userRepository: context.read<UserRepository>(),
+                  ),
             ),
           ],
           child: BlocBuilder<UserBloc, UserState>(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
@@ -124,7 +125,7 @@ class WaitingRoomScreen extends StatelessWidget {
               FloatingActionButtonLocation.centerFloat,
           floatingActionButton: state.isOurGame
               ? FloatingActionButton.extended(
-                  icon: const Icon(Icons.play_arrow),
+                  icon: Icon(MdiIcons.play),
                   label: const Text("START GAME"),
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   onPressed: () async {
@@ -213,7 +214,7 @@ class WaitingRoomScreen extends StatelessWidget {
         backgroundImage: AssetImage("assets/rando_cardrissian.png"),
       ),
       trailing: Icon(
-        Icons.computer,
+        MdiIcons.robot,
         color: Theme.of(context).colorScheme.background,
       ),
       onTap: () async {

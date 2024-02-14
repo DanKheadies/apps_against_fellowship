@@ -13,7 +13,7 @@ part 'game_state.dart';
 
 class GameBloc extends HydratedBloc<GameEvent, GameState> {
   final AuthRepository _authRepository;
-  final Game _initialGame; // TODO
+  // final Game _initialGame; // TODO
   final GameRepository _gameRepository;
   final UserBloc _userBloc;
 
@@ -28,7 +28,7 @@ class GameBloc extends HydratedBloc<GameEvent, GameState> {
     required UserBloc userBloc,
   })  : _authRepository = authRepository,
         _gameRepository = gameRepository,
-        _initialGame = initialGame,
+        // _initialGame = initialGame,
         _userBloc = userBloc,
         super(const GameState()) {
     on<ClearError>(_onClearError);

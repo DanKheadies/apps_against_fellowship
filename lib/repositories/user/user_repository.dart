@@ -98,6 +98,10 @@ class UserRepository extends BaseUserRepository {
         ));
   }
 
+  // Stream<User> observeUser() {
+  //   return getUser()
+  // }
+
   // @override
   // Stream<User> getUserStream({
   //   required String userId,

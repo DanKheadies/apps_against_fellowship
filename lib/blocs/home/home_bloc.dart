@@ -1,27 +1,30 @@
-import 'dart:async';
+// import 'dart:async';
 
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logger/logger.dart';
 
 import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
+// import 'package:apps_against_fellowship/repositories/repositories.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   // final GameRepository _gameRepository;
-  final UserRepository _userRepository;
-  StreamSubscription? _joinedGamesSubscription;
-  StreamSubscription? _userSubscription;
+  // final UserRepository _userRepository;
+  // StreamSubscription? _joinedGamesSubscription;
+  // StreamSubscription? _userSubscription;
 
-  HomeBloc({
-    // required GameRepository gameRepository,
-    required UserRepository userRepository,
-  })  :
+  HomeBloc(
+      //   {
+      //   // required GameRepository gameRepository,
+      //   required UserRepository userRepository,
+      // }
+      )
+      :
         // _gameRepository = gameRepository,
-        _userRepository = userRepository,
+        // _userRepository = userRepository,
         super(HomeState.loading()) {
     on<HomeStarted>(_onHomeStarted);
     on<JoinedGamesUpdated>(_onJoinedGamesUpdated);
@@ -34,14 +37,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     HomeStarted event,
     Emitter<HomeState> emit,
   ) async {
+    // TODO: see if a user sub and joinedGame sub are necessary
     try {
       // _userSubscription?.cancel();
-      // _userSubscription = _userRepository.getUserStream().listen((user)) {
-      //  ... do the user stream stuff
-      //  add(
-      //    UserUpdated(user);
-      //  );
-      // }
+      // _userSubscription = _userRepository.observeUser()
     } catch (err) {
       Logger().e('Error on home start: $err');
     }

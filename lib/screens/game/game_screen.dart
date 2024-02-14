@@ -38,14 +38,14 @@ class GameScreen extends StatelessWidget {
         builder: (context, state) {
           if (state.game.gameStatus == GameStatus.waitingRoom) {
             return state.gameStateStatus == GameStateStatus.submitting
-                ? StartingRoomScreen(state)
-                : WaitingRoomScreen();
+                ? StartingRoomScreen(state: state)
+                : const WaitingRoomScreen();
           } else if (state.game.gameStatus == GameStatus.starting) {
-            return StartingRoomScreen(state);
+            return StartingRoomScreen(state: state);
           } else if (state.game.gameStatus == GameStatus.inProgress) {
-            return GamePlayScreen(state);
+            return GamePlayScreen(state: state);
           } else if (state.game.gameStatus == GameStatus.completed) {
-            return CompletedGameScreen();
+            return const CompletedGameScreen();
           } else {
             return const SizedBox();
           }

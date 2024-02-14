@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
@@ -148,7 +149,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Preference(
                 title: 'Sign Out',
                 icon: Icon(
-                  Icons.logout,
+                  // Icons.logout,
+                  MdiIcons.logout,
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () => signOut(context),
@@ -158,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 titleColor: Theme.of(context).colorScheme.error,
                 titleWeight: FontWeight.bold,
                 icon: Icon(
-                  Icons.delete_forever_outlined,
+                  MdiIcons.deleteForeverOutline,
                   color: Theme.of(context).colorScheme.error,
                 ),
                 onTap: () => deleteAccount(context),
@@ -171,7 +173,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Preference(
                 title: 'Privacy Policy',
                 icon: Icon(
-                  Icons.shield_outlined,
+                  MdiIcons.shieldSearch,
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
@@ -182,7 +184,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Preference(
                 title: 'Terms of Service',
                 icon: Icon(
-                  Icons.format_align_left,
+                  // Icons.format_align_left,
+                  MdiIcons.clipboard,
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
@@ -193,7 +196,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Preference(
                 title: 'Open Source Licenses',
                 icon: Icon(
-                  Icons.source_outlined,
+                  MdiIcons.sourceBranch,
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
@@ -210,7 +213,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Feedback',
                 subtitle: 'Provide feedback on issues or improvements',
                 icon: Icon(
-                  Icons.face,
+                  MdiIcons.faceAgent,
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
@@ -222,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Contribute',
                 subtitle: 'Checkout the source code on GitHub!',
                 icon: Icon(
-                  Icons.code,
+                  MdiIcons.github,
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 onTap: () {
@@ -283,7 +286,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         child: Preference(
                           title: 'Version',
                           icon: Icon(
-                            Icons.developer_mode,
+                            MdiIcons.application,
                             color: Theme.of(context).colorScheme.primary,
                           ),
                           subtitle: packageInfo != null
@@ -308,7 +311,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           subtitle:
                               'Clear out the preferences to their default state',
                           icon: Icon(
-                            Icons.restore,
+                            MdiIcons.restore,
                             color: Theme.of(context).colorScheme.primary,
                           ),
                           onTap: () {
@@ -326,15 +329,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           },
                         ),
                         Preference(
-                          title: "Developer packs",
-                          subtitle: "Custom card packs from the developer",
+                          title: 'Developer packs',
+                          subtitle: 'Custom card packs from the developer',
                           trailing: state.user.developerPackEnabled
                               ? const Text(
-                                  "ENABLED",
+                                  'ENABLED',
                                   style: TextStyle(color: Colors.green),
                                 )
                               : const Text(
-                                  "DISABLED",
+                                  'DISABLED',
                                   style: TextStyle(color: Colors.redAccent),
                                 ),
                           // icon: Image.asset(

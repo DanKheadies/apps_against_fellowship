@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
@@ -29,7 +30,7 @@ class JoinGameWidget extends StatelessWidget {
     return HomeOutlineButton(
       icon: state.joiningGame == ''
           ? Icon(
-              Icons.gamepad_outlined,
+              MdiIcons.gamepadVariantOutline,
               color: Theme.of(context).colorScheme.primary,
             )
           : const SizedBox(

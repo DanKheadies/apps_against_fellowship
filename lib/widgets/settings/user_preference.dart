@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
@@ -35,7 +36,7 @@ class UserPreference extends StatelessWidget {
             child: state.user.avatarUrl != ''
                 ? null
                 : Icon(
-                    Icons.person,
+                    MdiIcons.account,
                     color: Theme.of(context).colorScheme.background,
                   ),
           ),

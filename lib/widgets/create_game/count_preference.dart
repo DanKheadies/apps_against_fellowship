@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class CountPreference extends StatelessWidget {
   final int value;
@@ -33,7 +34,7 @@ class CountPreference extends StatelessWidget {
           IconButton(
             padding: const EdgeInsets.all(8),
             icon: Icon(
-              Icons.remove,
+              MdiIcons.minus,
               color: Theme.of(context).colorScheme.surface,
             ),
             onPressed: () {
@@ -59,7 +60,7 @@ class CountPreference extends StatelessWidget {
           IconButton(
             padding: const EdgeInsets.all(8),
             icon: Icon(
-              Icons.remove,
+              MdiIcons.plus,
               color: Theme.of(context).colorScheme.surface,
             ),
             onPressed: () {
