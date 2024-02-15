@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kt_dart/kt.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
@@ -40,13 +41,14 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
                       SnackBar(
-                        content: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(state.error),
-                            const Icon(Icons.error)
-                          ],
-                        ),
+                        // content: Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     Text(state.error),
+                        //     const Icon(Icons.error)
+                        //   ],
+                        // ),
+                        content: Text(state.error),
                         backgroundColor: Theme.of(context).colorScheme.error,
                       ),
                     );
@@ -78,9 +80,9 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
       builder: (context, state) {
         return DefaultTabController(
           length: 2,
-          child: Scaffold(
-            appBar: AppBar(
-              // brightness: Brightness.dark,
+          child: ScreenWrapper(
+            screen: 'Create Game',
+            customAppBar: AppBar(
               title: Text(
                 'New Game',
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
@@ -93,7 +95,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                   color: Theme.of(context).colorScheme.surface,
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  context.goNamed('home');
                 },
               ),
               bottom: TabBar(
@@ -104,10 +106,10 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                 ],
               ),
             ),
-            bottomNavigationBar: BottomAppBar(
+            customBottAppBar: BottomAppBar(
               notchMargin: 8,
               shape: const CircularNotchedRectangle(),
-              child: Container(
+              child: SizedBox(
                 height: 56,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -120,7 +122,12 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                           state.createGameStatus == CreateGameStatus.loading
                               ? "Loading..."
                               : "${state.totalPrompts} Prompts ${state.totalResponses} Responses",
-                          style: Theme.of(context).textTheme.titleLarge,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.surface,
+                              ),
                         ),
                       ),
                     ),
@@ -128,22 +135,27 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                 ),
               ),
             ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.endDocked,
-            floatingActionButton: state.selectedSets.isNotEmpty() &&
+            flactionLocation: FloatingActionButtonLocation.endDocked,
+            flaction: state.selectedSets.isNotEmpty() &&
                     state.createGameStatus != CreateGameStatus.loading
                 ? FloatingActionButton(
-                    child: const Icon(Icons.check),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.background,
+                    shape: const CircleBorder(),
                     onPressed: () async {
                       // Start game?
                       // Analytics().logSelectContent(
                       //     contentType: 'action', itemId: 'create_game');
                       // context.bloc<CreateGameBloc>().add(CreateGame());
                       print('TODO: start game');
+                      context.read<CreateGameBloc>().add(
+                            CreateGame(),
+                          );
                     },
+                    child: const Icon(Icons.check),
                   )
                 : null,
-            body: TabBarView(
+            child: TabBarView(
               children: [
                 _buildCardSetLists(state),
                 _buildGameOptions(context, state),
@@ -180,7 +192,12 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
             // Analytics().logSelectContent(
             //     contentType: 'game_option', itemId: 'prizes_to_win');
             // context.bloc<CreateGameBloc>().add(ChangePrizesToWin(value));
-            print('TODO: change prizes to win');
+            // print('TODO: change prizes to win');
+            context.read<CreateGameBloc>().add(
+                  ChangePrizesToWin(
+                    prizesToWin: value,
+                  ),
+                );
           },
         ),
         CountPreference(
@@ -193,7 +210,12 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
             // Analytics().logSelectContent(
             //     contentType: 'game_option', itemId: 'player_limit');
             // context.bloc<CreateGameBloc>().add(ChangePlayerLimit(value));
-            print('TODO: change players #');
+            // print('TODO: change players #');
+            context.read<CreateGameBloc>().add(
+                  ChangePlayerLimit(
+                    playerLimit: value,
+                  ),
+                );
           },
         ),
         SwitchListTile(
@@ -205,7 +227,12 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
             // Analytics()
             //     .logSelectContent(contentType: 'game_option', itemId: 'pick2');
             // context.bloc<CreateGameBloc>().add(ChangePick2Enabled(value));
-            print('TODO: change pick 2');
+            // print('TODO: change pick 2');
+            context.read<CreateGameBloc>().add(
+                  ChangePick2Enabled(
+                    enabled: value,
+                  ),
+                );
           },
         ),
         SwitchListTile(
@@ -217,7 +244,12 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
             // Analytics().logSelectContent(
             //     contentType: 'game_option', itemId: 'draw2_pick3');
             // context.bloc<CreateGameBloc>().add(ChangeDraw2Pick3Enabled(value));
-            print('TODO: change draw 2 pick 3');
+            // print('TODO: change draw 2 pick 3');
+            context.read<CreateGameBloc>().add(
+                  ChangeDraw2Pick3Enabled(
+                    enabled: value,
+                  ),
+                );
           },
         ),
       ],

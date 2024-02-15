@@ -31,7 +31,17 @@ class CreateGameState extends Equatable {
   });
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [
+        cardSets,
+        createdGame,
+        createGameStatus,
+        draw2pick3Enabled,
+        error,
+        pick2Enabled,
+        playerLimit,
+        prizesToWin,
+        selectedSets,
+      ];
 
   int get totalPrompts => selectedSets.sumBy((cs) => cs.prompts);
   int get totalResponses => selectedSets.sumBy((cs) => cs.responses);

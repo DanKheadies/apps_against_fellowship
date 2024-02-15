@@ -27,6 +27,8 @@ class GameRepository extends BaseGameRepository {
     bool pick2Enabled = true,
     bool draw2Pick3Enabled = true,
   }) async {
+    print('creating');
+    print(cardSets);
     var newGameDoc = _firestore.collection('games').doc();
     var game = Game(
       cardSets: cardSets.map((c) => c.id).asList().toSet(),
@@ -41,8 +43,10 @@ class GameRepository extends BaseGameRepository {
       playerLimit: playerLimit,
       prizesToWin: prizesToWin,
     );
-
+    print('newGame toJson');
     await newGameDoc.set(game.toJson());
+    print('done');
+    print(newGameDoc);
 
     // Now add yourself as a player to the game
     await _addSelfToGame(
@@ -50,7 +54,7 @@ class GameRepository extends BaseGameRepository {
       gid: user.id,
       me: user,
     );
-
+    print('g2g');
     return game;
   }
 
@@ -297,6 +301,7 @@ class GameRepository extends BaseGameRepository {
       userId: me.id,
     );
 
+    // TODO: enable firebase functions
     final HttpsCallable callable =
         FirebaseFunctions.instance.httpsCallable('joinGame');
     HttpsCallableResult response = await callable.call(<String, dynamic>{

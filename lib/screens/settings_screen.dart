@@ -388,7 +388,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
                     },
                     child: Image.asset(
-                      'assets/cc_by_nc_sa.png',
+                      'assets/images/cc_by_nc_sa.png',
                       width: 96,
                     ),
                     // child: const Icon(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-// import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/services/services.dart';
 
 class HeaderItem extends StatelessWidget {
@@ -23,7 +23,14 @@ class HeaderItem extends StatelessWidget {
         // context
         //     .bloc<CreateGameBloc>()
         //     .add(CardSourceSelected(title, isChecked));
-        print('TODO: select card source');
+        // print('TODO: select card source');
+        print('select header, isChecked: $isChecked');
+        context.read<CreateGameBloc>().add(
+              CardSourceSelected(
+                isAllChecked: isChecked,
+                source: title,
+              ),
+            );
       },
       child: Column(
         children: [
@@ -46,10 +53,16 @@ class HeaderItem extends StatelessWidget {
                     // context
                     //     .bloc<CreateGameBloc>()
                     //     .add(CardSourceSelected(title, value));
-                    print('TODO: select card source');
+                    // print('TODO: select card source');
+                    context.read<CreateGameBloc>().add(
+                          CardSourceSelected(
+                            isAllChecked: isChecked,
+                            source: title,
+                          ),
+                        );
                   },
                   activeColor: Theme.of(context).colorScheme.primary,
-                  checkColor: Theme.of(context).colorScheme.surface,
+                  checkColor: Theme.of(context).colorScheme.background,
                 ),
                 Expanded(
                   child: Container(
@@ -57,7 +70,7 @@ class HeaderItem extends StatelessWidget {
                     child: Text(
                       CahScrubber.scrub(title),
                       style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                            color: Theme.of(context).colorScheme.onPrimary,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                     ),
                   ),

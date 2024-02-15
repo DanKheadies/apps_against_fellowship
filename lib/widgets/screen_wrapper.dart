@@ -5,7 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 
 class ScreenWrapper extends StatelessWidget {
+  final AppBar? customAppBar;
   final bool? hideAppBar;
+  final BottomAppBar? customBottAppBar;
+  final FloatingActionButton? flaction;
+  final FloatingActionButtonLocation? flactionLocation;
   final List<Widget>? actions;
   final String? goBackTo;
   final String screen;
@@ -16,6 +20,10 @@ class ScreenWrapper extends StatelessWidget {
     required this.child,
     required this.screen,
     this.actions,
+    this.customAppBar,
+    this.customBottAppBar,
+    this.flaction,
+    this.flactionLocation,
     this.goBackTo = '',
     this.hideAppBar = false,
   });
@@ -42,26 +50,30 @@ class ScreenWrapper extends StatelessWidget {
         child: Scaffold(
           appBar: hideAppBar!
               ? null
-              : AppBar(
-                  title: Text(
-                    screen,
-                    style: const TextStyle().copyWith(
-                      color: Theme.of(context).colorScheme.surface,
+              : customAppBar ??
+                  AppBar(
+                    title: Text(
+                      screen,
+                      style: const TextStyle().copyWith(
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
                     ),
+                    actions: actions,
+                    leading: goBackTo! != ''
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.chevron_left,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                            onPressed: () {
+                              context.goNamed(goBackTo!);
+                            },
+                          )
+                        : const SizedBox(),
                   ),
-                  actions: actions,
-                  leading: goBackTo! != ''
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.chevron_left,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          onPressed: () {
-                            context.goNamed(goBackTo!);
-                          },
-                        )
-                      : const SizedBox(),
-                ),
+          bottomNavigationBar: customBottAppBar,
+          floatingActionButtonLocation: flactionLocation,
+          floatingActionButton: flaction,
           body: InkWell(
             onLongPress: () {
               context.read<UserBloc>().add(

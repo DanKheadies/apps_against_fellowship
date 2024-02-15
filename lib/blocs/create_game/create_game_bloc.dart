@@ -181,6 +181,7 @@ class CreateGameBloc extends Bloc<CreateGameEvent, CreateGameState> {
     Emitter<CreateGameState> emit,
   ) async {
     if (state.createGameStatus == CreateGameStatus.loaded) return;
+    print('test');
 
     try {
       var cardSets = await _cardsRepository.getAvailableCardSets();

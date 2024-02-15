@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
@@ -15,18 +15,6 @@ class HomeScreen extends StatelessWidget {
     return ScreenWrapper(
       screen: 'Home',
       hideAppBar: true,
-      // actions: [
-      //   IconButton(
-      //     onPressed: () {
-      //       context.read<AuthBloc>().add(
-      //             SignOut(),
-      //           );
-      //     },
-      //     icon: const Icon(
-      //       Icons.exit_to_app,
-      //     ),
-      //   ),
-      // ],
       child: BlocProvider(
         create: (context) => HomeBloc(
             // gameRepository: context.read<GameRepository>(),
@@ -124,6 +112,7 @@ class HomeScreen extends StatelessWidget {
                                     // Push Notifications check permissions
                                     // context.goNamed('createGame');
                                     print('TODO: go to create game screen');
+                                    context.goNamed('createGame');
                                   }
                                 : null,
                           ),

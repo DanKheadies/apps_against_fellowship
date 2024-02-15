@@ -35,7 +35,7 @@ class CountPreference extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             icon: Icon(
               MdiIcons.minus,
-              color: Theme.of(context).colorScheme.surface,
+              color: Theme.of(context).colorScheme.primary,
             ),
             onPressed: () {
               var newValue = (value - 1).clamp(min, max);
@@ -46,14 +46,14 @@ class CountPreference extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
+              color: Theme.of(context).colorScheme.surface,
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
             child: Text(
               value.toString(),
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.surface,
+                    color: Theme.of(context).colorScheme.background,
                   ),
             ),
           ),
@@ -61,7 +61,7 @@ class CountPreference extends StatelessWidget {
             padding: const EdgeInsets.all(8),
             icon: Icon(
               MdiIcons.plus,
-              color: Theme.of(context).colorScheme.surface,
+              color: Theme.of(context).colorScheme.primary,
             ),
             onPressed: () {
               var newValue = (value + 1).clamp(min, max);
