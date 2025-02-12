@@ -1,6 +1,6 @@
 class CahScrubber {
   static String scrub(String name) {
-    print(name);
+    // print(name);
     return name
         .replaceAll("CAH : ", "")
         .replaceAll("CAH: ", "")

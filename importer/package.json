@@ -1,25 +1,31 @@
 {
-  "name": "importer",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "tsc",
-    "import": "tsc && node build/main.js",
-    "import52Pack": "tsc && node build/main.js --doc 1EtXldfg_GlGoM22WguM_oS_s0-SndA4QF2xnClfh2C0 --sheet 2018240023 --pl 40 --rl 85",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "typescript": "^3.8.3"
-  },
-  "dependencies": {
-    "@types/minimist": "^1.2.0",
-    "@types/node": "^13.11.1",
-    "firebase-admin": "^12.0.0",
-    "google-spreadsheet": "^4.1.1",
-    "minimist": "^1.2.5"
-  }
+    "name": "importer",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc",
+        "import": "tsc && node build/main.js",
+        "import52Pack": "tsc && node build/main.js --doc 1EtXldfg_GlGoM22WguM_oS_s0-SndA4QF2xnClfh2C0 --sheet 2018240023 --pl 40 --rl 85",
+        "test": "echo \"Error: no test specified\" && exit 123"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^8.24.0",
+        "@typescript-eslint/parser": "^8.24.0",
+        "eslint": "^9.20.1",
+        "eslint-config-prettier": "^10.0.1",
+        "prettier": "^3.5.0",
+        "typescript": "^5.7.3"
+    },
+    "dependencies": {
+        "@google-cloud/secret-manager": "^5.6.0",
+        "@types/minimist": "^1.2.5",
+        "@types/node": "^22.13.1",
+        "firebase-admin": "^13.1.0",
+        "google-spreadsheet": "^4.1.4",
+        "minimist": "^1.2.8"
+    }
 }

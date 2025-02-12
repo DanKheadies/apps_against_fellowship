@@ -16,20 +16,20 @@ const sheetId = argv.sheet || '2018240023';
 const cardSetOnly = argv['set-only'] || false;
 const emulator = argv['emulator'] || false;
 if (emulator) {
-    process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
+    process.env.FIRESTORE_EMULATOR_HOST = 'localhost:8080';
 }
-const serviceAccount = require("../config/firebase_admin_sdk.json");
+const serviceAccount = require('../config/firebase_admin_sdk.json');
 // import * as serviceAccount from '../config/firebase_admin_sdk.json';
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://apps-against-fellowship-default-rtdb.firebaseio.com/"
+    databaseURL: 'https://apps-against-fellowship-default-rtdb.firebaseio.com/',
 });
 const db = admin.firestore();
 // @ts-ignore
 async function loadAndSavePromptCards(sheet) {
     // Let's load all the prompts
     await sheet.loadCells(`A2:D${promptLength}`);
-    console.log("Prompt cells loaded");
+    console.log('Prompt cells loaded');
     const prompts = new Map();
     for (let i = 2; i <= promptLength; i++) {
         const promptText = sheet.getCellByA1(`A${i}`).value;
@@ -43,7 +43,7 @@ async function loadAndSavePromptCards(sheet) {
                 const newSet = {
                     id: (0, utils_1.cleanPath)(promptSet),
                     set: promptSet,
-                    source: sourceSheet
+                    source: sourceSheet,
                 };
                 cards = [newSet, []];
             }
@@ -52,20 +52,21 @@ async function loadAndSavePromptCards(sheet) {
                 text: promptText,
                 special: promptSpecial,
                 set: promptSet,
-                source: sourceSheet
+                source: sourceSheet,
             });
             prompts.set(promptSet, cards);
         }
     }
     for (let [promptSet, cards] of prompts) {
-        const cardSetDocument = db.collection('cardSets')
+        const cardSetDocument = db
+            .collection('cardSets')
             .doc((0, utils_1.cleanPath)(promptSet));
         // Set the set master document
         await cardSetDocument.set({
             name: promptSet,
             source: cards[0].source,
             prompts: cards[1].length,
-            promptIndexes: cards[1].map((card) => card.cid)
+            promptIndexes: cards[1].map((card) => card.cid),
         }, { merge: true });
         if (!cardSetOnly) {
             const promptsCollection = cardSetDocument.collection('prompts');
@@ -78,13 +79,13 @@ async function loadAndSavePromptCards(sheet) {
                         await batch.commit();
                         batch = db.batch();
                         currentBatchCount = 0;
-                        console.log("Batch committed to Firebase");
+                        console.log('Batch committed to Firebase');
                     }
                     batch.set(document, prompt);
                     currentBatchCount += 1;
                 }
                 catch (e) {
-                    console.log("Error processing prompt card: " + e);
+                    console.log('Error processing prompt card: ' + e);
                 }
             }
             await batch.commit();
@@ -96,7 +97,7 @@ async function loadAndSaveResponseCards(sheet) {
     var _a;
     // Let's load all the prompts
     await sheet.loadCells(`G2:I${responseLength}`);
-    console.log("Response cells loaded");
+    console.log('Response cells loaded');
     const responses = new Map();
     for (let i = 2; i <= responseLength; i++) {
         const responseText = (_a = sheet.getCellByA1(`G${i}`).value) === null || _a === void 0 ? void 0 : _a.toString();
@@ -109,7 +110,7 @@ async function loadAndSaveResponseCards(sheet) {
                 const newSet = {
                     id: (0, utils_1.cleanPath)(responseSet),
                     set: responseSet,
-                    source: sourceSheet
+                    source: sourceSheet,
                 };
                 cards = [newSet, []];
             }
@@ -117,19 +118,20 @@ async function loadAndSaveResponseCards(sheet) {
                 cid: cid,
                 text: responseText,
                 set: responseSet,
-                source: sourceSheet
+                source: sourceSheet,
             });
             responses.set(responseSet, cards);
         }
     }
     for (let [responseSet, cards] of responses) {
-        const cardSetDocument = db.collection('cardSets')
+        const cardSetDocument = db
+            .collection('cardSets')
             .doc((0, utils_1.cleanPath)(responseSet));
         await cardSetDocument.set({
             name: responseSet,
             source: cards[0].source,
             responses: cards[1].length,
-            responseIndexes: cards[1].map((card) => card.cid)
+            responseIndexes: cards[1].map((card) => card.cid),
         }, { merge: true });
         if (!cardSetOnly) {
             const responsesCollection = cardSetDocument.collection('responses');
@@ -142,13 +144,13 @@ async function loadAndSaveResponseCards(sheet) {
                         await batch.commit();
                         batch = db.batch();
                         currentBatchCount = 0;
-                        console.log("Batch committed to Firebase");
+                        console.log('Batch committed to Firebase');
                     }
                     batch.set(document, response);
                     currentBatchCount += 1;
                 }
                 catch (e) {
-                    console.log("Error processing response card: " + e);
+                    console.log('Error processing response card: ' + e);
                 }
             }
             await batch.commit();
@@ -161,9 +163,7 @@ async function run(docId) {
     const serviceAccountAuth = new google_auth_library_1.JWT({
         email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
         key: process.env.GOOGLE_PRIVATE_KEY,
-        scopes: [
-            'https://www.googleapis.com/auth/spreadsheets',
-        ],
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     const doc = new google_spreadsheet_1.GoogleSpreadsheet(docId, serviceAccountAuth);
     await doc.loadInfo();
@@ -173,13 +173,13 @@ async function run(docId) {
     console.log(sheet.title);
     console.log(sheet.rowCount);
     // Let's load all the prompts
-    console.log("Start loading prompts");
+    console.log('Start loading prompts');
     await loadAndSavePromptCards(sheet);
     console.log("Prompt card's read and written");
     // Let's load all the response cards
-    console.log("Start loading responses");
+    console.log('Start loading responses');
     await loadAndSaveResponseCards(sheet);
-    console.log("Finished loading all CaH cards into firestore");
+    console.log('Finished loading all CaH cards into firestore');
 }
 run(documentId);
 //# sourceMappingURL=main.js.map
