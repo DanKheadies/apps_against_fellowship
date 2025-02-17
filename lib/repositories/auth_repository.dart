@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 
-class AuthRepository extends BaseAuthRepository {
+class AuthRepository {
   final auth.FirebaseAuth _firebaseAuth;
   final UserRepository _userRepository;
 
@@ -15,7 +15,7 @@ class AuthRepository extends BaseAuthRepository {
   })  : _firebaseAuth = firebaseAuth ?? auth.FirebaseAuth.instance,
         _userRepository = userRepository;
 
-  @override
+  /// Get Firebase's current user.
   auth.User? getUser() {
     try {
       final currentUser = _firebaseAuth.currentUser;
@@ -26,27 +26,10 @@ class AuthRepository extends BaseAuthRepository {
     }
   }
 
-  @override
+  /// A stream for Firebase's user changes.
   Stream<auth.User?> get user => _firebaseAuth.userChanges();
 
-  @override
-  Future<auth.User?> loginWithEmail({
-    required String email,
-    required String emailLink,
-  }) async {
-    try {
-      final userCredentials = await _firebaseAuth.signInWithEmailLink(
-        email: email,
-        emailLink: emailLink,
-      );
-      return userCredentials.user;
-    } catch (err) {
-      print('login error: $err');
-      throw Exception(err);
-    }
-  }
-
-  @override
+  /// Authenticate with Firebase's email-password.
   Future<auth.User?> loginWithEmailAndPassword({
     required String email,
     required String password,
@@ -63,7 +46,7 @@ class AuthRepository extends BaseAuthRepository {
     }
   }
 
-  @override
+  /// Authenticate with Firebase's Google auth.
   // Future<auth.User?> loginWithGoogle({
   Future<void> loginWithGoogle({
     required String email,
@@ -82,7 +65,7 @@ class AuthRepository extends BaseAuthRepository {
     // }
   }
 
-  @override
+  /// Authenticate with Firebase anonymously.
   Future<auth.User?> registerAnonymous() async {
     try {
       final anonCredentials = await _firebaseAuth.signInAnonymously();
@@ -90,7 +73,7 @@ class AuthRepository extends BaseAuthRepository {
       await _userRepository.createUser(
         user: User.emptyUser.copyWith(
           id: anonCredentials.user!.uid,
-          name: 'Anon y Mus',
+          name: 'Anon Emus',
           updatedAt: anonCredentials.user!.metadata.creationTime,
         ),
       );
@@ -102,7 +85,7 @@ class AuthRepository extends BaseAuthRepository {
     }
   }
 
-  @override
+  /// Create a user account on Firebase with email and password.
   Future<auth.User?> registerUser({
     required String email,
     required String password,
@@ -130,7 +113,7 @@ class AuthRepository extends BaseAuthRepository {
     }
   }
 
-  @override
+  /// Send a Firebase auth password reset. 
   Future<void> resetPassword({
     required String email,
   }) async {
@@ -143,28 +126,45 @@ class AuthRepository extends BaseAuthRepository {
     }
   }
 
-  @override
-  Future<void> sendLoginEmailLink({
-    required String email,
-  }) async {
-    try {
-      await _firebaseAuth.sendSignInLinkToEmail(
-        email: email,
-        actionCodeSettings: auth.ActionCodeSettings(
-          url: '', // TODO: add for web
-          handleCodeInApp: true,
-          iOSBundleId: 'com.dtfun.appsAgainstFellowship',
-          androidInstallApp: true,
-          androidMinimumVersion: '21',
-          androidPackageName: 'com.dtfun.apps_against_fellowship',
-        ),
-      );
-    } catch (err) {
-      print('login error: $err');
-    }
-  }
+  // /// Authenticate with Firebase's email link. (TODO)
+  // Future<auth.User?> loginWithEmail({
+  //   required String email,
+  //   required String emailLink,
+  // }) async {
+  //   try {
+  //     final userCredentials = await _firebaseAuth.signInWithEmailLink(
+  //       email: email,
+  //       emailLink: emailLink,
+  //     );
+  //     return userCredentials.user;
+  //   } catch (err) {
+  //     print('login error: $err');
+  //     throw Exception(err);
+  //   }
+  // }
 
-  @override
+  // @override
+  // Future<void> sendLoginEmailLink({
+  //   required String email,
+  // }) async {
+  //   try {
+  //     await _firebaseAuth.sendSignInLinkToEmail(
+  //       email: email,
+  //       actionCodeSettings: auth.ActionCodeSettings(
+  //         url: '', // TODO: add for web
+  //         handleCodeInApp: true,
+  //         iOSBundleId: 'com.dtfun.appsAgainstFellowship',
+  //         androidInstallApp: true,
+  //         androidMinimumVersion: '21',
+  //         androidPackageName: 'com.dtfun.apps_against_fellowship',
+  //       ),
+  //     );
+  //   } catch (err) {
+  //     print('login error: $err');
+  //   }
+  // }
+
+  /// Log out 
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }

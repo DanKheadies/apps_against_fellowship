@@ -1,50 +1,52 @@
-// import 'dart:async';
+import 'dart:async';
 
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/models/models.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:logger/logger.dart';
-
-import 'package:apps_against_fellowship/models/models.dart';
-// import 'package:apps_against_fellowship/repositories/repositories.dart';
+// import 'package:logger/logger.dart';
 
 part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  // final GameRepository _gameRepository;
-  // final UserRepository _userRepository;
-  // StreamSubscription? _joinedGamesSubscription;
-  // StreamSubscription? _userSubscription;
+  final GameRepository _gameRepository;
+  final UserBloc _userBloc;
+  StreamSubscription? _joinedGamesSubscription;
 
-  HomeBloc(
-      //   {
-      //   // required GameRepository gameRepository,
-      //   required UserRepository userRepository,
-      // }
-      )
-      :
-        // _gameRepository = gameRepository,
-        // _userRepository = userRepository,
+  HomeBloc({
+    required GameRepository gameRepository,
+    required UserBloc userBloc,
+  })  : _gameRepository = gameRepository,
+        _userBloc = userBloc,
         super(HomeState.loading()) {
-    on<HomeStarted>(_onHomeStarted);
     on<JoinedGamesUpdated>(_onJoinedGamesUpdated);
     on<UserUpdatedViaHome>(_onUserUpdatedViaHome);
     on<LeaveGame>(_onLeaveGame);
     on<JoinGame>(_onJoinGame);
+
+    _joinedGamesSubscription = _gameRepository
+        .observeJoinedGames(_userBloc.state.user)
+        .listen((event) {
+      add(
+        JoinedGamesUpdated(games: event),
+      );
+    });
   }
 
-  void _onHomeStarted(
-    HomeStarted event,
-    Emitter<HomeState> emit,
-  ) async {
-    // TODO: see if a user sub and joinedGame sub are necessary
-    try {
-      // _userSubscription?.cancel();
-      // _userSubscription = _userRepository.observeUser()
-    } catch (err) {
-      Logger().e('Error on home start: $err');
-    }
-  }
+  // void _onHomeStarted(
+  //   HomeStarted event,
+  //   Emitter<HomeState> emit,
+  // ) async {
+  //   // TODO: see if a user sub and joinedGame sub are necessary
+  //   try {
+  //     _userSubscription?.cancel();
+  //     _userSubscription = _userRepository.
+  //   } catch (err) {
+  //     Logger().e('Error on home start: $err');
+  //   }
+  // }
 
   void _onJoinedGamesUpdated(
     JoinedGamesUpdated event,
@@ -125,5 +127,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
       );
     }
+  }
+
+  @override
+  Future<void> close() {
+    _joinedGamesSubscription?.cancel();
+    _joinedGamesSubscription = null;
+    return super.close();
   }
 }

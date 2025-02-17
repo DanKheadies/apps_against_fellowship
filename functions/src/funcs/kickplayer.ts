@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {CallableContext} from "firebase-functions/lib/common/providers/https";
+// import { CallableContext } from "firebase-functions/lib/common/providers/https";
 import {error} from "../util/error";
 import * as firebase from "../firebase/firebase";
 import {nextJudge} from "../models/game";
@@ -11,16 +11,20 @@ import {nextJudge} from "../models/game";
  * from that game so they can't re-join
  *
  * @param {any} data
- * @param {CallableContext} context
  */
-export async function handleKickPlayer(data: any, context: CallableContext) {
-  const uid = context.auth?.uid;
+export async function handleKickPlayer(data: any) {
+  // const uid = context.auth?.uid;
+  const uid = data.uid;
   const gameId = data.game_id;
   const playerId = data.player_id;
 
-  if (!uid) error("unauthenticated", "You must be authenticated to use this endpoint");
+  if (!uid) {
+    error("unauthenticated", "You must be authenticated to use this endpoint");
+  }
   if (!gameId) error("invalid-argument", "You must specify a valid game");
-  if (!playerId) error("invalid-argument", "You must specify the player you want to kick");
+  if (!playerId) {
+    error("invalid-argument", "You must specify the player you want to kick");
+  }
 
   const game = await firebase.games.getGame(gameId);
   if (game) {
@@ -40,7 +44,9 @@ export async function handleKickPlayer(data: any, context: CallableContext) {
         firebase.players.deleteUserGame(transaction, uid, gameId);
       });
 
-      console.log(`Player(${playerId}) was kicked from the Game(${game.gid})`);
+      console.log(
+        `Player(${playerId}) was kicked from the Game(${game.gameId})`
+      );
 
       return {
         success: true,

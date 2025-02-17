@@ -1,12 +1,10 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-// import 'package:apps_against_fellowship/config/config.dart';
-// import 'package:apps_against_fellowship/repositories/repositories.dart';
-import 'package:apps_against_fellowship/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,10 +15,9 @@ class HomeScreen extends StatelessWidget {
       hideAppBar: true,
       child: BlocProvider(
         create: (context) => HomeBloc(
-            // gameRepository: context.read<GameRepository>(),
-            // userRepository: context.read<UserRepository>(),
-            )
-          ..add(HomeStarted()),
+          gameRepository: context.read<GameRepository>(),
+          userBloc: context.read<UserBloc>(),
+        ),
         child: MultiBlocListener(
           listeners: [
             // Error Listener
@@ -110,8 +107,6 @@ class HomeScreen extends StatelessWidget {
                                 ? () {
                                     // Analytics > start game
                                     // Push Notifications check permissions
-                                    // context.goNamed('createGame');
-                                    print('TODO: go to create game screen');
                                     context.goNamed('createGame');
                                   }
                                 : null,
@@ -175,12 +170,35 @@ class HomeScreen extends StatelessWidget {
                         : const SizedBox(),
                     // const SizedBox(height: 50),
                     // TextButton(
-                    //   onPressed: () {
-                    //     context.read<AuthBloc>().add(
-                    //           SignOut(),
+                    //   onPressed: () async {
+                    //     // context.read<AuthBloc>().add(
+                    //     //       SignOut(),
+                    //     //     );
+                    //     try {
+                    //       await FirebaseFunctions.instance
+                    //           .httpsCallable('testCallFunction')
+                    //           .call(
+                    //         {
+                    //           'email': 'dan@kheadies.com',
+                    //           'message': 'This works!',
+                    //         },
+                    //       );
+
+                    //       if (context.mounted) {
+                    //         ScaffoldMessenger.of(context).showSnackBar(
+                    //           const SnackBar(
+                    //             duration: Duration(seconds: 3),
+                    //             content: Text('Success!'),
+                    //           ),
                     //         );
+                    //       }
+                    //     } on FirebaseFunctionsException catch (error) {
+                    //       print('error: $error');
+                    //     } catch (err) {
+                    //       print('err: $err');
+                    //     }
                     //   },
-                    //   child: const Text('Sign Out'),
+                    //   child: const Text('Test Function'),
                     // ),
                   ],
                 ),

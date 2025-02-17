@@ -1,7 +1,6 @@
+import 'package:apps_against_fellowship/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-
-import 'package:apps_against_fellowship/models/models.dart';
 
 enum GameStatus {
   completed,
@@ -47,7 +46,7 @@ class Game extends Equatable {
     required this.cardSets,
     required this.gameId,
     required this.gameStatus,
-    required this.id, // TODO: required (?)
+    required this.id,
     required this.ownerId,
     this.draw2Pick3Enabled = true,
     this.judgeRotation,
@@ -116,8 +115,8 @@ class Game extends Equatable {
           .toList();
     }
 
-    // TODO
-    Set<String> cardSetsSet = {};
+    Set<String> cardSetsSet =
+        (json['cardSets'] as List).map((set) => set as String).toSet();
 
     return Game(
       cardSets: cardSetsSet,
@@ -132,7 +131,7 @@ class Game extends Equatable {
       pick2Enabled: json['pick2Enabled'] ?? true,
       playerLimit: json['playerLimit'] ?? initPlayerLimit,
       prizesToWin: json['prizesToWin'] ?? initPrizesToWin,
-      round: json['round'] ?? 1,
+      round: json['round'] ?? 0, // 1,
       turn: json['turn'] ?? Turn.emptyTurn,
       winner: json['winner'] ?? '',
     );
@@ -140,20 +139,15 @@ class Game extends Equatable {
 
   factory Game.fromSnapshot(DocumentSnapshot snap) {
     dynamic data = snap.data();
+
     return Game.fromJson(data).copyWith(
       id: snap.id,
     );
   }
 
   Map<String, dynamic> toJson() {
-    // TODO: is this the right route for a complex list (?); List<CustomModel>
-    // var judgeRotationList = [];
-    // for (var judgePos in judgeRotation!) {
-    //   judgeRotationList.add(judgePos.toJson());
-    // }
-
     return {
-      'cardSets': cardSets,
+      'cardSets': cardSets.toList(),
       'draw2Pick3Enabled': draw2Pick3Enabled,
       'gameId': gameId,
       'gameStatus': gameStatus.name,

@@ -1,7 +1,7 @@
+import 'package:apps_against_fellowship/models/models.dart';
+import 'package:apps_against_fellowship/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import 'package:apps_against_fellowship/screens/screens.dart';
 
 final GoRouter goRouter = GoRouter(
   routes: [
@@ -40,7 +40,9 @@ final GoRouter goRouter = GoRouter(
       name: 'game',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: const CreateGameScreen(),
+        child: GameScreen(
+          game: state.extra as Game,
+        ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(
           opacity: animation,
@@ -104,11 +106,11 @@ final GoRouter goRouter = GoRouter(
       ),
     ),
     GoRoute(
-      path: '/signIn',
-      name: 'signIn',
+      path: '/welcome',
+      name: 'welcome',
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: const SignInScreen(),
+        child: const WelcomeScreen(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(
           opacity: animation,

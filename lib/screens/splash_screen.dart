@@ -16,7 +16,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   bool played = false;
   int fileIndex = 0;
   List<String> files = [
@@ -43,27 +43,6 @@ class _SplashScreenState extends State<SplashScreen>
     fileIndex = Random().nextInt(files.length);
   }
 
-  void decideRoute(
-    BuildContext context,
-    AuthState authState,
-    UserState userState,
-  ) {
-    if (authState.status == AuthStatus.unauthenticated ||
-        authState.status == AuthStatus.unknown) {
-      print('to sign in');
-      context.goNamed('signIn');
-    } else if (authState.status == AuthStatus.authenticated &&
-        !userState.user.acceptedTerms) {
-      print('to tos');
-      context.goNamed('tos');
-    } else if (authState.status == AuthStatus.authenticated) {
-      print('to home');
-      context.goNamed('home');
-    } else {
-      print('No route could be decided.');
-    }
-  }
-
   @override
   void dispose() {
     aniCont.dispose();
@@ -82,7 +61,8 @@ class _SplashScreenState extends State<SplashScreen>
             return BlocBuilder<UserBloc, UserState>(
               builder: (context, userState) {
                 return InkWell(
-                  onTap: () => decideRoute(context, authState, userState),
+                  // onTap: () => decideRoute(context, authState, userState),
+                  onTap: () => context.goNamed('welcome'),
                   child: Center(
                     child: Center(
                       child: Lottie.asset(
@@ -98,7 +78,8 @@ class _SplashScreenState extends State<SplashScreen>
                             fileIndex == 0
                                 ? composition.duration * 2
                                 : composition.duration,
-                            () => decideRoute(context, authState, userState),
+                            // () => decideRoute(context, authState, userState),
+                            () => context.goNamed('welcome'),
                           );
                         },
                       ),
@@ -112,4 +93,26 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
+
+  // void decideRoute(
+  //   BuildContext context,
+  //   AuthState authState,
+  //   UserState userState,
+  // ) {
+  //   if (authState.status == AuthStatus.unauthenticated ||
+  //       authState.status == AuthStatus.unknown) {
+  //     print('to sign in');
+  //     context.goNamed('welcome');
+  //   } else if (authState.status == AuthStatus.authenticated &&
+  //       !userState.user.acceptedTerms) {
+  //     // TODO: treat as onboarding (?)
+  //     print('to tos');
+  //     context.goNamed('tos');
+  //   } else if (authState.status == AuthStatus.authenticated) {
+  //     print('to home');
+  //     context.goNamed('home');
+  //   } else {
+  //     print('No route could be decided.');
+  //   }
+  // }
 }

@@ -5,9 +5,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-import 'package:apps_against_fellowship/repositories/repositories.dart';
-
-class DevicesRepository extends BaseDevicesRepository {
+class DevicesRepository {
   final auth.FirebaseAuth _firebaseAuth;
   final DeviceInfoPlugin _deviceInfoPlugin;
   final FirebaseFirestore _firestore;
@@ -20,7 +18,7 @@ class DevicesRepository extends BaseDevicesRepository {
         _firebaseAuth = firebaseAuth ?? auth.FirebaseAuth.instance,
         _firestore = firestore ?? FirebaseFirestore.instance;
 
-  @override
+  /// Update the user's push token.
   Future<void> updatePushToken({
     required String deviceId,
     required String token,

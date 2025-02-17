@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
-// import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -26,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ScreenWrapper(
       screen: 'Profile',
       goBackTo: 'home',
+      canScroll: false,
       child: BlocBuilder<UserBloc, UserState>(
         builder: (context, state) {
           if (state.userStatus == UserStatus.initial ||
@@ -51,6 +51,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onSubmit: (value) {
                           context.read<UserBloc>().add(
                                 UpdateUser(
+                                  updateFirebase: true,
                                   user: state.user.copyWith(
                                     name: value,
                                   ),

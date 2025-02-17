@@ -1,8 +1,14 @@
 /* eslint-disable max-len */
 import {UserRecord} from "firebase-functions/lib/v1/providers/auth";
+// import {} from "firebase-functions/lib/v2/providers/";
 import * as admin from "firebase-admin";
 import {firestore} from "../firebase/firebase";
-import {COLLECTION_DEVICES, COLLECTION_GAMES, COLLECTION_PLAYERS, COLLECTION_USERS} from "../firebase/constants";
+import {
+  COLLECTION_DEVICES,
+  COLLECTION_GAMES,
+  COLLECTION_PLAYERS,
+  COLLECTION_USERS,
+} from "../firebase/constants";
 import {UserGame} from "../models/usergame";
 import {Game} from "../models/game";
 import FieldValue = admin.firestore.FieldValue;
@@ -14,8 +20,7 @@ import FieldValue = admin.firestore.FieldValue;
 export async function handleAccountDeletion(user: UserRecord) {
   console.log(`Deleting User(${user.uid}, name=${user.displayName})`);
 
-  const userDoc = firestore.collection(COLLECTION_USERS)
-    .doc(user.uid);
+  const userDoc = firestore.collection(COLLECTION_USERS).doc(user.uid);
 
   const userGames = userDoc.collection(COLLECTION_GAMES);
   const userDevices = userDoc.collection(COLLECTION_DEVICES);
@@ -57,15 +62,20 @@ export async function handleAccountDeletion(user: UserRecord) {
  * @param {UserGame} userGame
  * @param {string} uid
  */
-async function removePlayerFromGame(transaction: admin.firestore.Transaction, userGame: UserGame, uid: string) {
-  const gameDoc = firestore.collection(COLLECTION_GAMES)
-    .doc(userGame.id!);
+async function removePlayerFromGame(
+  transaction: admin.firestore.Transaction,
+  userGame: UserGame,
+  uid: string
+) {
+  const gameDoc = firestore.collection(COLLECTION_GAMES).doc(userGame.id!);
 
   const gameSnapshot = await gameDoc.get();
   const game = gameSnapshot.data() as Game;
 
   if (game) {
-    console.log(`Removing player from Game(gid=${game.gid}, id=${game.id})`);
+    console.log(
+      `Removing player from Game(gameId=${game.gameId}, id=${game.id})`
+    );
 
     transaction.update(gameDoc, {
       judgeRotation: FieldValue.arrayRemove(uid),

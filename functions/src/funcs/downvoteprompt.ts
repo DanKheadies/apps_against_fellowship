@@ -1,11 +1,21 @@
 /* eslint-disable max-len */
-import {Change, EventContext} from "firebase-functions/lib/v1/cloud-functions";
-import {DocumentSnapshot} from "firebase-functions/lib/v1/providers/firestore";
+// import {
+//   Change,
+//   EventContext,
+// } from "firebase-functions/lib/v1/cloud-functions";
+import {
+  Change,
+  // DocumentSnapshot,
+  FirestoreEvent,
+  QueryDocumentSnapshot,
+} from "firebase-functions/v2/firestore";
+// import { DocumentSnapshot } from "firebase-functions/lib/v1/providers/firestore";
 import * as firestore from "../firebase/firebase";
 import {Player, RANDO_CARDRISSIAN} from "../models/player";
 import {getSpecial} from "../models/cards";
 import {Turn} from "../models/turn";
 import {Tally} from "../models/tally";
+// import { DocumentSnapshot } from "firebase-admin/firestore";
 
 const downVoteThreshold = 2 / 3;
 
@@ -22,21 +32,34 @@ const downVoteThreshold = 2 / 3;
  * 4. Draw a new prompt card
  * 5. Reset the turn with new prompt, no downvotes, and no responses but keep the same judge
  *
- * @param {Change<DocumentSnapshot>} change
- * @param {EventContext} context
+ * @param {FirestoreEvent<Change<QueryDocumentSnapshot>>} event
  */
-export async function handleDownVote(change: Change<DocumentSnapshot>, context: EventContext) {
-  const gameId = context.params.gameId;
+export async function handleDownVote(
+  // change: Change<DocumentSnapshot>,
+  event: FirestoreEvent<
+    Change<QueryDocumentSnapshot> | undefined,
+    {
+      gameId: string;
+    }
+  >
+  // context: EventContext
+) {
+  // const gameId = context.params.gameId;
+  const gameId = event.params.gameId;
 
-  const previousTally = change.before.data() as Tally;
-  const newTally = change.after.data() as Tally;
+  // const previousTally = change.before.data() as Tally;
+  const previousTally = event.data?.before.data() as Tally;
+  // const newTally = change.after.data() as Tally;
+  const newTally = event.data?.after.data() as Tally;
 
   console.log(`Previous Game(${JSON.stringify(previousTally)})`);
   console.log(`New Game(${JSON.stringify(newTally)})`);
 
   const previousDownVotes = previousTally.votes;
   const newDownVotes = newTally.votes;
-  console.log(`Comparing change in downvotes (previous=${previousDownVotes.length}, new=${newDownVotes.length})`);
+  console.log(
+    `Comparing change in downvotes (previous=${previousDownVotes.length}, new=${newDownVotes.length})`
+  );
   if (newDownVotes.length > previousDownVotes.length) {
     // Downvotes have changed pull the player list to check if > 2/3 of players have downvoted
     const players = await firestore.games.getPlayers(gameId);
@@ -86,7 +109,8 @@ async function resetTurn(gameId: string, players: Player[]): Promise<void> {
       } else if (getSpecial(newPromptCard.special) === "DRAW 2, PICK 3") {
         drawCount = 3;
       }
-      turn.responses[RANDO_CARDRISSIAN] = await firestore.games.drawResponseCards(gameId, drawCount);
+      turn.responses[RANDO_CARDRISSIAN] =
+        await firestore.games.drawResponseCards(gameId, drawCount);
       console.log("Rando Cardrissian has been dealt into the next turn");
     }
 

@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {CallableContext} from "firebase-functions/lib/v1/providers/https";
+// import { CallableContext } from "firebase-functions/lib/v1/providers/https";
 import {error} from "../util/error";
 import * as firebase from "../firebase/firebase";
 import {Turn, TurnWinner} from "../models/turn";
@@ -26,10 +26,10 @@ import FieldValue = admin.firestore.FieldValue;
  * TODO: Clean up this function to make it less monolith
  *
  * @param {any} data
- * @param {CallableContext} context
  */
-export async function handlePickWinner(data: any, context: CallableContext) {
-  const uid = context.auth?.uid;
+export async function handlePickWinner(data: any) {
+  // const uid = context.auth?.uid;
+  const uid = data.uid;
   const gameId = data.game_id;
   const winningPlayerId = data.player_id;
 
@@ -42,15 +42,21 @@ export async function handlePickWinner(data: any, context: CallableContext) {
         const gameTurn = game.turn!;
 
         /*
-        * Pre-Conditions
-        */
+         * Pre-Conditions
+         */
 
-        if (game.state !== "inProgress") {
-          error("failed-precondition", "This game is not in-progress, cannot pick a winner");
+        if (game.gameStatus !== "inProgress") {
+          error(
+            "failed-precondition",
+            "This game is not in-progress, cannot pick a winner"
+          );
         }
 
         if (gameTurn.judgeId !== uid) {
-          error("permission-denied", "Only the judge can pick a winner for the turn");
+          error(
+            "permission-denied",
+            "Only the judge can pick a winner for the turn"
+          );
         }
 
         const players = await firebase.games.getPlayers(gameId);
@@ -70,8 +76,8 @@ export async function handlePickWinner(data: any, context: CallableContext) {
         }
 
         /*
-        * Create New Turn
-        */
+         * Create New Turn
+         */
 
         const turnWinner: TurnWinner = {
           playerId: winningPlayer.id,
@@ -107,7 +113,8 @@ export async function handlePickWinner(data: any, context: CallableContext) {
           } else if (getSpecial(newPromptCard.special) === "DRAW 2, PICK 3") {
             drawCount = 3;
           }
-          turn.responses[RANDO_CARDRISSIAN] = await firebase.games.drawResponseCards(gameId, drawCount);
+          turn.responses[RANDO_CARDRISSIAN] =
+            await firebase.games.drawResponseCards(gameId, drawCount);
           console.log("Rando Cardrissian has been dealt into the next turn");
         }
 
@@ -122,7 +129,11 @@ export async function handlePickWinner(data: any, context: CallableContext) {
         await firebase.games.clearDownvotes(gameId);
 
         // Award previous game's prompt to winning player
-        await firebase.players.awardPrompt(gameId, winningPlayerId, game.turn!.promptCard);
+        await firebase.players.awardPrompt(
+          gameId,
+          winningPlayerId,
+          game.turn!.promptCard
+        );
 
         // Now Re-deal cards to the player based on the new prompt's special
         await dealNewCardsToPlayers(game, newPromptCard, players);
@@ -136,15 +147,25 @@ export async function handlePickWinner(data: any, context: CallableContext) {
           return prizeCount;
         };
 
-        const gameWinningPlayer = players?.find((p) => getPrizeLength(p) >= game.prizesToWin);
+        const gameWinningPlayer = players?.find(
+          (p) => getPrizeLength(p) >= game.prizesToWin
+        );
         if (gameWinningPlayer) {
-          await firebase.games.updateStateWithData(gameId, {
-            state: "completed",
-            winner: gameWinningPlayer.id,
-            gid: `${game.gid}-completed`,
-          }, players);
+          await firebase.games.updateStateWithData(
+            gameId,
+            {
+              gameStatus: "completed",
+              winner: gameWinningPlayer.id,
+              gameId: `${game.gameId}-completed`,
+            },
+            players
+          );
 
-          await firebase.push.sendGameOverMessage(game, players, gameWinningPlayer);
+          await firebase.push.sendGameOverMessage(
+            game,
+            players,
+            gameWinningPlayer
+          );
         } else {
           await firebase.push.sendNewRoundMessage(game, turn, players);
         }
@@ -154,15 +175,20 @@ export async function handlePickWinner(data: any, context: CallableContext) {
           success: true,
         };
       } else {
-        error("not-found",
-          `Unable to find a game for ${gameId}`);
+        error("not-found", `Unable to find a game for ${gameId}`);
       }
     } else {
-      error("invalid-argument", "The function must be called with a valid \"game_id\".");
+      error(
+        "invalid-argument",
+        "The function must be called with a valid \"game_id\"."
+      );
     }
   } else {
     // Throw error
-    error("failed-precondition", "The function must be called while authenticated.");
+    error(
+      "failed-precondition",
+      "The function must be called while authenticated."
+    );
   }
 }
 
@@ -172,7 +198,11 @@ export async function handlePickWinner(data: any, context: CallableContext) {
  * @param {PromptCard} newPrompt
  * @param {Player[]} players
  */
-async function dealNewCardsToPlayers(game: Game, newPrompt: PromptCard, players: Player[]) {
+async function dealNewCardsToPlayers(
+  game: Game,
+  newPrompt: PromptCard,
+  players: Player[]
+) {
   // Now Re-deal cards to the player based on the new prompt's special
   let dealCount = 1;
   const previousPromptSpecial = getSpecial(game.turn?.promptCard!.special);
@@ -207,7 +237,9 @@ async function dealNewCardsToPlayers(game: Game, newPrompt: PromptCard, players:
   await firebase.firestore.runTransaction(async (transaction) => {
     for (const [playerId, responseCards] of playerCards.entries()) {
       firebase.players.addToHand(transaction, game.id, playerId, responseCards);
-      console.log(`New cards(count=${responseCards.length}) dealt to ${playerId}`);
+      console.log(
+        `New cards(count=${responseCards.length}) dealt to ${playerId}`
+      );
     }
   });
 }

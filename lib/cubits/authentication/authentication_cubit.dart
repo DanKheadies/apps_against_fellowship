@@ -15,6 +15,15 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
     );
   }
 
+  void nameChanged(String value) {
+    emit(
+      state.copyWith(
+        name: value,
+        status: AuthenticationStatus.initial,
+      ),
+    );
+  }
+
   void passwordChanged(String value) {
     emit(
       state.copyWith(

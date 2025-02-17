@@ -1,3 +1,8 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/config/config.dart';
+import 'package:apps_against_fellowship/cubits/cubits.dart';
+import 'package:apps_against_fellowship/firebase_options.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,20 +13,8 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-import 'package:apps_against_fellowship/config/config.dart';
-import 'package:apps_against_fellowship/cubits/cubits.dart';
-import 'package:apps_against_fellowship/firebase_options.dart';
-import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
-// import 'package:apps_against_fellowship/simple_bloc_observer.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // TODO (?)
-  // App Preferences
-  // Update: nah use as Hydrated User Bloc
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -29,8 +22,8 @@ Future<void> main() async {
 
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb
-        ? HydratedStorage.webStorageDirectory
-        : await getTemporaryDirectory(),
+        ? HydratedStorageDirectory.web
+        : HydratedStorageDirectory((await getTemporaryDirectory()).path),
   );
 
   // TODO: is logger needed (?)
@@ -78,7 +71,6 @@ class MyApp extends StatelessWidget {
           ),
           RepositoryProvider(
             create: (context) => CardsRepository(
-              // cardCache: context.read<CardCacheState>(),
               cardCache: context.read<CardCacheCubit>(),
             ),
           ),
@@ -92,6 +84,9 @@ class MyApp extends StatelessWidget {
         // 3) Locales
         child: MultiBlocProvider(
           providers: [
+            BlocProvider(
+              create: (context) => AuthenticationCubit(),
+            ),
             BlocProvider(
               create: (context) => UserBloc(
                 storageRepository: context.read<StorageRepository>(),
@@ -109,14 +104,14 @@ class MyApp extends StatelessWidget {
               create: (context) => GameBloc(
                 authRepository: context.read<AuthRepository>(),
                 gameRepository: context.read<GameRepository>(),
-                initialGame: Game.emptyGame,
                 userBloc: context.read<UserBloc>(),
               ),
             ),
             BlocProvider(
               create: (context) => HomeBloc(
-                  // userRepository: context.read<UserRepository>(),
-                  ),
+                gameRepository: context.read<GameRepository>(),
+                userBloc: context.read<UserBloc>(),
+              ),
             ),
           ],
           child: BlocBuilder<UserBloc, UserState>(

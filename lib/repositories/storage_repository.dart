@@ -1,16 +1,13 @@
 import 'dart:typed_data';
 
-// import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-class StorageRepository extends BaseStorageRepository {
+class StorageRepository {
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
 
-  @override
   Future<String> getDatabaseUrl({
     required User user,
     required String imageName,
@@ -22,7 +19,6 @@ class StorageRepository extends BaseStorageRepository {
     return downloadUrl;
   }
 
-  @override
   Future<String> uploadImage({
     required User user,
     required Uint8List bytes,
@@ -49,7 +45,6 @@ class StorageRepository extends BaseStorageRepository {
     }
   }
 
-  @override
   Future<void> removeProfileImage({
     required String url,
   }) async {

@@ -1,5 +1,9 @@
 /* eslint-disable max-len */
-import {COLLECTION_GAMES, COLLECTION_PLAYERS, COLLECTION_USERS} from "../constants";
+import {
+  COLLECTION_GAMES,
+  COLLECTION_PLAYERS,
+  COLLECTION_USERS,
+} from "../constants";
 import {PromptCard, ResponseCard} from "../../models/cards";
 import {firestore} from "../firebase";
 import * as admin from "firebase-admin";
@@ -14,8 +18,13 @@ import {User} from "../../models/user";
  * @param {string} gameId the game to join
  * @param {Player} player the player to add
  */
-export function joinGame(transaction: admin.firestore.Transaction, gameId: string, player: Player) {
-  const doc = firestore.collection(COLLECTION_GAMES)
+export function joinGame(
+  transaction: admin.firestore.Transaction,
+  gameId: string,
+  player: Player
+) {
+  const doc = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_PLAYERS)
     .doc(player.id);
@@ -29,8 +38,14 @@ export function joinGame(transaction: admin.firestore.Transaction, gameId: strin
  * @param {string} gameId the games document id
  * @param {UserGame} userGame the document to write
  */
-export function createUserGame(transaction: admin.firestore.Transaction, uid: string, gameId: string, userGame: UserGame) {
-  const doc = firestore.collection(COLLECTION_USERS)
+export function createUserGame(
+  transaction: admin.firestore.Transaction,
+  uid: string,
+  gameId: string,
+  userGame: UserGame
+) {
+  const doc = firestore
+    .collection(COLLECTION_USERS)
     .doc(uid)
     .collection(COLLECTION_GAMES)
     .doc(gameId);
@@ -43,8 +58,13 @@ export function createUserGame(transaction: admin.firestore.Transaction, uid: st
  * @param {string} uid
  * @param {string} gameId
  */
-export function deleteUserGame(transaction: admin.firestore.Transaction, uid: string, gameId: string) {
-  const doc = firestore.collection(COLLECTION_USERS)
+export function deleteUserGame(
+  transaction: admin.firestore.Transaction,
+  uid: string,
+  gameId: string
+) {
+  const doc = firestore
+    .collection(COLLECTION_USERS)
     .doc(uid)
     .collection(COLLECTION_GAMES)
     .doc(gameId);
@@ -59,8 +79,13 @@ export function deleteUserGame(transaction: admin.firestore.Transaction, uid: st
  * @param {string} playerId the id of the player to update
  * @param {ResponseCard[]} responseCards the list of {@link ResponseCard} to update as the player's hand
  */
-export async function setHand(gameId: string, playerId: string, responseCards: ResponseCard[]): Promise<void> {
-  const playerDoc = firestore.collection(COLLECTION_GAMES)
+export async function setHand(
+  gameId: string,
+  playerId: string,
+  responseCards: ResponseCard[]
+): Promise<void> {
+  const playerDoc = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_PLAYERS)
     .doc(playerId);
@@ -78,14 +103,15 @@ export async function setHand(gameId: string, playerId: string, responseCards: R
  * @param {string} playerId the id of the player to update
  * @param {ResponseCard[]} responseCards the list of {@link ResponseCard} to update as the player's hand
  * @return {admin.firestore.Transaction}
-*/
+ */
 export function setHandByTransaction(
   transaction: admin.firestore.Transaction,
   gameId: string,
   playerId: string,
   responseCards: ResponseCard[]
 ): admin.firestore.Transaction {
-  const playerDoc = firestore.collection(COLLECTION_GAMES)
+  const playerDoc = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_PLAYERS)
     .doc(playerId);
@@ -103,8 +129,14 @@ export function setHandByTransaction(
  * @param {PromptCard} prize the prize to remove as cost
  * @param {ResponseCard[]} responseCards the list of {@link ResponseCard} to update as the player's hand
  */
-export async function reDealHand(gameId: string, playerId: string, prize: PromptCard, responseCards: ResponseCard[]): Promise<void> {
-  const playerDoc = firestore.collection(COLLECTION_GAMES)
+export async function reDealHand(
+  gameId: string,
+  playerId: string,
+  prize: PromptCard,
+  responseCards: ResponseCard[]
+): Promise<void> {
+  const playerDoc = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_PLAYERS)
     .doc(playerId);
@@ -128,7 +160,8 @@ export function addToHand(
   playerId: string,
   responseCards: ResponseCard[]
 ) {
-  const playerDoc = firestore.collection(COLLECTION_GAMES)
+  const playerDoc = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_PLAYERS)
     .doc(playerId);
@@ -144,8 +177,13 @@ export function addToHand(
  * @param {string} playerId the player id
  * @param {PromptCard} promptCard the prize to award
  */
-export async function awardPrompt(gameId: string, playerId: string, promptCard: PromptCard): Promise<void> {
-  const playerDoc = firestore.collection(COLLECTION_GAMES)
+export async function awardPrompt(
+  gameId: string,
+  playerId: string,
+  promptCard: PromptCard
+): Promise<void> {
+  const playerDoc = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_PLAYERS)
     .doc(playerId);
@@ -160,8 +198,12 @@ export async function awardPrompt(gameId: string, playerId: string, promptCard: 
  * @param {string} userId the id of the user to update the player objs of
  * @param {User} updatedUser the new user obj to update with
  */
-export async function updateAllPlayers(userId: string, updatedUser: User): Promise<void> {
-  const snapshot = await firestore.collectionGroup(COLLECTION_PLAYERS)
+export async function updateAllPlayers(
+  userId: string,
+  updatedUser: User
+): Promise<void> {
+  const snapshot = await firestore
+    .collectionGroup(COLLECTION_PLAYERS)
     .where("id", "==", userId)
     .get();
 
@@ -174,6 +216,8 @@ export async function updateAllPlayers(userId: string, updatedUser: User): Promi
         });
       }
     });
-    console.log(`Updated all ${snapshot.docs.length} player objects for User(${userId})`);
+    console.log(
+      `Updated all ${snapshot.docs.length} player objects for User(${userId})`
+    );
   }
 }

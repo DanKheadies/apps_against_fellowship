@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
-// import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+// import 'package:logger/logger.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PastGame extends StatelessWidget {
   final bool isLeavingGame;
@@ -24,8 +26,18 @@ class PastGame extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text('Leave game?'),
-          content: Text('Are you sure you want to leave the game ${game.gid}?'),
+          title: Text(
+            'Leave game?',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.surface,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to leave the game ${game.gameId}?',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.surface,
+            ),
+          ),
           actions: [
             TextButton(
               child: Text(
@@ -54,19 +66,31 @@ class PastGame extends StatelessWidget {
   void openGame(BuildContext context) async {
     // Analytics > past game open
     try {
-      print('TODOs: game repo and nav');
-      // TODO: game repo
-      // var existingGame = await context.read<GameRepository>().getGame(game.id);
-      // TODO: go router
-      // Navigator.of(context).push(GamePageRoute(existingGame));
-    } catch (err) {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('$err'),
-          ),
+      var existingGame = await context.read<GameRepository>().getGame(
+            game.id,
+            context.read<UserBloc>().state.user,
+          );
+
+      if (context.mounted) {
+        context.goNamed(
+          'game',
+          extra: existingGame,
         );
+      } else {
+        print('context mounting error - go to Game screen');
+      }
+    } catch (err) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(
+              content: Text('$err'),
+            ),
+          );
+      } else {
+        print('context mounting error - error message messenger');
+      }
     }
   }
 
@@ -79,7 +103,7 @@ class PastGame extends StatelessWidget {
             margin: const EdgeInsets.only(left: 16),
             child: Icon(
               MdiIcons.deleteEmpty,
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
             ),
           ),
           const Expanded(
@@ -89,7 +113,7 @@ class PastGame extends StatelessWidget {
             margin: const EdgeInsets.only(right: 16),
             child: Icon(
               MdiIcons.deleteEmpty,
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
             ),
           ),
         ],
@@ -101,15 +125,15 @@ class PastGame extends StatelessWidget {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 24),
       title: Text(
-        game.gid,
+        game.gameId,
         style: Theme.of(context).textTheme.titleMedium!.copyWith(
               color: Theme.of(context).colorScheme.onPrimary,
             ),
       ),
       subtitle: Text(
-        isLeavingGame ? 'Leaving...' : 'TODO game state', // game.state.label,
+        isLeavingGame ? 'Leaving...' : game.gameState.gameStatus.label,
         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-              color: Colors.white60,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
       ),
       trailing: isLeavingGame
@@ -119,17 +143,17 @@ class PastGame extends StatelessWidget {
               child: CircularProgressIndicator(),
             )
           : Text(
-              // DateTime.parse(game.joinedAt),
-              'TODO joinedAt',
+              game.joinedAt != null
+                  ? DateFormat('MMM d @ H:m').format(game.joinedAt!)
+                  : '???',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: Colors.white54,
+                    color: Theme.of(context).colorScheme.surface,
                   ),
             ),
-      // onTap: game.state == GameState.inProgress ||
-      //         game.state == GameState.waitingRoom
-      //     ? () => openGame(context)
-      //     : () {},
-      onTap: () => print('TODO game state'),
+      onTap: game.gameState.gameStatus == GameStatus.inProgress ||
+              game.gameState.gameStatus == GameStatus.waitingRoom
+          ? () => openGame(context)
+          : () {},
     );
   }
 

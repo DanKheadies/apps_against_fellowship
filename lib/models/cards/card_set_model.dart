@@ -42,7 +42,7 @@ class CardSet extends Equatable {
 
   factory CardSet.fromJson(Map<String, dynamic> json) {
     return CardSet(
-      id: json['id'] ?? '',
+      id: json['id'] ?? json['name'] ?? '',
       name: json['name'] ?? '',
       prompts: json['prompts'] ?? 0,
       responses: json['responses'] ?? 0,

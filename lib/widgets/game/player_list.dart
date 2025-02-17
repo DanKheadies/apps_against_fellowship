@@ -22,7 +22,6 @@ class PlayerList extends StatelessWidget {
       create: (context) => GameBloc(
         authRepository: context.read<AuthRepository>(),
         gameRepository: context.read<GameRepository>(),
-        initialGame: initialGame,
         userBloc: context.read<UserBloc>(),
       )..add(
           Subscribe(

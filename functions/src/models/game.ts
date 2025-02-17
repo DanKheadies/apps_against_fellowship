@@ -6,22 +6,26 @@ import {Turn} from "./turn";
  * Resource: `/games/{game_id}`
  */
 export type Game = {
-    id: string;
-    gid: string;
-    ownerId: string;
-    state: GameState;
-    round: number;
-    prizesToWin: number;
-    playerLimit: number;
-    pick2Enabled?: boolean;
-    draw2Pick3Enabled?: boolean;
-    judgeRotation: string[];
-    cardSets: string[];
-    turn?: Turn;
-    winner?: string;
-}
+  id: string;
+  gameId: string;
+  ownerId: string;
+  gameStatus: GameStatus;
+  round: number;
+  prizesToWin: number;
+  playerLimit: number;
+  pick2Enabled?: boolean;
+  draw2Pick3Enabled?: boolean;
+  judgeRotation: string[];
+  cardSets: string[];
+  turn?: Turn;
+  winner?: string;
+};
 
-export declare type GameState = "waitingRoom" | "starting" | "inProgress" | "completed";
+export declare type GameStatus =
+  | "waitingRoom"
+  | "starting"
+  | "inProgress"
+  | "completed";
 
 /**
  * Get the next judge in the game's judge rotation for the given judge id

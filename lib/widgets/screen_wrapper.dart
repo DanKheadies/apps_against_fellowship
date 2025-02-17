@@ -1,11 +1,11 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-
 class ScreenWrapper extends StatelessWidget {
   final AppBar? customAppBar;
+  final bool? canScroll;
   final bool? hideAppBar;
   final BottomAppBar? customBottAppBar;
   final FloatingActionButton? flaction;
@@ -13,6 +13,7 @@ class ScreenWrapper extends StatelessWidget {
   final List<Widget>? actions;
   final String? goBackTo;
   final String screen;
+  final VoidCallback? specialBack;
   final Widget child;
 
   const ScreenWrapper({
@@ -20,30 +21,38 @@ class ScreenWrapper extends StatelessWidget {
     required this.child,
     required this.screen,
     this.actions,
+    this.canScroll = true,
     this.customAppBar,
     this.customBottAppBar,
     this.flaction,
     this.flactionLocation,
     this.goBackTo = '',
     this.hideAppBar = false,
+    this.specialBack,
   });
 
   @override
   Widget build(BuildContext context) {
+    // print('build wrapper');
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        print('auth bloc listener');
-        if (state.status == AuthStatus.authenticated) {
-          print('auth\'d so home');
-          context.goNamed('home');
-        } else if (state.status == AuthStatus.unauthenticated ||
+        print('trigger screen wrapper - auth');
+        String screen =
+            GoRouter.of(context).routeInformationProvider.value.uri.toString();
+        print(screen);
+        if (state.status == AuthStatus.unauthenticated ||
             state.status == AuthStatus.unknown) {
-          print('not auth\'d: ${state.status}');
-          context.goNamed('signIn');
-        } else {
-          print('auth is submitting..');
+          print('not auth\'d, stay at welcome');
+          context.goNamed('welcome');
+        } else if (state.status == AuthStatus.authenticated &&
+            screen == '/welcome') {
+          print('auth\'d, to home');
+          context.goNamed('home');
         }
+        // TODO: TOS, et al
       },
+      // TOOD: see ii-CC about hasSubscription for notifications
       child: Title(
         title: screen,
         color: Colors.purpleAccent,
@@ -62,12 +71,11 @@ class ScreenWrapper extends StatelessWidget {
                     leading: goBackTo! != ''
                         ? IconButton(
                             icon: Icon(
-                              Icons.chevron_left,
+                              Icons.arrow_back,
                               color: Theme.of(context).colorScheme.primary,
                             ),
-                            onPressed: () {
-                              context.goNamed(goBackTo!);
-                            },
+                            onPressed:
+                                specialBack ?? () => context.goNamed(goBackTo!),
                           )
                         : const SizedBox(),
                   ),
@@ -82,7 +90,7 @@ class ScreenWrapper extends StatelessWidget {
                     ),
                   );
             },
-            child: child, // TODO: clean up
+            child: child,
           ),
         ),
       ),

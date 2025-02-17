@@ -1,12 +1,11 @@
 // import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:apps_against_fellowship/models/models.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:uuid/uuid.dart';
-
-import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
 
 part 'user_event.dart';
 part 'user_state.dart';
@@ -138,18 +137,22 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
       ),
     );
 
-    User updatedUser = event.user.copyWith(
-      updatedAt: DateTime.now(),
-    );
+    User updatedUser = User.emptyUser;
+
+    if (event.accountCreation == false) {
+      updatedUser = event.user.copyWith(
+        updatedAt: DateTime.now(),
+      );
+    } else {
+      updatedUser = event.user;
+    }
 
     try {
-      if (event.user != User.emptyUser) {
+      if (event.updateFirebase) {
         await _userRepository.updateUser(
           user: updatedUser,
         );
       }
-
-      // TODO: update homebloc
 
       emit(
         state.copyWith(

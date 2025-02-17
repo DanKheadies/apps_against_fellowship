@@ -1,34 +1,30 @@
 import 'dart:async';
 
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/models/models.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
-
 part 'game_event.dart';
 part 'game_state.dart';
 
-class GameBloc extends HydratedBloc<GameEvent, GameState> {
+// class GameBloc extends HydratedBloc<GameEvent, GameState> {
+class GameBloc extends Bloc<GameEvent, GameState> {
   final AuthRepository _authRepository;
-  // final Game _initialGame; // TODO
   final GameRepository _gameRepository;
   final UserBloc _userBloc;
-
   StreamSubscription? _gameSubcription;
   StreamSubscription? _playersSubscription;
   StreamSubscription? _downvoteSubscription;
 
   GameBloc({
     required AuthRepository authRepository,
-    required Game initialGame,
     required GameRepository gameRepository,
     required UserBloc userBloc,
   })  : _authRepository = authRepository,
         _gameRepository = gameRepository,
-        // _initialGame = initialGame,
         _userBloc = userBloc,
         super(const GameState()) {
     on<ClearError>(_onClearError);
@@ -130,6 +126,8 @@ class GameBloc extends HydratedBloc<GameEvent, GameState> {
     GameUpdated event,
     Emitter<GameState> emit,
   ) {
+    print('updating game w/');
+    print(event.game);
     emit(
       state.copyWith(
         game: event.game,
@@ -219,6 +217,7 @@ class GameBloc extends HydratedBloc<GameEvent, GameState> {
       await _gameRepository.pickWinner(
         state.game.id,
         event.winningPlayerId,
+        _userBloc.state.user.id,
       );
 
       emit(
@@ -242,6 +241,7 @@ class GameBloc extends HydratedBloc<GameEvent, GameState> {
     PlayersUpdated event,
     Emitter<GameState> emit,
   ) {
+    print('players updated');
     emit(
       state.copyWith(
         gameStateStatus: GameStateStatus.goodToGo, // TODO
@@ -265,6 +265,7 @@ class GameBloc extends HydratedBloc<GameEvent, GameState> {
     try {
       await _gameRepository.startGame(
         state.game.id,
+        _userBloc.state.user.id,
       );
     } catch (err) {
       if (err is PlatformException) {
@@ -309,6 +310,7 @@ class GameBloc extends HydratedBloc<GameEvent, GameState> {
       try {
         await _gameRepository.submitResponse(
           state.game.id,
+          _userBloc.state.user.id,
           state.selectedCards,
         );
 
@@ -334,6 +336,7 @@ class GameBloc extends HydratedBloc<GameEvent, GameState> {
     Subscribe event,
     Emitter<GameState> emit,
   ) {
+    print('subscribing to game..');
     var user = _authRepository.getUser();
     add(
       UserUpdated(
@@ -353,6 +356,7 @@ class GameBloc extends HydratedBloc<GameEvent, GameState> {
     _playersSubscription?.cancel();
     _playersSubscription =
         _gameRepository.observePlayers(event.gameId).listen((players) {
+      print('observing players...');
       add(
         PlayersUpdated(
           players: players,
@@ -416,12 +420,25 @@ class GameBloc extends HydratedBloc<GameEvent, GameState> {
   }
 
   @override
-  GameState? fromJson(Map<String, dynamic> json) {
-    return GameState.fromJson(json);
+  Future<void> close() {
+    _downvoteSubscription?.cancel();
+    _downvoteSubscription = null;
+    _gameSubcription?.cancel();
+    _gameSubcription = null;
+    _playersSubscription?.cancel();
+    _playersSubscription = null;
+    return super.close();
   }
 
-  @override
-  Map<String, dynamic>? toJson(GameState state) {
-    return state.toJson();
-  }
+  // @override
+  // GameState? fromJson(Map<String, dynamic> json) {
+  //   return GameState.fromJson(json);
+  // }
+
+  // @override
+  // Map<String, dynamic>? toJson(GameState state) {
+  //   print('gameBloc toJson');
+  //   print(state);
+  //   return state.toJson();
+  // }
 }

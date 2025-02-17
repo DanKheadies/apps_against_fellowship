@@ -1,7 +1,6 @@
+import 'package:apps_against_fellowship/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-
-import 'package:apps_against_fellowship/models/models.dart';
 
 class Player extends Equatable {
   static const defaultName = '"A player needs a name"';
@@ -77,12 +76,19 @@ class Player extends Equatable {
   factory Player.fromSnapshot(DocumentSnapshot snap) {
     dynamic data = snap.data();
 
-    List<PromptCard> prizesList = (data['prizes'] as List)
-        .map((prize) => PromptCard.fromJson(prize))
-        .toList();
-    List<ResponseCard> handList = (data['hand'] as List)
-        .map((card) => ResponseCard.fromJson(card))
-        .toList();
+    List<PromptCard> prizesList = [];
+    List<ResponseCard> handList = [];
+
+    if (data['prizes'] != null) {
+      (data['prizes'] as List)
+          .map((prize) => PromptCard.fromJson(prize))
+          .toList();
+    }
+    if (data['hand'] != null) {
+      (data['hand'] as List)
+          .map((card) => ResponseCard.fromJson(card))
+          .toList();
+    }
 
     return Player(
       avatarUrl: data['avatarUrl'] ?? '',

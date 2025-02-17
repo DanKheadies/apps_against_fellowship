@@ -1,11 +1,10 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/models/models.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:kt_dart/kt.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
 
 part 'create_game_event.dart';
 part 'create_game_state.dart';
@@ -22,7 +21,6 @@ class CreateGameBloc extends Bloc<CreateGameEvent, CreateGameState> {
   })  : _cardsRepository = cardsRepository,
         _gameRepository = gameRepository,
         _userBloc = userBloc,
-        //  super(const CreateGameState()) {
         super(CreateGameState.empty()) {
     on<CardSetSelected>(_onCardSetSelected);
     on<CardSourceSelected>(_onCardSourceSelected);
@@ -104,6 +102,7 @@ class CreateGameBloc extends Bloc<CreateGameEvent, CreateGameState> {
   ) {
     _userBloc.add(
       UpdateUser(
+        updateFirebase: true,
         user: _userBloc.state.user.copyWith(
           playerLimit: event.playerLimit,
         ),
@@ -123,6 +122,7 @@ class CreateGameBloc extends Bloc<CreateGameEvent, CreateGameState> {
   ) {
     _userBloc.add(
       UpdateUser(
+        updateFirebase: true,
         user: _userBloc.state.user.copyWith(
           prizesToWin: event.prizesToWin,
         ),
@@ -181,19 +181,25 @@ class CreateGameBloc extends Bloc<CreateGameEvent, CreateGameState> {
     Emitter<CreateGameState> emit,
   ) async {
     if (state.createGameStatus == CreateGameStatus.loaded) return;
-    print('test');
+
+    emit(
+      state.copyWith(
+        createGameStatus: CreateGameStatus.loading,
+      ),
+    );
 
     try {
       var cardSets = await _cardsRepository.getAvailableCardSets();
       var filteredCardSets = cardSets.where((cs) {
-        return (cs.source == "Developer" &&
-                _userBloc.state.user.developerPackEnabled) ||
-            cs.source != "Developer";
+        return cs.source != "Developer" ||
+            (cs.source == "Developer" &&
+                _userBloc.state.user.developerPackEnabled);
       }).toList();
 
       emit(
         state.copyWith(
           cardSets: filteredCardSets.toImmutableList(),
+          createGameStatus: CreateGameStatus.loaded,
         ),
       );
     } catch (err) {

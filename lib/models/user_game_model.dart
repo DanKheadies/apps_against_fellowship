@@ -1,17 +1,16 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
 
 class UserGame extends Equatable {
   final DateTime? joinedAt;
   final GameState gameState;
-  final String gid;
+  final String gameId;
   final String id;
 
   const UserGame({
     required this.gameState,
-    required this.gid,
+    required this.gameId,
     required this.id,
     this.joinedAt,
   });
@@ -19,7 +18,7 @@ class UserGame extends Equatable {
   @override
   List<Object?> get props => [
         gameState,
-        gid,
+        gameId,
         id,
         joinedAt,
       ];
@@ -27,12 +26,12 @@ class UserGame extends Equatable {
   UserGame copyWith({
     DateTime? joinedAt,
     GameState? gameState,
-    String? gid,
+    String? gameId,
     String? id,
   }) {
     return UserGame(
       gameState: gameState ?? this.gameState,
-      gid: gid ?? this.gid,
+      gameId: gameId ?? this.gameId,
       id: id ?? this.id,
       joinedAt: joinedAt ?? this.joinedAt,
     );
@@ -40,13 +39,14 @@ class UserGame extends Equatable {
 
   factory UserGame.fromSnapshot(DocumentSnapshot snap) {
     dynamic data = snap.data();
+
     DateTime joined = data['joinedAt'] != null
-        ? (data['joinedAt'] as Timestamp).toDate()
+        ? DateTime.parse(data['joinedAt'])
         : DateTime.now();
 
     return UserGame(
       gameState: data['gameState'] ?? GameState.emptyGame,
-      gid: data['gid'] ?? '',
+      gameId: data['gameId'] ?? '',
       id: snap.id,
       joinedAt: joined,
     );
@@ -59,7 +59,7 @@ class UserGame extends Equatable {
 
     return UserGame(
       gameState: json['gameState'] ?? GameState.emptyGame,
-      gid: json['gid'] ?? '',
+      gameId: json['gameId'] ?? '',
       id: json['id'] ?? '',
       joinedAt: joined,
     );
@@ -68,7 +68,7 @@ class UserGame extends Equatable {
   Map<String, dynamic> toSnap() {
     return {
       'gameState': gameState.toJson(),
-      'gid': gid,
+      'gameId': gameId,
       'id': id,
       'joinedAt': joinedAt?.toUtc(),
     };
@@ -77,7 +77,7 @@ class UserGame extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'gameState': gameState.toJson(),
-      'gid': gid,
+      'gameId': gameId,
       'id': id,
       'joinedAt': joinedAt.toString(),
     };
@@ -85,7 +85,7 @@ class UserGame extends Equatable {
 
   static const emptyUserGame = UserGame(
     gameState: GameState.emptyGame,
-    gid: '',
+    gameId: '',
     id: '',
     // joinedAt: DateTime.now(),
   );

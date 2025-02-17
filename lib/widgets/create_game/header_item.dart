@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/services/services.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HeaderItem extends StatelessWidget {
   final bool isChecked;
@@ -20,11 +19,7 @@ class HeaderItem extends StatelessWidget {
       onTap: () {
         // Analytics()
         //     .logSelectContent(contentType: 'card_set_source', itemId: title);
-        // context
-        //     .bloc<CreateGameBloc>()
-        //     .add(CardSourceSelected(title, isChecked));
-        // print('TODO: select card source');
-        print('select header, isChecked: $isChecked');
+
         context.read<CreateGameBloc>().add(
               CardSourceSelected(
                 isAllChecked: isChecked,
@@ -36,7 +31,8 @@ class HeaderItem extends StatelessWidget {
         children: [
           Divider(
             height: 1,
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
+            // color: Theme.of(context).cardColor,
           ),
           Container(
             height: 48,
@@ -50,10 +46,6 @@ class HeaderItem extends StatelessWidget {
                   onChanged: (value) {
                     // Analytics().logSelectContent(
                     //     contentType: 'card_set_source', itemId: title);
-                    // context
-                    //     .bloc<CreateGameBloc>()
-                    //     .add(CardSourceSelected(title, value));
-                    // print('TODO: select card source');
                     context.read<CreateGameBloc>().add(
                           CardSourceSelected(
                             isAllChecked: isChecked,
@@ -62,7 +54,7 @@ class HeaderItem extends StatelessWidget {
                         );
                   },
                   activeColor: Theme.of(context).colorScheme.primary,
-                  checkColor: Theme.of(context).colorScheme.background,
+                  checkColor: Theme.of(context).colorScheme.surface,
                 ),
                 Expanded(
                   child: Container(

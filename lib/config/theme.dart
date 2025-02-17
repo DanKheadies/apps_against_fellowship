@@ -44,6 +44,7 @@ ThemeData lightTheme() {
     bottomAppBarTheme: const BottomAppBarTheme(
       color: white,
     ),
+    // dividerColor: Colors.red,
     canvasColor: white,
     cardColor: whiteBright,
     colorScheme: const ColorScheme.light().copyWith(
@@ -52,10 +53,11 @@ ThemeData lightTheme() {
       onPrimary: primaryDark,
       primaryContainer: primaryLight,
       error: error,
-      background: white,
+      background: white, // convert background to secondary
       onBackground: whiteBright,
-      surface: black,
+      surface: black, // convert surface to tertiary
       onSurface: blackNight,
+
     ),
     iconTheme: const IconThemeData(
       color: primary,

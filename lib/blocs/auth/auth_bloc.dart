@@ -1,12 +1,11 @@
 import 'dart:async';
 
-import 'package:equatable/equatable.dart';
-import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:hydrated_bloc/hydrated_bloc.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -16,6 +15,7 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
   final UserBloc _userBloc;
   final UserRepository _userRepository;
   StreamSubscription<auth.User?>? _authUserSubscription;
+  StreamSubscription? _userSubscription;
 
   AuthBloc({
     required AuthRepository authRepository,
@@ -32,6 +32,7 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
     on<RegisterAnonymously>(_onRegisterAnonymously);
     on<RegisterWithEmailAndPassword>(_onRegisterWithEmailAndPassword);
     on<ResetError>(_onResetError);
+    on<ResetPassword>(_onResetPassword);
     on<SignOut>(_onSignOut);
 
     _authUserSubscription = _authRepository.user.listen((authUser) {
@@ -39,8 +40,18 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
         AuthUserChanged(
           authUser: authUser,
         );
-      } else {
-        SignOut();
+
+        _userSubscription =
+            _userRepository.getUserStream(userId: authUser.uid).listen((user) {
+          _userBloc.add(
+            UpdateUser(
+              updateFirebase: false,
+              user: user,
+            ),
+          );
+        });
+        // } else {
+        //   SignOut();
       }
     });
   }
@@ -49,8 +60,6 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
     AuthUserChanged event,
     Emitter<AuthState> emit,
   ) {
-    // TODO: update user bloc
-
     emit(
       state.copyWith(
         authUser: event.authUser,
@@ -82,16 +91,12 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
       );
 
       User updatedUser = user.copyWith(
-        acceptedTerms: user.acceptedTerms,
-        avatarUrl: user.avatarUrl,
-        id: user.id,
-        isDarkTheme: user.isDarkTheme,
-        name: user.name,
         updatedAt: DateTime.now(),
       );
 
       _userBloc.add(
         UpdateUser(
+          updateFirebase: true,
           user: updatedUser,
         ),
       );
@@ -104,10 +109,14 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
       );
     } catch (err) {
       print('login (E&P) error: $err');
+      // TODO: provide a better errorMessage
+      String errorMessage = err.toString().contains('malformed or has expired')
+          ? 'The email and password combination are invalid. Please double check and try again.'
+          : err.toString();
       emit(
         state.copyWith(
           authUser: null,
-          errorMessage: err.toString(),
+          errorMessage: errorMessage,
           status: AuthStatus.unauthenticated,
         ),
       );
@@ -118,36 +127,37 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
     LoginWithLink event,
     Emitter<AuthState> emit,
   ) async {
-    if (state.status == AuthStatus.submitting) return;
+    print('TODO: login w/ link');
+    // if (state.status == AuthStatus.submitting) return;
 
-    emit(
-      state.copyWith(
-        status: AuthStatus.submitting,
-      ),
-    );
+    // emit(
+    //   state.copyWith(
+    //     status: AuthStatus.submitting,
+    //   ),
+    // );
 
-    try {
-      var authUser = await _authRepository.loginWithEmail(
-        email: event.email,
-        emailLink: event.emailLink,
-      );
+    // try {
+    //   var authUser = await _authRepository.loginWithEmail(
+    //     email: event.email,
+    //     emailLink: event.emailLink,
+    //   );
 
-      emit(
-        state.copyWith(
-          authUser: authUser,
-          status: AuthStatus.authenticated,
-        ),
-      );
-    } catch (err) {
-      print('login (EwL) error: $err');
-      emit(
-        state.copyWith(
-          authUser: null,
-          errorMessage: err.toString(),
-          status: AuthStatus.unauthenticated,
-        ),
-      );
-    }
+    //   emit(
+    //     state.copyWith(
+    //       authUser: authUser,
+    //       status: AuthStatus.authenticated,
+    //     ),
+    //   );
+    // } catch (err) {
+    //   print('login (EwL) error: $err');
+    //   emit(
+    //     state.copyWith(
+    //       authUser: null,
+    //       errorMessage: err.toString(),
+    //       status: AuthStatus.unauthenticated,
+    //     ),
+    //   );
+    // }
   }
 
   void _onLoginWithGoogle(
@@ -256,6 +266,19 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
         password: event.password,
       );
 
+      _userBloc.add(
+        UpdateUser(
+          accountCreation: true,
+          updateFirebase: false,
+          user: User.emptyUser.copyWith(
+            email: event.email,
+            name: event.name,
+            id: authUser?.uid,
+            updatedAt: authUser?.metadata.creationTime,
+          ),
+        ),
+      );
+
       emit(
         state.copyWith(
           authUser: authUser,
@@ -285,6 +308,17 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
     );
   }
 
+  void _onResetPassword(
+    ResetPassword event,
+    Emitter<AuthState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        errorMessage: '',
+      ),
+    );
+  }
+
   void _onSignOut(
     SignOut event,
     Emitter<AuthState> emit,
@@ -301,10 +335,10 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
       _authRepository.signOut();
 
       _userBloc.add(
-        const UpdateUser(
-          user: User.emptyUser,
-        ),
+        ClearUser(),
       );
+      _userSubscription?.cancel();
+      _userSubscription = null;
 
       emit(
         state.copyWith(
@@ -327,6 +361,9 @@ class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
   @override
   Future<void> close() {
     _authUserSubscription?.cancel();
+    _authUserSubscription = null;
+    _userSubscription?.cancel();
+    _userSubscription = null;
     return super.close();
   }
 

@@ -1,12 +1,17 @@
 /* eslint-disable max-len */
 import {
-  COLLECTION_CARD_POOL, COLLECTION_DOWNVOTES,
+  COLLECTION_CARD_POOL,
+  COLLECTION_DOWNVOTES,
   COLLECTION_GAMES,
-  COLLECTION_PLAYERS, COLLECTION_TURNS, COLLECTION_USERS, COLLECTION_VETOED,
+  COLLECTION_PLAYERS,
+  COLLECTION_TURNS,
+  COLLECTION_USERS,
+  COLLECTION_VETOED,
   DOCUMENT_PROMPTS,
-  DOCUMENT_RESPONSES, DOCUMENT_TALLY,
+  DOCUMENT_RESPONSES,
+  DOCUMENT_TALLY,
 } from "../constants";
-import {Game, GameState} from "../../models/game";
+import {Game, GameStatus} from "../../models/game";
 import {Player, RANDO_CARDRISSIAN} from "../../models/player";
 import {cards, firestore} from "../firebase";
 import {PromptCard, ResponseCard} from "../../models/cards";
@@ -22,7 +27,8 @@ import Timestamp = admin.firestore.Timestamp;
  * @param {string} gameId the document id of the game to pull
  */
 export async function getGame(gameId: string): Promise<Game | undefined> {
-  const gameDocSnapshot = await firestore.collection(COLLECTION_GAMES)
+  const gameDocSnapshot = await firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .get();
 
@@ -36,9 +42,11 @@ export async function getGame(gameId: string): Promise<Game | undefined> {
  * @param {admin.firestore.Transaction} transaction the transaction to fetch this game in
  * @param {string} gameId the document id of the game to pull
  */
-export async function getGameByTransaction(transaction: admin.firestore.Transaction, gameId: string): Promise<Game | undefined> {
-  const gameDoc = firestore.collection(COLLECTION_GAMES)
-    .doc(gameId);
+export async function getGameByTransaction(
+  transaction: admin.firestore.Transaction,
+  gameId: string
+): Promise<Game | undefined> {
+  const gameDoc = firestore.collection(COLLECTION_GAMES).doc(gameId);
 
   const snapshot = await transaction.get(gameDoc);
   if (snapshot.exists) {
@@ -51,11 +59,12 @@ export async function getGameByTransaction(transaction: admin.firestore.Transact
 
 /**
  * Fetch a {@link Game} object by it's {gameId}
- * @param {string} gid the game invite code
+ * @param {string} gameId the game invite code
  */
-export async function findGame(gid: string): Promise<Game | undefined> {
-  const gameDocSnapshot = await firestore.collection(COLLECTION_GAMES)
-    .where("gid", "==", gid)
+export async function findGame(gameId: string): Promise<Game | undefined> {
+  const gameDocSnapshot = await firestore
+    .collection(COLLECTION_GAMES)
+    .where("gameId", "==", gameId)
     .limit(1)
     .get();
 
@@ -75,13 +84,14 @@ export async function findGame(gid: string): Promise<Game | undefined> {
  * @param {string} uid
  * @param {Game} game
  */
-export function leaveGame(transaction: admin.firestore.Transaction, uid: string, game: Game) {
-  const gameDoc = firestore.collection(COLLECTION_GAMES)
-    .doc(game.id);
+export function leaveGame(
+  transaction: admin.firestore.Transaction,
+  uid: string,
+  game: Game
+) {
+  const gameDoc = firestore.collection(COLLECTION_GAMES).doc(game.id);
 
-  const playerDoc = gameDoc
-    .collection(COLLECTION_PLAYERS)
-    .doc(uid);
+  const playerDoc = gameDoc.collection(COLLECTION_PLAYERS).doc(uid);
 
   // Set your player to inactive
   transaction.update(playerDoc, {
@@ -104,8 +114,11 @@ export function leaveGame(transaction: admin.firestore.Transaction, uid: string,
  * Fetch all the {@link Player}s for a {@link Game} by the {gameId}
  * @param {string} gameId the id of the game to get all the players for
  */
-export async function getPlayers(gameId: string): Promise<Player[] | undefined> {
-  const playerCollection = firestore.collection(COLLECTION_GAMES)
+export async function getPlayers(
+  gameId: string
+): Promise<Player[] | undefined> {
+  const playerCollection = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_PLAYERS);
 
@@ -122,7 +135,8 @@ export async function getPlayersByTransaction(
   transaction: admin.firestore.Transaction,
   gameId: string
 ): Promise<Player[] | undefined> {
-  const playerCollection = firestore.collection(COLLECTION_GAMES)
+  const playerCollection = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_PLAYERS);
 
@@ -139,8 +153,12 @@ export async function getPlayersByTransaction(
  * @param {string} gameId the id of the game to get all the players for
  * @param {string} playerId the id of the player to fetch
  */
-export async function getPlayer(gameId: string, playerId: string): Promise<Player | undefined> {
-  const playerDoc = await firestore.collection(COLLECTION_GAMES)
+export async function getPlayer(
+  gameId: string,
+  playerId: string
+): Promise<Player | undefined> {
+  const playerDoc = await firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_PLAYERS)
     .doc(playerId);
@@ -154,7 +172,8 @@ export async function getPlayer(gameId: string, playerId: string): Promise<Playe
  * @param {string} gameId the game id to draw from
  */
 export async function drawPromptCard(gameId: string): Promise<PromptCard> {
-  const promptCardPool = firestore.collection(COLLECTION_GAMES)
+  const promptCardPool = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_CARD_POOL)
     .doc(DOCUMENT_PROMPTS);
@@ -175,7 +194,8 @@ export async function drawPromptCard(gameId: string): Promise<PromptCard> {
  * @param {string} gameId
  */
 export async function getResponseCardPool(gameId: string): Promise<CardPool> {
-  const responseCardPool = firestore.collection(COLLECTION_GAMES)
+  const responseCardPool = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_CARD_POOL)
     .doc(DOCUMENT_RESPONSES);
@@ -189,8 +209,12 @@ export async function getResponseCardPool(gameId: string): Promise<CardPool> {
  * @param {string} gameId the id of the game to pull from
  * @param {number} count the number of response cards to draw
  */
-export async function drawResponseCards(gameId: string, count: number): Promise<ResponseCard[]> {
-  const responseCardPool = firestore.collection(COLLECTION_GAMES)
+export async function drawResponseCards(
+  gameId: string,
+  count: number
+): Promise<ResponseCard[]> {
+  const responseCardPool = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_CARD_POOL)
     .doc(DOCUMENT_RESPONSES);
@@ -218,8 +242,7 @@ export function submitResponseCards(
   playerId: string,
   responseCards: ResponseCard[]
 ) {
-  const gameDoc = firestore.collection(COLLECTION_GAMES)
-    .doc(gameId);
+  const gameDoc = firestore.collection(COLLECTION_GAMES).doc(gameId);
 
   transaction.update(gameDoc, {
     [`turn.responses.${playerId}`]: responseCards,
@@ -232,14 +255,20 @@ export function submitResponseCards(
  * @param {string} gameId the document id of the game
  * @param {Game} game the game in which to return responses for, if the current turn is valid
  */
-export async function returnResponseCards(gameId: string, game: Game): Promise<void> {
+export async function returnResponseCards(
+  gameId: string,
+  game: Game
+): Promise<void> {
   if (game.turn) {
-    const playerCollection = firestore.collection(COLLECTION_GAMES)
+    const playerCollection = firestore
+      .collection(COLLECTION_GAMES)
       .doc(gameId)
       .collection(COLLECTION_PLAYERS);
 
     await firestore.runTransaction(async (transaction) => {
-      for (const [playerId, responses] of Object.entries<ResponseCard[]>(game.turn!.responses)) {
+      for (const [playerId, responses] of Object.entries<ResponseCard[]>(
+        game.turn!.responses
+      )) {
         if (playerId !== RANDO_CARDRISSIAN) {
           const playerDoc = playerCollection.doc(playerId);
           transaction.update(playerDoc, {
@@ -256,8 +285,12 @@ export async function returnResponseCards(gameId: string, game: Game): Promise<v
  * @param {string} gameId
  * @param {PromptCard} promptCard
  */
-export async function storeVetoedPromptCard(gameId: string, promptCard: PromptCard): Promise<void> {
-  const vetoedDoc = firestore.collection(COLLECTION_GAMES)
+export async function storeVetoedPromptCard(
+  gameId: string,
+  promptCard: PromptCard
+): Promise<void> {
+  const vetoedDoc = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_VETOED)
     .doc();
@@ -273,13 +306,14 @@ export async function storeVetoedPromptCard(gameId: string, promptCard: PromptCa
  * @param {string} gameId
  */
 export async function clearDownvotes(gameId: string) {
-  const tallyDoc = firestore.collection(COLLECTION_GAMES)
+  const tallyDoc = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_DOWNVOTES)
     .doc(DOCUMENT_TALLY);
 
   await tallyDoc.set({
-    "votes": [],
+    votes: [],
   });
 }
 
@@ -290,9 +324,11 @@ export async function clearDownvotes(gameId: string) {
  * @param {string} gameId the game to update
  * @param {FirebaseFirestore.UpdateData<any>} data the data to update
  */
-export async function update(gameId: string, data: FirebaseFirestore.UpdateData<any>) {
-  const gameDoc = firestore.collection(COLLECTION_GAMES)
-    .doc(gameId);
+export async function update(
+  gameId: string,
+  data: FirebaseFirestore.UpdateData<any>
+) {
+  const gameDoc = firestore.collection(COLLECTION_GAMES).doc(gameId);
 
   await gameDoc.update(data);
 }
@@ -305,10 +341,14 @@ export async function update(gameId: string, data: FirebaseFirestore.UpdateData<
  * @param {string} gameId the game to update
  * @param {FirebaseFirestore.UpdateData<any>} data the data to update
  */
-export function updateByTransaction(transaction: admin.firestore.Transaction, gameId: string, data: FirebaseFirestore.UpdateData<any>) {
-  const gameDoc = firestore.collection(COLLECTION_GAMES)
-    .doc(gameId);
+export function updateByTransaction(
+  transaction: admin.firestore.Transaction,
+  gameId: string,
+  data: FirebaseFirestore.UpdateData<any>
+) {
+  const gameDoc = firestore.collection(COLLECTION_GAMES).doc(gameId);
 
+  // TODO: datat should be data.data (?)
   transaction.update(gameDoc, data);
 }
 
@@ -318,26 +358,34 @@ export function updateByTransaction(transaction: admin.firestore.Transaction, ga
  * @param {FirebaseFirestore.UpdateData<any>} data the game state data to update
  * @param {Player[]} players the list of players to update their state of
  */
-export async function updateStateWithData(gameId: string, data: FirebaseFirestore.UpdateData<any>, players: Player[] = []): Promise<void> {
-  if (!data.state) throw Error("You must pass a state when updating this way");
+export async function updateStateWithData(
+  gameId: string,
+  data: FirebaseFirestore.UpdateData<any>,
+  players: Player[] = []
+): Promise<void> {
+  // TODO: see if this form of data is correct or if it should just be data.gameStatus
+  console.log("update state w/ data");
+  if (!data.data["gameStatus"]) {
+    throw Error("You must pass a state when updating this way");
+  }
 
-  const gameDoc = firestore.collection(COLLECTION_GAMES)
-    .doc(gameId);
+  const gameDoc = firestore.collection(COLLECTION_GAMES).doc(gameId);
 
-  await gameDoc.update(data);
+  await gameDoc.update(data.data);
 
   // We should also update all the UserGame states for every player connected to the game
   if (players.length > 0) {
     for (const player of players) {
       if (!player.isRandoCardrissian) {
-        const playerUserGameDoc = firestore.collection(COLLECTION_USERS)
+        const playerUserGameDoc = firestore
+          .collection(COLLECTION_USERS)
           .doc(player.id)
           .collection(COLLECTION_GAMES)
           .doc(gameId);
 
         try {
           await playerUserGameDoc.update({
-            state: data.state,
+            gameStatus: data.data["gameStatus"],
           });
         } catch (e) {
           console.log(`Unable to update player's game state: ${e}`);
@@ -353,9 +401,12 @@ export async function updateStateWithData(gameId: string, data: FirebaseFirestor
  * @param {string} gameId
  * @param {string} userId
  */
-export function addToJudgeRotation(transaction: admin.firestore.Transaction, gameId: string, userId: string) {
-  const gameDoc = firestore.collection(COLLECTION_GAMES)
-    .doc(gameId);
+export function addToJudgeRotation(
+  transaction: admin.firestore.Transaction,
+  gameId: string,
+  userId: string
+) {
+  const gameDoc = firestore.collection(COLLECTION_GAMES).doc(gameId);
 
   transaction.update(gameDoc, {
     judgeRotation: FieldValue.arrayUnion(userId),
@@ -365,13 +416,21 @@ export function addToJudgeRotation(transaction: admin.firestore.Transaction, gam
 /**
  * Update the {@link Game} state
  * @param {string} gameId the game to update
- * @param {GameState} state the state to update to
+ * @param {GameStatus} gameStatus the state to update to
  * @param {Player[]} players the list of players to update their state of
  */
-export async function updateState(gameId: string, state: GameState, players: Player[] = []): Promise<void> {
-  return updateStateWithData(gameId, {
-    state: state,
-  }, players);
+export async function updateState(
+  gameId: string,
+  gameStatus: GameStatus,
+  players: Player[] = []
+): Promise<void> {
+  return updateStateWithData(
+    gameId,
+    {
+      gameStatus: gameStatus,
+    },
+    players
+  );
 }
 
 /**
@@ -379,9 +438,13 @@ export async function updateState(gameId: string, state: GameState, players: Pla
  * @param {Game} game
  * @param {TurnWinner} turnWinner
  */
-export async function storeTurn(game: Game, turnWinner: TurnWinner): Promise<void> {
+export async function storeTurn(
+  game: Game,
+  turnWinner: TurnWinner
+): Promise<void> {
   if (game.turn) {
-    const turnDoc = firestore.collection(COLLECTION_GAMES)
+    const turnDoc = firestore
+      .collection(COLLECTION_GAMES)
       .doc(game.id)
       .collection(COLLECTION_TURNS)
       .doc(`${game.round}`);
@@ -414,21 +477,20 @@ export async function seedCardPool(
   console.log(`Prompts: ${promptCardIndexes}`);
   console.log(`Responses: ${responseCardIndexes}`);
 
-  const cardPoolCollection = firestore.collection(COLLECTION_GAMES)
+  const cardPoolCollection = firestore
+    .collection(COLLECTION_GAMES)
     .doc(gameId)
     .collection(COLLECTION_CARD_POOL);
 
   if (promptCardIndexes.length > 0) {
-    await cardPoolCollection.doc(DOCUMENT_PROMPTS)
-      .set({
-        cards: (promptCardIndexes ?? []),
-      });
+    await cardPoolCollection.doc(DOCUMENT_PROMPTS).set({
+      cards: promptCardIndexes ?? [],
+    });
   }
 
   if (responseCardIndexes.length > 0) {
-    await cardPoolCollection.doc(DOCUMENT_RESPONSES)
-      .set({
-        cards: (responseCardIndexes ?? []),
-      });
+    await cardPoolCollection.doc(DOCUMENT_RESPONSES).set({
+      cards: responseCardIndexes ?? [],
+    });
   }
 }

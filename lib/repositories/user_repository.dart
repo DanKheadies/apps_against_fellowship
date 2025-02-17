@@ -1,16 +1,14 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserRepository extends BaseUserRepository {
+class UserRepository {
   final FirebaseFirestore _firebaseFirestore;
 
   UserRepository({
     FirebaseFirestore? firebaseFirestore,
   }) : _firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
 
-  @override
   Future<String> getPhotoUrl({
     required String userId,
   }) async {
@@ -24,7 +22,6 @@ class UserRepository extends BaseUserRepository {
     return User.fromSnapshot(snap).avatarUrl;
   }
 
-  @override
   Future<String> updateUserPicture({
     required String imageName,
     required String bucket,
@@ -50,7 +47,6 @@ class UserRepository extends BaseUserRepository {
     }
   }
 
-  @override
   Future<User> getUser({
     required String userId,
   }) async {
@@ -64,7 +60,6 @@ class UserRepository extends BaseUserRepository {
     return User.fromSnapshot(snap);
   }
 
-  @override
   Future<void> createUser({
     required User user,
   }) async {
@@ -85,7 +80,6 @@ class UserRepository extends BaseUserRepository {
     }
   }
 
-  @override
   Future<void> updateUser({
     required User user,
   }) async {
@@ -102,16 +96,15 @@ class UserRepository extends BaseUserRepository {
   //   return getUser()
   // }
 
-  // @override
-  // Stream<User> getUserStream({
-  //   required String userId,
-  // }) {
-  //   // Update: this is the main issue when registering a new user
-  //   // Returning the {} is what's throwing the List<dynamic> but got null issue.
-  //   // Would be better to return an empty user and handle post-fact.
-  //   return _firebaseFirestore.collection('users').doc(userId).snapshots().map(
-  //         (snap) =>
-  //             snap.data() == null ? User.emptyUser : User.fromSnapshot(snap),
-  //       );
-  // }
+  Stream<User> getUserStream({
+    required String userId,
+  }) {
+    // Update: this is the main issue when registering a new user
+    // Returning the {} is what's throwing the List<dynamic> but got null issue.
+    // Would be better to return an empty user and handle post-fact.
+    return _firebaseFirestore.collection('users').doc(userId).snapshots().map(
+          (snap) =>
+              snap.data() == null ? User.emptyUser : User.fromSnapshot(snap),
+        );
+  }
 }

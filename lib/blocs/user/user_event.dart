@@ -27,14 +27,20 @@ class UpdateTheme extends UserEvent {
 }
 
 class UpdateUser extends UserEvent {
+  final bool? accountCreation;
+  final bool updateFirebase;
   final User user;
 
   const UpdateUser({
+    required this.updateFirebase,
     required this.user,
+    this.accountCreation = false,
   });
 
   @override
   List<Object?> get props => [
+        accountCreation,
+        updateFirebase,
         user,
       ];
 }

@@ -1,14 +1,12 @@
-// import 'package:flutter/foundation.dart';
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/models/models.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kt_dart/kt.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
-import 'package:apps_against_fellowship/widgets/widgets.dart';
 
 class CreateGameScreen extends StatefulWidget {
   const CreateGameScreen({super.key});
@@ -28,7 +26,6 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
           gameRepository: context.read<GameRepository>(),
           userBloc: context.read<UserBloc>(),
         )..add(LoadCreateGame()),
-        // ),
         child: MultiBlocListener(
           listeners: [
             // Error Listener
@@ -61,10 +58,15 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
               listenWhen: (previous, current) =>
                   current.createdGame.id != previous.createdGame.id,
               listener: (context, state) {
+                // TODO: the UX is slightly off, half second of seeing the lists
+                // again before navigating away; rather it keep showing 'loading'
                 if (state.createdGame != Game.emptyGame) {
                   // Navigator.of(context)
                   //     .pushReplacement(GamePageRoute(state.createdGame));
-                  print('navigate to a different game screen w/ this data');
+                  context.goNamed(
+                    'game',
+                    extra: state.createdGame,
+                  );
                 }
               },
             ),
@@ -78,91 +80,95 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
   Widget _buildScaffold() {
     return BlocBuilder<CreateGameBloc, CreateGameState>(
       builder: (context, state) {
-        return DefaultTabController(
-          length: 2,
-          child: ScreenWrapper(
-            screen: 'Create Game',
-            customAppBar: AppBar(
-              title: Text(
-                'New Game',
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.surface,
+        return state.createGameStatus == CreateGameStatus.loaded
+            ? _buildLoading()
+            : DefaultTabController(
+                length: 2,
+                child: ScreenWrapper(
+                  screen: 'Create Game',
+                  customAppBar: AppBar(
+                    title: Text(
+                      'New Game',
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
                     ),
-              ),
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Theme.of(context).colorScheme.surface,
-                ),
-                onPressed: () {
-                  context.goNamed('home');
-                },
-              ),
-              bottom: TabBar(
-                labelColor: Theme.of(context).colorScheme.surface,
-                tabs: const [
-                  Tab(text: "CARDS"),
-                  Tab(text: "OPTIONS"),
-                ],
-              ),
-            ),
-            customBottAppBar: BottomAppBar(
-              notchMargin: 8,
-              shape: const CircularNotchedRectangle(),
-              child: SizedBox(
-                height: 56,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          // state.isLoading
-                          state.createGameStatus == CreateGameStatus.loading
-                              ? "Loading..."
-                              : "${state.totalPrompts} Prompts ${state.totalResponses} Responses",
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(
-                                color: Theme.of(context).colorScheme.surface,
+                    leading: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back,
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
+                      onPressed: () {
+                        context.goNamed('home');
+                      },
+                    ),
+                    bottom: TabBar(
+                      labelColor: Theme.of(context).colorScheme.surface,
+                      tabs: const [
+                        Tab(text: "CARDS"),
+                        Tab(text: "OPTIONS"),
+                      ],
+                    ),
+                  ),
+                  customBottAppBar: BottomAppBar(
+                    notchMargin: 8,
+                    shape: const CircularNotchedRectangle(),
+                    child: SizedBox(
+                      height: 56,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                // state.isLoading
+                                state.createGameStatus ==
+                                        CreateGameStatus.loading
+                                    ? "Loading..."
+                                    : "${state.totalPrompts} Prompts ${state.totalResponses} Responses",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .copyWith(
+                                      color:
+                                          Theme.of(context).colorScheme.surface,
+                                    ),
                               ),
-                        ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
+                  flactionLocation: FloatingActionButtonLocation.endDocked,
+                  flaction: state.selectedSets.isNotEmpty() &&
+                          state.createGameStatus != CreateGameStatus.loading
+                      ? FloatingActionButton(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor:
+                              Theme.of(context).colorScheme.surface,
+                          shape: const CircleBorder(),
+                          onPressed: () async {
+                            // Analytics().logSelectContent(
+                            //     contentType: 'action', itemId: 'create_game');
+                            context.read<CreateGameBloc>().add(
+                                  CreateGame(),
+                                );
+                          },
+                          child: const Icon(Icons.check),
+                        )
+                      : null,
+                  child: TabBarView(
+                    children: [
+                      _buildCardSetLists(state),
+                      _buildGameOptions(context, state),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            flactionLocation: FloatingActionButtonLocation.endDocked,
-            flaction: state.selectedSets.isNotEmpty() &&
-                    state.createGameStatus != CreateGameStatus.loading
-                ? FloatingActionButton(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Theme.of(context).colorScheme.background,
-                    shape: const CircleBorder(),
-                    onPressed: () async {
-                      // Start game?
-                      // Analytics().logSelectContent(
-                      //     contentType: 'action', itemId: 'create_game');
-                      // context.bloc<CreateGameBloc>().add(CreateGame());
-                      print('TODO: start game');
-                      context.read<CreateGameBloc>().add(
-                            CreateGame(),
-                          );
-                    },
-                    child: const Icon(Icons.check),
-                  )
-                : null,
-            child: TabBarView(
-              children: [
-                _buildCardSetLists(state),
-                _buildGameOptions(context, state),
-              ],
-            ),
-          ),
-        );
+              );
       },
     );
   }
@@ -191,8 +197,6 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
           onValueChanged: (value) {
             // Analytics().logSelectContent(
             //     contentType: 'game_option', itemId: 'prizes_to_win');
-            // context.bloc<CreateGameBloc>().add(ChangePrizesToWin(value));
-            // print('TODO: change prizes to win');
             context.read<CreateGameBloc>().add(
                   ChangePrizesToWin(
                     prizesToWin: value,
@@ -209,8 +213,6 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
           onValueChanged: (value) {
             // Analytics().logSelectContent(
             //     contentType: 'game_option', itemId: 'player_limit');
-            // context.bloc<CreateGameBloc>().add(ChangePlayerLimit(value));
-            // print('TODO: change players #');
             context.read<CreateGameBloc>().add(
                   ChangePlayerLimit(
                     playerLimit: value,
@@ -226,8 +228,6 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
           onChanged: (value) {
             // Analytics()
             //     .logSelectContent(contentType: 'game_option', itemId: 'pick2');
-            // context.bloc<CreateGameBloc>().add(ChangePick2Enabled(value));
-            // print('TODO: change pick 2');
             context.read<CreateGameBloc>().add(
                   ChangePick2Enabled(
                     enabled: value,
@@ -243,8 +243,6 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
           onChanged: (value) {
             // Analytics().logSelectContent(
             //     contentType: 'game_option', itemId: 'draw2_pick3');
-            // context.bloc<CreateGameBloc>().add(ChangeDraw2Pick3Enabled(value));
-            // print('TODO: change draw 2 pick 3');
             context.read<CreateGameBloc>().add(
                   ChangeDraw2Pick3Enabled(
                     enabled: value,
@@ -259,6 +257,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
   Widget _buildLoading() {
     return Container(
       height: double.maxFinite,
+      width: double.maxFinite,
       alignment: Alignment.center,
       child: const CircularProgressIndicator(),
     );
@@ -280,14 +279,10 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
             isSelected: selected.contains(cs),
           ));
       var allItemsSelected = items.all((i) => i.isSelected);
-      // var noItemsSelected = items.none((i) => i.isSelected);
       return mutableListOf<Widget>(
         HeaderItem(
           title: key,
           isChecked: allItemsSelected ? true : false,
-          // : noItemsSelected
-          //     ? false
-          //     : null,
         ),
       )..addAll(items);
     });

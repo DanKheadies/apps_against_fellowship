@@ -30,7 +30,9 @@ class PlayerCircleAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return player.isRandoCardrissian
         ? CircleAvatar(
-            backgroundImage: const AssetImage('assets/rando_cardrissian.png'),
+            backgroundImage: const AssetImage(
+              'assets/images/rando_cardrissian.png',
+            ),
             radius: radius,
           )
         : CircleAvatar(
@@ -44,13 +46,11 @@ class PlayerCircleAvatar extends StatelessWidget {
                 ? player.name != ''
                     ? Text(
                         playerInitials,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium!
-                            .copyWith(
-                              // color: Colors.white,
-                              color: Theme.of(context).colorScheme.background,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  // color: Colors.white,
+                                  color: Theme.of(context).colorScheme.surface,
+                                ),
                       )
                     : null
                 : null,

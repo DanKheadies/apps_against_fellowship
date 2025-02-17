@@ -1,12 +1,5 @@
 part of 'game_bloc.dart';
 
-// enum GameStatus {
-//   completed,
-//   inProgress,
-//   starting,
-//   waitingRoom,
-// }
-
 enum GameStateStatus {
   error,
   goodToGo,
@@ -16,8 +9,6 @@ enum GameStateStatus {
 }
 
 class GameState extends Equatable {
-  // final bool isSubmitting;
-  // final bool isLoading;
   final Game game;
   final GameStateStatus gameStateStatus;
   final GameStatus gameStatus;
@@ -88,11 +79,6 @@ class GameState extends Equatable {
     List<String> downvotesList = (json['downvotes'] as List)
         .map((downvote) => downvote as String)
         .toList();
-    // if (json['downvotes'] != null) {
-    //   downvotesList = (json['downvotes'] as List)
-    //       .map((downvotes) => downvotes as String)
-    //       .toList();
-    // }
 
     return GameState(
       downvotes: downvotesList,
@@ -112,13 +98,8 @@ class GameState extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    // var downvotesList = []; // TODO (?)
     var playersList = [];
     var selectedCardsList = [];
-
-    // for (var downvote in downvotes) {
-    //   downvotesList.add(downvote.toJson());
-    // }
 
     for (var player in players) {
       playersList.add(player.toJson());

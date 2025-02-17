@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-import {CallableContext} from "firebase-functions/lib/common/providers/https";
 import * as firebase from "../firebase/firebase";
 import {CardSet, getSpecial} from "../models/cards";
 import {cut, shuffle} from "../util/shuffle";
@@ -21,21 +20,26 @@ import {Game} from "../models/game";
  * 4. Update GameState => 'inProgress'
  *
  * @param {any} data
- * @param {CallableContext} context
  */
-export async function handleStartGame(data: any, context: CallableContext) {
-  const uid = context.auth?.uid;
-  const gameId = data.game_id;
+export async function handleStartGame(data: any) {
+  console.log("start game");
+  // const uid = context.auth?.uid;
+  // const uid = data.uid;
+  const uid = data.data["uid"];
+  // const gameId = data.game_id;
+  const gameId = data.data["game_id"];
 
   if (uid) {
     if (gameId) {
       // Load the game for this gameId and verify that it is in the correct state
       const game = await firebase.games.getGame(gameId);
-      if (game?.state === "waitingRoom") {
+      if (game?.gameStatus === "waitingRoom") {
+        console.log("waiting room");
         game.id = gameId;
         // Game exists and is in the appropriate state. Now we will seed the card pull
         const players = await firebase.games.getPlayers(gameId);
         if (players && players.length > 2) {
+          console.log("more than 2 players");
           // Okay, enough players are in this game, now seed it
           const cardSets = await firebase.cards.getCardSet(...game.cardSets);
           if (cardSets.length > 0) {
@@ -43,40 +47,65 @@ export async function handleStartGame(data: any, context: CallableContext) {
             await firebase.games.updateState(gameId, "starting");
 
             // combine and shuffle all prompt cards
-            const promptCardIndexes = combineAndShuffleIndexes(cardSets, (set) => set.promptIndexes ?? []);
-            const responseCardIndexes = combineAndShuffleIndexes(cardSets, (set) => set.responseIndexes ?? []);
+            const promptCardIndexes = combineAndShuffleIndexes(
+              cardSets,
+              (set) => set.promptIndexes ?? []
+            );
+            const responseCardIndexes = combineAndShuffleIndexes(
+              cardSets,
+              (set) => set.responseIndexes ?? []
+            );
 
             // const promptCards = pickRandomCountFromArray(promptCardIndexes, promptCardSeedCount(players.length));
             // const responseCards = pickRandomCountFromArray(responseCardIndexes, responseCardSeedCount(players.length, game.prizesToWin));
 
-            const promptCards = drawN(promptCardIndexes, promptCardSeedCount(players.length));
-            const responseCards = drawN(responseCardIndexes, responseCardSeedCount(players.length, game.prizesToWin));
-            const cardPool: GameCardPool = {prompts: promptCards, responses: responseCards};
+            const promptCards = drawN(
+              promptCardIndexes,
+              promptCardSeedCount(players.length)
+            );
+            const responseCards = drawN(
+              responseCardIndexes,
+              responseCardSeedCount(players.length, game.prizesToWin)
+            );
+            const cardPool: GameCardPool = {
+              prompts: promptCards,
+              responses: responseCards,
+            };
 
             // Deal 10 cards to every player, except Rando Cardrissian
             await dealPlayersIn(gameId, players, cardPool);
 
             /*
-                         * Generate the turn
-                         */
+             * Generate the turn
+             */
             const firstTurn = await generateFirstTurn(game, players, cardPool);
 
             /*
-                         * Seed Card Pool
-                         */
-            await firebase.games.seedCardPool(gameId, cardPool.prompts, cardPool.responses);
-            console.log(`The Game(${gameId}) has now been seeded with ${cardPool.prompts.length} Prompt cards and ${cardPool.responses.length} Response cards`);
+             * Seed Card Pool
+             */
+            await firebase.games.seedCardPool(
+              gameId,
+              cardPool.prompts,
+              cardPool.responses
+            );
+            console.log(
+              `The Game(${gameId}) has now been seeded with ${cardPool.prompts.length} Prompt cards and ${cardPool.responses.length} Response cards`
+            );
 
             /*
-                         * Game, Set & Match
-                         */
+             * Game, Set & Match
+             */
 
             // Now that we have dealt in every player, set judging rotation, setup first turn, and seeded
             // the card pool it's now time to update the card's set to 'inProgress'
             await firebase.games.updateState(gameId, "inProgress", players);
 
             // Send push notification to participants
-            await firebase.push.sendGameStartedMessage(game, players, firstTurn);
+            await firebase.push.sendGameStartedMessage(
+              game,
+              players,
+              firstTurn
+            );
 
             // FINISH! Return some arbitrary result that the app won't deal with.
             return {
@@ -84,22 +113,37 @@ export async function handleStartGame(data: any, context: CallableContext) {
               success: true,
             };
           } else {
-            error("failed-precondition", "This game was setup with an invalid number of card sets");
+            error(
+              "failed-precondition",
+              "This game was setup with an invalid number of card sets"
+            );
           }
         } else {
-          error("failed-precondition",
-            "There aren't enough players in this game to start, try inviting Rando Cardrissian.");
+          console.log("not enough players");
+          error(
+            "failed-precondition",
+            "There aren't enough players in this game to start, try inviting Rando Cardrissian."
+          );
         }
       } else {
-        error("not-found",
-          `Unable to find a game for ${gameId}, or game is not in the waiting room`);
+        error(
+          "not-found",
+          `Unable to find a game for ${gameId}, or game is not in the waiting room`
+        );
       }
     } else {
-      error("invalid-argument", "The function must be called with a valid \"game_id\".");
+      error(
+        "invalid-argument",
+        "The function must be called with a valid \"game_id\"."
+      );
     }
   } else {
     // Throw error
-    error("failed-precondition", "The function must be called while authenticated.");
+
+    error(
+      "failed-precondition",
+      "The function must be called while authenticated."
+    );
   }
 }
 
@@ -110,7 +154,11 @@ export async function handleStartGame(data: any, context: CallableContext) {
  * @param {GameCardPool} cardPool the pool of cards to deal from
  * @return {Promise<void>}
  */
-async function dealPlayersIn(gameId: string, players: Player[], cardPool: GameCardPool): Promise<void> {
+async function dealPlayersIn(
+  gameId: string,
+  players: Player[],
+  cardPool: GameCardPool
+): Promise<void> {
   // Deal 10 cards to every player, except Rando Cardrissian
   for (const player of players) {
     if (!player.isRandoCardrissian) {
@@ -123,7 +171,9 @@ async function dealPlayersIn(gameId: string, players: Player[], cardPool: GameCa
 
       console.log(`Hand dealt for ${player.name}`);
     } else {
-      console.log("Rando Cardrissian doesn't play by the rules so he doesn't need a hand");
+      console.log(
+        "Rando Cardrissian doesn't play by the rules so he doesn't need a hand"
+      );
     }
   }
 }
@@ -149,9 +199,15 @@ async function generateFirstTurn(
   const promptIndex = draw(cardPool.prompts);
   let promptCard = await firebase.cards.getPromptCard(promptIndex);
   if (game.pick2Enabled === false || game.draw2Pick3Enabled === false) {
-    while ((getSpecial(promptCard.special) === "PICK 2" && game.pick2Enabled === false) ||
-            (getSpecial(promptCard.special) === "DRAW 2, PICK 3" && game.draw2Pick3Enabled === false)) {
-      console.log("Re-drawing prompt card because player has placed restrictions");
+    while (
+      (getSpecial(promptCard.special) === "PICK 2" &&
+        game.pick2Enabled === false) ||
+      (getSpecial(promptCard.special) === "DRAW 2, PICK 3" &&
+        game.draw2Pick3Enabled === false)
+    ) {
+      console.log(
+        "Re-drawing prompt card because player has placed restrictions"
+      );
       promptCard = await firebase.cards.getPromptCard(draw(cardPool.prompts));
     }
   }
@@ -165,8 +221,13 @@ async function generateFirstTurn(
 
   // Go ahead and set Rando Cardrissian's response if he is a part of this game
   if (players.find((p) => p.isRandoCardrissian)) {
-    const randoResponseCardIndexes = dealResponses(cardPool.responses, getSpecial(promptCard.special));
-    turn.responses[RANDO_CARDRISSIAN] = await firebase.cards.getResponseCards(randoResponseCardIndexes);
+    const randoResponseCardIndexes = dealResponses(
+      cardPool.responses,
+      getSpecial(promptCard.special)
+    );
+    turn.responses[RANDO_CARDRISSIAN] = await firebase.cards.getResponseCards(
+      randoResponseCardIndexes
+    );
     console.log("Rando Cardrissian has been dealt into the first turn");
   }
 
@@ -187,7 +248,10 @@ async function generateFirstTurn(
  * @param {CardSet} selector the selector to pick which array of indexexs from the set you want
  * @return {string[]}
  */
-function combineAndShuffleIndexes(cardSets: CardSet[], selector: (set: CardSet) => string[]): string[] {
+function combineAndShuffleIndexes(
+  cardSets: CardSet[],
+  selector: (set: CardSet) => string[]
+): string[] {
   const allResponses = flatMap(cardSets, selector);
   shuffle(allResponses);
   shuffle(allResponses);
@@ -204,10 +268,7 @@ function combineAndShuffleIndexes(cardSets: CardSet[], selector: (set: CardSet) 
  * @return {number}
  */
 function promptCardSeedCount(numPlayers: number): number {
-  return Math.max(
-    numPlayers * 12,
-    200
-  );
+  return Math.max(numPlayers * 12, 200);
 }
 
 /**
@@ -217,9 +278,13 @@ function promptCardSeedCount(numPlayers: number): number {
  * @param {number} prizesToWin
  * @return {number}
  */
-function responseCardSeedCount(numPlayers: number, prizesToWin: number): number {
-  const count = (numPlayers * 10) /* To account for initial deal */ +
-        (numPlayers * prizesToWin * numPlayers) + /* To account for drawing cards */
-        (numPlayers * 10); /* To account for re-deals */
+function responseCardSeedCount(
+  numPlayers: number,
+  prizesToWin: number
+): number {
+  const count =
+    numPlayers * 10 /* To account for initial deal */ +
+    numPlayers * prizesToWin * numPlayers /* To account for drawing cards */ +
+    numPlayers * 10; /* To account for re-deals */
   return Math.max(count, 200);
 }

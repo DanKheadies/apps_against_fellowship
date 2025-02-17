@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {FunctionsErrorCode} from "firebase-functions/lib/v1/providers/https";
+import {FunctionsErrorCode} from "firebase-functions/lib/v2/providers/https";
 import * as functions from "firebase-functions";
 
 /**

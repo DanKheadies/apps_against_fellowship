@@ -20,6 +20,7 @@ class ReDealButton extends StatelessWidget {
             tooltip: 'Re-deal your hand',
             color: Colors.white,
             onPressed: () async {
+              String userId = context.read<UserBloc>().state.user.id;
               final gameContext = context.read<GameRepository>();
               var result = await showDialog<bool>(
                   context: context,
@@ -72,7 +73,10 @@ class ReDealButton extends StatelessWidget {
               if (result ?? false) {
                 // Analytics().logSelectContent(
                 //     contentType: 'action', itemId: 'redeal_hand');
-                await gameContext.reDealHand(state.game.id);
+                await gameContext.reDealHand(
+                  state.game.id,
+                  userId,
+                );
               }
             },
           );

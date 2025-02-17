@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class TermsOfServiceScreen extends StatelessWidget {
@@ -44,6 +43,7 @@ class TermsOfServiceScreen extends StatelessWidget {
                     onPressed: () {
                       context.read<UserBloc>().add(
                             UpdateUser(
+                              updateFirebase: true,
                               user: state.user.copyWith(
                                 acceptedTerms: true,
                               ),

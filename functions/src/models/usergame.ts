@@ -1,8 +1,8 @@
-import {GameState} from "./game";
+import {GameStatus} from "./game";
 
 export type UserGame = {
-    id?: string;
-    gid: string;
-    joinedAt: string;
-    state: GameState
-}
+  id?: string;
+  gameId: string;
+  joinedAt: string;
+  gameStatus: GameStatus;
+};

@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import {CallableContext} from "firebase-functions/lib/v1/providers/https";
+// import {CallableContext} from "firebase-functions/lib/v1/providers/https";
 import * as firebase from "../firebase/firebase";
 import {error} from "../util/error";
 
@@ -12,27 +12,33 @@ import {error} from "../util/error";
  * any responses in the turn removed
  *
  * @param {any} data
- * @param {CallableContext} context
  */
-export async function handleLeaveGame(data: any, context: CallableContext) {
-  const uid = context.auth?.uid;
+export async function handleLeaveGame(data: any) {
+  // const uid = context.auth?.uid;
+  const uid = data.uid;
   const gameId = data.game_id;
 
-  if (!uid) error("unauthenticated", "You must be authenticated to use this endpoint");
-  if (!gameId) error("invalid-argument", "You must specify a valid game code or id");
+  if (!uid) {
+    error("unauthenticated", "You must be authenticated to use this endpoint");
+  }
+  if (!gameId) {
+    error("invalid-argument", "You must specify a valid game code or id");
+  }
 
   const game = await firebase.games.getGame(gameId);
   if (game) {
-    if (game.state === "starting") error("unavailable", "You can't leave a game that is starting");
+    if (game.gameStatus === "starting") {
+      error("unavailable", "You can't leave a game that is starting");
+    }
     await firebase.firestore.runTransaction(async (transaction) => {
-      if (game.state !== "completed") {
+      if (game.gameStatus !== "completed") {
         firebase.games.leaveGame(transaction, uid, game);
         console.log("Player has been removed from an active game");
       }
 
       // Delete user game
       firebase.players.deleteUserGame(transaction, uid, gameId);
-      console.log(`Player has left the game (${game.gid})`);
+      console.log(`Player has left the game (${game.gameId})`);
     });
 
     return {

@@ -13,12 +13,17 @@ import SendResponse = admin.messaging.SendResponse;
 
 /**
  * Send a push notification to a user as a way to get them to re-engage with the game
- * @param {string} gameId the id of the game you are waving from
+ * @param {string} gameId the 5-digit id of the game you are waving from
  * @param {Player} from the player who is sending the wave
  * @param {Player} to the player to send the wave to
  * @param {string} message an optional message override for the push notification
  */
-export async function sendWaveToPlayer(gameId: string, from: Player, to: Player, message?: string) {
+export async function sendWaveToPlayer(
+  gameId: string,
+  from: Player,
+  to: Player,
+  message?: string
+) {
   const tokens = await getPlayerPushTokens([to]);
   await sendMulticastMessage({
     tokens: tokens,
@@ -28,7 +33,9 @@ export async function sendWaveToPlayer(gameId: string, from: Player, to: Player,
     },
     notification: {
       title: `${from.name} waves at you!`,
-      body: message || `${from.name} wants you to re-engage with the game. Maybe quit being a slacker.`,
+      body:
+        message ||
+        `${from.name} wants you to re-engage with the game. Maybe quit being a slacker.`,
     },
     android: {
       notification: {
@@ -47,11 +54,13 @@ export async function sendWaveToPlayer(gameId: string, from: Player, to: Player,
  * @param {string} playerName the name of the player that joined
  */
 export async function sendPlayerJoinedMessage(game: Game, playerName: string) {
-  const tokens = await getPlayerPushTokens([{
-    id: game.ownerId,
-    isRandoCardrissian: false,
-    name: "",
-  }]);
+  const tokens = await getPlayerPushTokens([
+    {
+      id: game.ownerId,
+      isRandoCardrissian: false,
+      name: "",
+    },
+  ]);
   await sendMulticastMessage({
     tokens: tokens,
     data: {
@@ -59,7 +68,7 @@ export async function sendPlayerJoinedMessage(game: Game, playerName: string) {
       gameId: game.id,
     },
     notification: {
-      title: `Player Joined - ${game.gid}`,
+      title: `Player Joined - ${game.gameId}`,
       body: `${playerName} has joined your game!`,
     },
     android: {
@@ -86,7 +95,7 @@ export async function sendAllResponsesInMessage(game: Game, judge: Player) {
       gameId: game.id,
     },
     notification: {
-      title: `Time to judge - ${game.gid}`,
+      title: `Time to judge - ${game.gameId}`,
       body: "All responses are in. Choose a winner!",
     },
     android: {
@@ -105,7 +114,11 @@ export async function sendAllResponsesInMessage(game: Game, judge: Player) {
  * @param {Player[]} players the players of that game
  * @param {Turn} firstTurn the indicating turn of the round to determine the judge to name
  */
-export async function sendGameStartedMessage(game: Game, players: Player[], firstTurn: Turn) {
+export async function sendGameStartedMessage(
+  game: Game,
+  players: Player[],
+  firstTurn: Turn
+) {
   const tokens = await getPlayerPushTokens(players);
   const firstJudge = players.find((p) => p.id === firstTurn.judgeId);
   await sendMulticastMessage({
@@ -115,7 +128,7 @@ export async function sendGameStartedMessage(game: Game, players: Player[], firs
       gameId: game.id,
     },
     notification: {
-      title: `Game Started - ${game.gid}`,
+      title: `Game Started - ${game.gameId}`,
       body: `First judge is ${firstJudge?.name}`,
       imageUrl: firstJudge?.avatarUrl,
     },
@@ -136,7 +149,11 @@ export async function sendGameStartedMessage(game: Game, players: Player[], firs
  * @param {Player[]} players the players to notify
  * @param {Turn} newTurn the new turn generated
  */
-export async function sendTurnResetMessage(game: Game, players: Player[], newTurn: Turn) {
+export async function sendTurnResetMessage(
+  game: Game,
+  players: Player[],
+  newTurn: Turn
+) {
   const tokens = await getPlayerPushTokens(players);
   await sendMulticastMessage({
     tokens: tokens,
@@ -145,7 +162,7 @@ export async function sendTurnResetMessage(game: Game, players: Player[], newTur
       gameId: game.id,
     },
     notification: {
-      title: `Game - ${game.gid}`,
+      title: `Game - ${game.gameId}`,
       body: `The prompt has been voted out, picking a new prompt! "${newTurn.promptCard.text}"`,
     },
     android: {
@@ -167,14 +184,30 @@ export async function sendTurnResetMessage(game: Game, players: Player[], newTur
  * @param {Turn} newTurn the next turn to be played
  * @param {Player[]} players the list of players to send the message to
  */
-export async function sendNewRoundMessage(game: Game, newTurn: Turn, players: Player[]) {
-  const judgePushToken = await getPlayerPushTokens(players.filter((p) => p.id === newTurn.judgeId));
-  const winnerToken = await getPlayerPushTokens(players.filter((p) => p.id === newTurn.winner?.playerId));
-  const otherTokens = await getPlayerPushTokens(players.filter((p) => p.id !== newTurn.judgeId && p.id !== newTurn.winner?.playerId));
+export async function sendNewRoundMessage(
+  game: Game,
+  newTurn: Turn,
+  players: Player[]
+) {
+  const judgePushToken = await getPlayerPushTokens(
+    players.filter((p) => p.id === newTurn.judgeId)
+  );
+  const winnerToken = await getPlayerPushTokens(
+    players.filter((p) => p.id === newTurn.winner?.playerId)
+  );
+  const otherTokens = await getPlayerPushTokens(
+    players.filter(
+      (p) => p.id !== newTurn.judgeId && p.id !== newTurn.winner?.playerId
+    )
+  );
 
-  if (judgePushToken.length > 0) await sendNewJudgeMessage(game, judgePushToken);
+  if (judgePushToken.length > 0) {
+    await sendNewJudgeMessage(game, judgePushToken);
+  }
   if (winnerToken.length > 0) await sendWinnerMessage(game, winnerToken);
-  if (otherTokens.length > 0) await sendAllMessage(game, newTurn, game.round + 1, otherTokens);
+  if (otherTokens.length > 0) {
+    await sendAllMessage(game, newTurn, game.round + 1, otherTokens);
+  }
 }
 
 /**
@@ -183,7 +216,11 @@ export async function sendNewRoundMessage(game: Game, newTurn: Turn, players: Pl
  * @param {Player[]} players the list of players to send message to
  * @param {Player} gameWinningPlayer the game winning player
  */
-export async function sendGameOverMessage(game: Game, players: Player[], gameWinningPlayer: Player) {
+export async function sendGameOverMessage(
+  game: Game,
+  players: Player[],
+  gameWinningPlayer: Player
+) {
   const allTokens = await getPlayerPushTokens(players);
   await sendMulticastMessage({
     tokens: allTokens,
@@ -192,9 +229,12 @@ export async function sendGameOverMessage(game: Game, players: Player[], gameWin
       gameId: game.id,
     },
     notification: {
-      title: `Game Over - ${game.gid}`,
+      title: `Game Over - ${game.gameId}`,
       body: `The winner was ${gameWinningPlayer.name}`,
-      imageUrl: gameWinningPlayer.avatarUrl && gameWinningPlayer.avatarUrl.length > 0 ? gameWinningPlayer.avatarUrl : undefined,
+      imageUrl:
+        gameWinningPlayer.avatarUrl && gameWinningPlayer.avatarUrl.length > 0 ?
+          gameWinningPlayer.avatarUrl :
+          undefined,
     },
     android: {
       notification: {
@@ -219,7 +259,7 @@ async function sendNewJudgeMessage(game: Game, tokens: string[]) {
       gameId: game.id,
     },
     notification: {
-      title: `Game - ${game.gid}`,
+      title: `Game - ${game.gameId}`,
       body: "You are now the judge!",
     },
     android: {
@@ -246,7 +286,7 @@ async function sendWinnerMessage(game: Game, tokens: string[]) {
       gameId: game.id,
     },
     notification: {
-      title: `You won! - ${game.gid}`,
+      title: `You won! - ${game.gameId}`,
       body: `"${game.turn?.promptCard?.text}"`,
     },
     android: {
@@ -267,7 +307,12 @@ async function sendWinnerMessage(game: Game, tokens: string[]) {
  * @param {number} round
  * @param {string[]} tokens
  */
-async function sendAllMessage(game: Game, newTurn: Turn, round: number, tokens: string[]) {
+async function sendAllMessage(
+  game: Game,
+  newTurn: Turn,
+  round: number,
+  tokens: string[]
+) {
   await sendMulticastMessage({
     tokens: tokens,
     data: {
@@ -275,7 +320,7 @@ async function sendAllMessage(game: Game, newTurn: Turn, round: number, tokens: 
       gameId: game.id,
     },
     notification: {
-      title: `Next Round #${round} - ${game.gid}`,
+      title: `Next Round #${round} - ${game.gameId}`,
       body: `"${newTurn.promptCard.text}"`,
     },
     android: {
@@ -294,7 +339,7 @@ async function sendAllMessage(game: Game, newTurn: Turn, round: number, tokens: 
  * @param {MulticastMessage} message
  */
 async function sendMulticastMessage(message: MulticastMessage) {
-  const response = await firebase.messaging.sendMulticast(message);
+  const response = await firebase.messaging.sendEachForMulticast(message);
   await processBatchResponse(response);
 }
 
@@ -303,15 +348,23 @@ async function sendMulticastMessage(message: MulticastMessage) {
  * @param {BatchResponse} response
  */
 async function processBatchResponse(response: BatchResponse) {
-  console.log(`Multicast Response(success=${response.successCount}, failure=${response.failureCount})`);
+  console.log(
+    `Multicast Response(success=${response.successCount}, failure=${response.failureCount})`
+  );
   if (response.failureCount > 0) {
-    const failedResponses = response.responses
-      .filter((r: SendResponse) => !r.success);
+    const failedResponses = response.responses.filter(
+      (r: SendResponse) => !r.success
+    );
 
     // I we have failed responses with the right failure code, reset push tokens
     for (const failedResponse of failedResponses) {
-      if (failedResponse.error !== undefined && failedResponse.messageId !== undefined) {
-        console.log(`Failed Response (code=${failedResponse.error.code}, msg=${failedResponse.error.message}, stack=${failedResponse.error.stack})`);
+      if (
+        failedResponse.error !== undefined &&
+        failedResponse.messageId !== undefined
+      ) {
+        console.log(
+          `Failed Response (code=${failedResponse.error.code}, msg=${failedResponse.error.message}, stack=${failedResponse.error.stack})`
+        );
         switch (failedResponse.error.code) {
         case "messaging/invalid-registration-token":
         case "messaging/registration-token-not-registered":
@@ -329,7 +382,8 @@ async function processBatchResponse(response: BatchResponse) {
  */
 async function invalidatePushToken(token: string) {
   // Find the token
-  const snapshot = await firebase.firestore.collectionGroup(COLLECTION_DEVICES)
+  const snapshot = await firebase.firestore
+    .collectionGroup(COLLECTION_DEVICES)
     .where("token", "==", token)
     .limit(1)
     .get();
@@ -350,13 +404,16 @@ async function invalidatePushToken(token: string) {
  * @return {Promise<string[]>}
  */
 async function getPlayerPushTokens(players: Player[]): Promise<string[]> {
-  const devices = await Promise.all(players.map((value) => {
-    return firebase.firestore.collection(COLLECTION_USERS)
-      .doc(value.id)
-      .collection(COLLECTION_DEVICES)
-      .where("token", ">=", "")
-      .get()
-      .then((snap) => snap.docs.map((doc) => doc.data()["token"] as string));
-  }));
+  const devices = await Promise.all(
+    players.map((value) => {
+      return firebase.firestore
+        .collection(COLLECTION_USERS)
+        .doc(value.id)
+        .collection(COLLECTION_DEVICES)
+        .where("token", ">=", "")
+        .get()
+        .then((snap) => snap.docs.map((doc) => doc.data()["token"] as string));
+    })
+  );
   return flatten(devices);
 }

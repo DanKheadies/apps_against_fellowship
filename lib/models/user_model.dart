@@ -11,6 +11,7 @@ class User extends Equatable {
   final String avatarUrl;
   final String deviceId;
   final String id;
+  final String email;
   final String name;
   final String? pushToken;
 
@@ -19,6 +20,7 @@ class User extends Equatable {
     required this.avatarUrl,
     required this.developerPackEnabled,
     required this.deviceId,
+    required this.email,
     required this.id,
     required this.isDarkTheme,
     required this.name,
@@ -34,6 +36,7 @@ class User extends Equatable {
         avatarUrl,
         developerPackEnabled,
         deviceId,
+        email,
         id,
         isDarkTheme,
         name,
@@ -52,6 +55,7 @@ class User extends Equatable {
     int? prizesToWin,
     String? avatarUrl,
     String? deviceId,
+    String? email,
     String? id,
     String? name,
     String? pushToken,
@@ -61,6 +65,7 @@ class User extends Equatable {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       developerPackEnabled: developerPackEnabled ?? this.developerPackEnabled,
       deviceId: deviceId ?? this.deviceId,
+      email: email ?? this.email,
       id: id ?? this.id,
       isDarkTheme: isDarkTheme ?? this.isDarkTheme,
       name: name ?? this.name,
@@ -81,6 +86,7 @@ class User extends Equatable {
       avatarUrl: json['avatarUrl'] ?? '',
       developerPackEnabled: json['developerPackEnabled'] ?? false,
       deviceId: json['deviceId'] ?? '',
+      email: json['email'] ?? '',
       id: json['id'] ?? '',
       isDarkTheme: json['isDarkTheme'] ?? false,
       name: json['name'] ?? '',
@@ -107,6 +113,7 @@ class User extends Equatable {
       avatarUrl: data['avatarUrl'] ?? '',
       developerPackEnabled: data['developerPackEnabled'] ?? false,
       deviceId: data['deviceId'] ?? '',
+      email: data['email'] ?? '',
       id: snap.id,
       isDarkTheme: data['isDarkTheme'] ?? false,
       name: data['name'] ?? '',
@@ -127,6 +134,7 @@ class User extends Equatable {
       'avatarUrl': avatarUrl,
       'developerPackEnabled': developerPackEnabled,
       'deviceId': deviceId,
+      'email': email,
       'id': id,
       'isDarkTheme': isDarkTheme,
       'name': name,
@@ -142,6 +150,7 @@ class User extends Equatable {
     avatarUrl: '',
     developerPackEnabled: false,
     deviceId: '',
+    email: '',
     id: '',
     isDarkTheme: false,
     name: '',

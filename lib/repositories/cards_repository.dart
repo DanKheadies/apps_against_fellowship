@@ -1,12 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:apps_against_fellowship/cubits/cubits.dart';
 import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CardsRepository extends BaseCardsRepository {
+class CardsRepository {
   // final CardCacheState _cardCache;
   final CardCacheCubit _cardCache;
   final FirebaseFirestore _firestore;
@@ -25,7 +21,7 @@ class CardsRepository extends BaseCardsRepository {
   //       _firestore = firestore ?? FirebaseFirestore.instance,
   //       _userRepository = userRepository;
 
-  @override
+  /// Get the list of cardSets that you can use
   Future<List<CardSet>> getAvailableCardSets(
       // {
       //   required BuildContext context,

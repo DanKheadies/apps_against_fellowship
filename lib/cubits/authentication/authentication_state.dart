@@ -8,23 +8,28 @@ enum AuthenticationStatus {
 }
 
 class AuthenticationState extends Equatable {
-  final String email;
-  final String password;
   final AuthenticationStatus status;
+  final String email;
+  final String name;
+  final String password;
   final String? errorMessage;
 
   const AuthenticationState({
     required this.email,
+    required this.name,
     required this.password,
     required this.status,
     this.errorMessage,
   });
 
-  bool get isFormValid => email.isNotEmpty && password.isNotEmpty;
+  bool get isLoginValid => email != '' && password != '';
+
+  bool get isRegisterValid => email != '' && name != '' && password != '';
 
   factory AuthenticationState.initial() {
     return const AuthenticationState(
       email: '',
+      name: '',
       password: '',
       status: AuthenticationStatus.initial,
       errorMessage: '',
@@ -32,13 +37,15 @@ class AuthenticationState extends Equatable {
   }
 
   AuthenticationState copyWith({
-    String? email,
-    String? password,
     AuthenticationStatus? status,
+    String? email,
+    String? name,
+    String? password,
     String? errorMessage,
   }) {
     return AuthenticationState(
       email: email ?? this.email,
+      name: name ?? this.name,
       password: password ?? this.password,
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
@@ -48,8 +55,9 @@ class AuthenticationState extends Equatable {
   @override
   List<Object?> get props => [
         email,
+        errorMessage,
+        name,
         password,
         status,
-        errorMessage,
       ];
 }

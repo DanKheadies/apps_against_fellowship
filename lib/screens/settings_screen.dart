@@ -1,3 +1,7 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/models/models.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,11 +9,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
-import 'package:apps_against_fellowship/widgets/widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -21,7 +20,6 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> deleteAccount(BuildContext context) async {
     var authBloc = context.read<AuthBloc>();
-    // var authRepository = context.read<AuthRepository>();
 
     bool result = await showDialog(
         context: context,
@@ -84,7 +82,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         print('settings delete err: $err');
         if (err is PlatformException) {
           print('is platform exception, so probably google');
-          if (err.code == 'ERROR_REQUIRES_RECENT_LOGIN') ;
+          if (err.code == 'ERROR_REQUIRES_RECENT_LOGIN') {}
           // await authRepository.loginWithGoogle(
           //   email: email,
           //   password: password,
@@ -102,14 +100,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> signOut(BuildContext context) async {
-    var authBloc = context.read<AuthBloc>();
-    var authRepository = context.read<AuthRepository>();
+    // var authBloc = context.read<AuthBloc>();
+    // var authRepository = context.read<AuthRepository>();
 
-    await authRepository.signOut();
+    await context.read<AuthRepository>().signOut();
 
-    authBloc.add(
-      SignOut(),
-    );
+    // authBloc.add(
+    //   SignOut(),
+    // );
+    if (context.mounted) {
+      context.read<AuthBloc>().add(
+            SignOut(),
+          );
+    }
   }
 
   @override
@@ -257,6 +260,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             // Analytics > setting - dev packs
                             context.read<UserBloc>().add(
                                   UpdateUser(
+                                    updateFirebase: true,
                                     user: state.user.copyWith(
                                       developerPackEnabled: true,
                                     ),
@@ -317,6 +321,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           onTap: () {
                             context.read<UserBloc>().add(
                                   UpdateUser(
+                                    updateFirebase: true,
                                     user: state.user.copyWith(
                                       developerPackEnabled: false,
                                       isDarkTheme: false,

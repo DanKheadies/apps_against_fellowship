@@ -1,10 +1,12 @@
 /* eslint-disable max-len */
-import * as functions from "firebase-functions";
+import {onDocumentUpdated} from "firebase-functions/v2/firestore";
+import {onCall} from "firebase-functions/v2/https";
+import {handleContactMessage} from "./funcs/contactmessage";
 import {handleStartGame} from "./funcs/startgame";
 import {handlePickWinner} from "./funcs/pickwinner";
 import {handleDownVote} from "./funcs/downvoteprompt";
 import {handleReDealHand} from "./funcs/redealhand";
-import {handleAccountDeletion} from "./funcs/accountdeletion";
+// import { handleAccountDeletion } from "./funcs/accountdeletion";
 import {handleJoinGame} from "./funcs/joingame";
 import {handleSubmitResponses} from "./funcs/submitresponse";
 import {handleUserUpdates} from "./funcs/userupdates";
@@ -20,7 +22,7 @@ import {handleWave} from "./funcs/wave";
  * 1. Populate card pool
  * 2. Generated first turn
  * 3. Deal cards to players
- * 4. Update GameState => 'inProgress'
+ * 4. Update GameStatus => 'inProgress'
  *
  * Request Params:
  *     'game_id': the Firestore Document Id of the game you want to start
@@ -33,7 +35,8 @@ import {handleWave} from "./funcs/wave";
  *      }
  * </code></p>
  */
-exports.startGame = functions.https.onCall(handleStartGame);
+// exports.startGame = onCall(handleStartGame);
+export const startGame = onCall(async (data) => handleStartGame(data));
 
 /**
  * Pick Winner - [Callable Function]
@@ -47,21 +50,23 @@ exports.startGame = functions.https.onCall(handleStartGame);
  *    d. Draw Rando-Cardrissian, if present
  * 4. Draw new cards for all players
  */
-exports.pickWinner = functions.https.onCall(handlePickWinner);
+exports.pickWinner = onCall(handlePickWinner);
 
 /**
  * Re-Deal Hand - [Callable Function]
  *
  * This function will re-deal a user's hand in exchange for 1 prize card
  */
-exports.reDealHand = functions.https.onCall(handleReDealHand);
+exports.reDealHand = onCall(handleReDealHand);
 
 /**
  * Join Game - [Callable Function]
  *
  * This function is used to let player's join a game safely
  */
-exports.joinGame = functions.https.onCall(handleJoinGame);
+// exports.joinGame = onCall(handleJoinGame);
+// export const joinGame = onCall(handleJoinGame);
+export const joinGame = onCall(async (data) => handleJoinGame(data));
 
 /**
  * Leave Game - [Callable Function]
@@ -71,7 +76,7 @@ exports.joinGame = functions.https.onCall(handleJoinGame);
  * the game reference is deleted, otherwise the player is set to inactive, removed from judging, and
  * any responses in the turn removed
  */
-exports.leaveGame = functions.https.onCall(handleLeaveGame);
+exports.leaveGame = onCall(handleLeaveGame);
 
 /**
  * Kick Player - [Callable Function]
@@ -79,14 +84,14 @@ exports.leaveGame = functions.https.onCall(handleLeaveGame);
  * Kick a player from your game, only possible for game owner, and this will effectively ban them
  * from that game so they can't re-join
  */
-exports.kickPlayer = functions.https.onCall(handleKickPlayer);
+exports.kickPlayer = onCall(handleKickPlayer);
 
 /**
  * Submit Response - [Callable Function]
  *
  * This function will be used by players to be able to submit a response to an ongoing game
  */
-exports.submitResponses = functions.https.onCall(handleSubmitResponses);
+exports.submitResponses = onCall(handleSubmitResponses);
 
 /**
  * Wave at a player - [Callable Function]
@@ -97,7 +102,7 @@ exports.submitResponses = functions.https.onCall(handleSubmitResponses);
  *     'game_id': the Firestore Document Id of the game you want to start
  *     'player_id': the id of the player you want to wave to
  */
-exports.wave = functions.https.onCall(handleWave);
+exports.wave = onCall(handleWave);
 
 /**
  * Downvotes - [Firestore onUpdate Trigger]
@@ -114,9 +119,10 @@ exports.wave = functions.https.onCall(handleWave);
  * 4. Draw a new prompt card
  * 5. Reset the turn with new prompt, no downvotes, and no responses but keep the same judge
  */
-exports.downvotePrompt = functions.firestore
-  .document("games/{gameId}/downvotes/tally")
-  .onUpdate(handleDownVote);
+exports.downvotePrompt = onDocumentUpdated(
+  "games/{gameId}/downvotes/tally",
+  (event) => handleDownVote(event)
+);
 
 /**
  * User Updates - [Firestore onUpdate Trigger]
@@ -129,9 +135,12 @@ exports.downvotePrompt = functions.firestore
  * 1. Check if any part of the actual profile has changed
  * 2. Mass update user's Player objs
  */
-exports.updateUserProfile = functions.firestore
-  .document("users/{userId}")
-  .onUpdate(handleUserUpdates);
+// exports.updateUserProfile = functions.firestore
+//   .document("users/{userId}")
+//   .onUpdate(handleUserUpdates);
+exports.updateUserProfile = onDocumentUpdated("users/{userId}", (event) =>
+  handleUserUpdates(event)
+);
 
 /**
  * Account Deletion - [Authentication Trigger]
@@ -139,6 +148,29 @@ exports.updateUserProfile = functions.firestore
  * This function will listen to account deletions and delete all of their user data
  * stored in firebase
  */
-exports.accountDeletion = functions.auth
-  .user()
-  .onDelete(handleAccountDeletion);
+// exports.accountDeletion = functions.auth.user().onDelete(handleAccountDeletion);
+// UPDATE: This method for handling account deletion and user info removal has
+// been deprecated with the change from v1 to v2. Instead, the Firebase project
+// has a new "Delete User Data" extension that uses eventarc along with other
+// methods to find and remove user info.
+
+/**
+ * Contact Message
+ *
+ * Send an "email" to Firebase document.
+ * TODO: incorporate a true email service or send as a push notification topic.
+ */
+export const contactMessage = onCall(async (data) =>
+  handleContactMessage(data)
+);
+
+/**
+ * Test onCall function
+ */
+export const testCallFunction = onCall(async (data) => {
+  console.log("test function is callable");
+  console.log("data:");
+  console.log(data.data);
+  console.log(data.data["payload"]);
+  console.log(data.data["data"]);
+});
