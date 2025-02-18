@@ -1,5 +1,6 @@
 export 'create_game/widgets.dart';
 export 'game/widgets.dart';
+export 'google/widgets.dart';
 export 'home/widgets.dart';
 export 'profile/widgets.dart';
 export 'settings/widgets.dart';

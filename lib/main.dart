@@ -6,6 +6,7 @@ import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // import 'package:flutter_localizations/flutter_localizations.dart';
 // import 'package:flutter_translate/flutter_translate.dart';
@@ -37,6 +38,8 @@ Future<void> main() async {
   Logger.addLogListener((rec) {
     print('${rec.level.name}: ${rec.time}: ${rec.message}');
   });
+
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
 
   // TODO (?)
   // Setup Push Notifications

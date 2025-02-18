@@ -4,15 +4,27 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+const List<String> googleScopes = <String>[
+  'email',
+  'https://www.googleapis.com/auth/contacts.readonly',
+];
 
 class AuthRepository {
   final auth.FirebaseAuth _firebaseAuth;
+  final GoogleSignIn _googleSignIn;
   final UserRepository _userRepository;
 
   AuthRepository({
     auth.FirebaseAuth? firebaseAuth,
+    GoogleSignIn? googleSignIn,
     required UserRepository userRepository,
   })  : _firebaseAuth = firebaseAuth ?? auth.FirebaseAuth.instance,
+        _googleSignIn = googleSignIn ??
+            GoogleSignIn(
+              scopes: googleScopes,
+            ),
         _userRepository = userRepository;
 
   /// Get Firebase's current user.
@@ -29,6 +41,93 @@ class AuthRepository {
   /// A stream for Firebase's user changes.
   Stream<auth.User?> get user => _firebaseAuth.userChanges();
 
+  /// A stream for Google's user changes.
+  Stream<GoogleSignInAccount?> get userGoogle =>
+      _googleSignIn.onCurrentUserChanged;
+
+  /// Authenticate with Google's web access.
+  Future<bool> authorizeGoogleScopesForWeb({
+    required GoogleSignInAccount account,
+  }) async {
+    try {
+      return await _googleSignIn.requestScopes(googleScopes);
+    } catch (err) {
+      print('google error: $err');
+      throw Exception(err);
+    }
+  }
+
+  /// Authenticate with Google's service.
+  Future<auth.UserCredential?> loginWithGoogle() async {
+    try {
+      // print('try');
+      GoogleSignInAccount? account = await _googleSignIn.signIn();
+      // print('good?');
+      // print(account);
+
+      // TODO: figure out if kWeb check goes here or...
+
+      GoogleSignInAuthentication? googleAuth = await account?.authentication;
+
+      auth.OAuthCredential googleCredentials =
+          auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      auth.UserCredential googleUser =
+          await _firebaseAuth.signInWithCredential(googleCredentials);
+
+      // print(googleUser.user);
+      // print(googleUser.user?.displayName);
+      // print(googleUser.user?.email);
+
+      // TODO: figure out if kWeb check goes here.
+      // See auth bloc for more.
+
+      // If successful, check if the user already exists; otherwise, create a
+      // user.
+      if (account != null && googleUser.user != null) {
+        // print('most likely an issue here..');
+        bool exists = await _userRepository.checkForUser(
+          userId: googleUser.user!.uid,
+        );
+        // print('yea it cant call cuz not firebase');
+
+        if (!exists) {
+          // print('doesn\'t exist, so create');
+          await _userRepository.createUser(
+            user: User.emptyUser.copyWith(
+              id: googleUser.user?.uid,
+              name: googleUser.user?.displayName,
+              email: googleUser.user?.email,
+              avatarUrl: account.photoUrl,
+              updatedAt: DateTime.now(),
+            ),
+          );
+        }
+      }
+
+      // print('all done, return');
+      return googleUser;
+    } catch (err) {
+      print('google err: $err');
+      throw Exception(err);
+      // return null;
+    }
+  }
+
+  /// Authenticate with Google's service, shhhhhhhhhhh...
+  Future<void> loginWithGoogleSilently() async {
+    // print('shhhhh');
+    try {
+      await _googleSignIn.signInSilently();
+    } catch (err) {
+      print('google err: $err');
+      throw Exception(err);
+    }
+  }
+
   /// Authenticate with Firebase's email-password.
   Future<auth.User?> loginWithEmailAndPassword({
     required String email,
@@ -44,25 +143,6 @@ class AuthRepository {
       print('login error: $err');
       throw Exception(err);
     }
-  }
-
-  /// Authenticate with Firebase's Google auth.
-  // Future<auth.User?> loginWithGoogle({
-  Future<void> loginWithGoogle({
-    required String email,
-    required String password,
-  }) async {
-    print('TODO: google sign in');
-    // try {
-    //   final userCredentials = await _firebaseAuth.(
-    //     email: email,
-    //     password: password,
-    //   );
-    //   return userCredentials.user;
-    // } catch (err) {
-    //   print('login error: $err');
-    //   throw Exception(err);
-    // }
   }
 
   /// Authenticate with Firebase anonymously.
@@ -86,18 +166,20 @@ class AuthRepository {
   }
 
   /// Create a user account on Firebase with email and password.
-  Future<auth.User?> registerUser({
+  Future<auth.User?> registerUserWithFirebase({
     required String email,
     required String password,
     String? name,
   }) async {
     try {
+      print('register user');
       final userCredentials =
           await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-
+      print('creating user:');
+      print(user);
       await _userRepository.createUser(
         user: User.emptyUser.copyWith(
           id: userCredentials.user!.uid,
@@ -113,7 +195,7 @@ class AuthRepository {
     }
   }
 
-  /// Send a Firebase auth password reset. 
+  /// Send a Firebase auth password reset.
   Future<void> resetPassword({
     required String email,
   }) async {
@@ -164,7 +246,7 @@ class AuthRepository {
   //   }
   // }
 
-  /// Log out 
+  /// Log out
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }

@@ -9,16 +9,32 @@ abstract class AuthEvent extends Equatable {
 
 class AuthUserChanged extends AuthEvent {
   final auth.User? authUser;
+  final auth.UserCredential? authGoogleUser;
 
   const AuthUserChanged({
-    required this.authUser,
+    this.authUser,
+    this.authGoogleUser,
   });
 
   @override
   List<Object?> get props => [
         authUser,
+        authGoogleUser,
       ];
 }
+
+// class AuthGoogleUserChanged extends AuthEvent {
+//   final GoogleSignInAccount authGoogleUser;
+
+//   const AuthGoogleUserChanged({
+//     required this.authGoogleUser,
+//   });
+
+//   @override
+//   List<Object?> get props => [
+//         authGoogleUser,
+//       ];
+// }
 
 class LoginWithEmailAndPassword extends AuthEvent {
   final String email;
@@ -36,6 +52,20 @@ class LoginWithEmailAndPassword extends AuthEvent {
       ];
 }
 
+class LoginWithGoogle extends AuthEvent {
+  const LoginWithGoogle();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class LoginWithGoogleSilently extends AuthEvent {
+  const LoginWithGoogleSilently();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class LoginWithLink extends AuthEvent {
   final String email;
   final String emailLink;
@@ -49,22 +79,6 @@ class LoginWithLink extends AuthEvent {
   List<Object?> get props => [
         email,
         emailLink,
-      ];
-}
-
-class LoginWithGoogle extends AuthEvent {
-  final String email;
-  final String password;
-
-  const LoginWithGoogle({
-    required this.email,
-    required this.password,
-  });
-
-  @override
-  List<Object?> get props => [
-        email,
-        password,
       ];
 }
 

@@ -1,10 +1,10 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-import 'package:apps_against_fellowship/widgets/widgets.dart';
 
 class HelpDialog extends StatefulWidget {
   const HelpDialog({super.key});
@@ -37,24 +37,6 @@ class _HelpDialogState extends State<HelpDialog> {
         email = context.read<UserBloc>().state.user.email;
       });
     }
-  }
-
-  void clearInputs() async {
-    setState(() {
-      clearInput = true;
-      canSend = false;
-      email = '';
-      message = '';
-    });
-
-    Future.delayed(
-        const Duration(
-          milliseconds: 100,
-        ), () {
-      setState(() {
-        clearInput = false;
-      });
-    });
   }
 
   @override
@@ -142,7 +124,7 @@ class _HelpDialogState extends State<HelpDialog> {
                       onPressed: canSend
                           ? () async {
                               print('submit');
-                              await submit(context);
+                              await _submit(context);
                             }
                           : null,
                       child: Text(
@@ -163,7 +145,7 @@ class _HelpDialogState extends State<HelpDialog> {
     );
   }
 
-  Future<void> submit(
+  Future<void> _submit(
     BuildContext context,
   ) async {
     SystemChannels.textInput.invokeMethod('TextInput.hide');
@@ -192,7 +174,7 @@ class _HelpDialogState extends State<HelpDialog> {
             ),
           );
 
-        clearInputs();
+        _clearInputs();
       } on FirebaseFunctionsException catch (error) {
         print('error: $error');
       } catch (err) {
@@ -212,6 +194,24 @@ class _HelpDialogState extends State<HelpDialog> {
 
     setState(() {
       isSending = false;
+    });
+  }
+
+  void _clearInputs() async {
+    setState(() {
+      clearInput = true;
+      canSend = false;
+      email = '';
+      message = '';
+    });
+
+    Future.delayed(
+        const Duration(
+          milliseconds: 100,
+        ), () {
+      setState(() {
+        clearInput = false;
+      });
     });
   }
 }

@@ -47,6 +47,14 @@ class UserRepository {
     }
   }
 
+  Future<bool> checkForUser({
+    required String userId,
+  }) async {
+    print('check for user..');
+    return (await _firebaseFirestore.collection('users').doc(userId).get())
+        .exists;
+  }
+
   Future<User> getUser({
     required String userId,
   }) async {
@@ -63,21 +71,29 @@ class UserRepository {
   Future<void> createUser({
     required User user,
   }) async {
-    bool userExist =
-        (await _firebaseFirestore.collection('users').doc(user.id).get())
-            .exists;
-
-    if (userExist) {
-      return;
-    } else {
-      await _firebaseFirestore
-          .collection('users')
-          .doc(user.id)
-          // .set(user.toSnap());
-          .set(user.toJson(
+    print('create user');
+    if (!(await _firebaseFirestore.collection('users').doc(user.id).get())
+        .exists) {
+      print('creating user for ${user.id}:');
+      print(user);
+      await _firebaseFirestore.collection('users').doc(user.id).set(user.toJson(
             isFirebase: true,
           ));
+      // bool userExist =
+      //     (await _firebaseFirestore.collection('users').doc(user.id).get())
+      //         .exists;
     }
+
+    // if (userExist) {
+    //   return;
+    // } else {
+    //   await _firebaseFirestore
+    //       .collection('users')
+    //       .doc(user.id)
+    //       .set(user.toJson(
+    //         isFirebase: true,
+    //       ));
+    // }
   }
 
   Future<void> updateUser({

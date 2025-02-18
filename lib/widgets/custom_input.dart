@@ -42,14 +42,14 @@ class _CustomInputState extends State<CustomInput> {
     super.dispose();
   }
 
-  void clearText() {
+  void _clearText() {
     controller.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     if (widget.clearText! && controller.text.isNotEmpty) {
-      clearText();
+      _clearText();
     }
 
     return TextField(

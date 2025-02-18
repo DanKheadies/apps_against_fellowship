@@ -1,5 +1,6 @@
 export 'game/screens.dart';
 export 'error_screen.dart';
+export 'google_screen.dart';
 export 'home_screen.dart';
 export 'profile_screen.dart';
 export 'settings_screen.dart';

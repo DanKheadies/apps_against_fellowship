@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/repositories/auth_repository.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -47,6 +48,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     authenticationTimer = Timer(Duration.zero, () {});
     buttOpacTimer;
     titleOpacTimer;
+
+    // context.read<AuthRepository>().loginWithGoogleSilently();
+    context.read<AuthBloc>().add(
+          LoginWithGoogleSilently(),
+        );
+    // Note: Google user is throwing a null issue / red screen
+    // Some values are set as null on creation for Google but not Register
+    // or anon?
   }
 
   @override
@@ -73,6 +82,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           );
         } else if (state.status == AuthStatus.authenticated) {
           _triggerAuthenticationTimer();
+          print('auth state:');
+          print(state);
 
           return ScreenWrapper(
             screen: 'welcome',
@@ -219,6 +230,58 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   ),
                 ),
                 Positioned(
+                  top: size.height / 2 - 50,
+                  left: 0,
+                  child: AnimatedOpacity(
+                    opacity: buttonOpacity,
+                    duration: const Duration(seconds: 1),
+                    child: SizedBox(
+                      width: size.width,
+                      child: Center(
+                        child: HomeOutlineButton(
+                          icon: Icon(
+                            MdiIcons.logout,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          text: 'Sign Out',
+                          onTap: buttOpacTimer.isActive
+                              ? null
+                              // : () => context.goNamed('google'),
+                              : () => context.read<AuthBloc>().add(
+                                    SignOut(),
+                                  ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: size.height / 2 + 25,
+                  left: 0,
+                  child: AnimatedOpacity(
+                    opacity: buttonOpacity,
+                    duration: const Duration(seconds: 1),
+                    child: SizedBox(
+                      width: size.width,
+                      child: Center(
+                        child: HomeOutlineButton(
+                          icon: Icon(
+                            MdiIcons.google,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          text: 'Google',
+                          onTap: buttOpacTimer.isActive
+                              ? null
+                              // : () => context.goNamed('google'),
+                              : () => context.read<AuthBloc>().add(
+                                    LoginWithGoogle(),
+                                  ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
                   top: size.height / 2 + 100,
                   left: 0,
                   child: AnimatedOpacity(
@@ -344,6 +407,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         const Duration(seconds: 3),
         () {
           print('its been 3 seconds and still here, sign out');
+          print(context.read<AuthBloc>().state);
           context.read<AuthBloc>().add(
                 SignOut(),
               );

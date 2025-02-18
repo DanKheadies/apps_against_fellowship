@@ -106,6 +106,23 @@ final GoRouter goRouter = GoRouter(
       ),
     ),
     GoRoute(
+      path: '/google',
+      name: 'google',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const GoogleScreen(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      ),
+      redirect: (context, state) => newRedirect(
+        context,
+        state,
+      ),
+    ),
+    GoRoute(
       path: '/welcome',
       name: 'welcome',
       pageBuilder: (context, state) => CustomTransitionPage(

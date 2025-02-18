@@ -34,41 +34,8 @@ class _AuthenticationState extends State<Authentication> {
 
   @override
   void initState() {
-    emailCont.text = context.read<AuthenticationCubit>().state.email;
-
     super.initState();
-  }
-
-  void checkEmail(BuildContext context) {
-    var email = context.read<AuthenticationCubit>().state.email;
-
-    if (EmailValidator.validate(email)) {
-      setState(() {
-        validEmail = true;
-      });
-    } else {
-      if (email != '') {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            const SnackBar(
-              content: Text("Enter a valid email."),
-            ),
-          );
-      }
-
-      setState(() {
-        validEmail = false;
-      });
-    }
-  }
-
-  void closeKeyboard() {
-    FocusScopeNode currentFocus = FocusScope.of(context);
-
-    if (!currentFocus.hasPrimaryFocus) {
-      currentFocus.unfocus();
-    }
+    emailCont.text = context.read<AuthenticationCubit>().state.email;
   }
 
   @override
@@ -89,28 +56,7 @@ class _AuthenticationState extends State<Authentication> {
             (widget.isRegister &&
                 (context.read<AuthenticationCubit>().state.isRegisterValid &&
                     validPassword));
-        // bool g2g = !validEmail ||
-        //     (widget.isRegister &&
-        //         (!context.read<AuthenticationCubit>().state.isRegisterValid ||
-        //             !validPassword)) ||
-        //     (!widget.isRegister &&
-        //         !context.read<AuthenticationCubit>().state.isLoginValid);
 
-        // SingleChildScrollView(
-        //   physics: NeverScrollableScrollPhysics(),
-        //   child: ConstrainedBox(
-        //     constraints: BoxConstraints(
-        //       minWidth: MediaQuery.of(context).size.width,
-        //       minHeight: MediaQuery.of(context).size.height,
-        //     ),
-        //     child: IntrinsicHeight(
-        //       child: Column(
-        //         mainAxisSize: MainAxisSize.max,
-        //         children: <Widget>[],
-        //       ),
-        //     ),
-        //   ),
-        // ),
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom + 25,
@@ -132,8 +78,8 @@ class _AuthenticationState extends State<Authentication> {
                               .nameChanged(value);
                         },
                         onEditComplete: () {
-                          checkEmail(context);
-                          closeKeyboard();
+                          _checkEmail(context);
+                          _closeKeyboard();
                         },
                       ),
                     )
@@ -147,13 +93,13 @@ class _AuthenticationState extends State<Authentication> {
                 child: Focus(
                   // onKey: (focusNode, event) {
                   //   if (event.logicalKey == LogicalKeyboardKey.tab) {
-                  //     checkEmail(context);
+                  //     _checkEmail(context);
                   //   }
                   //   return KeyEventResult.ignored;
                   // },
                   onKeyEvent: (node, event) {
                     if (event.logicalKey == LogicalKeyboardKey.tab) {
-                      checkEmail(context);
+                      _checkEmail(context);
                     }
                     return KeyEventResult.ignored;
                   },
@@ -165,13 +111,14 @@ class _AuthenticationState extends State<Authentication> {
                       context.read<AuthenticationCubit>().emailChanged(value);
                     },
                     onEditComplete: () {
-                      checkEmail(context);
-                      closeKeyboard();
+                      _checkEmail(context);
+                      _closeKeyboard();
                     },
+                    // Note: disable to allow scroll
                     onTapOutside: (value) {
                       if (emailFocus.hasFocus) {
-                        checkEmail(context);
-                        closeKeyboard();
+                        _checkEmail(context);
+                        _closeKeyboard();
                       }
                     },
                   ),
@@ -219,13 +166,14 @@ class _AuthenticationState extends State<Authentication> {
                             },
                       onTap: () {
                         if (!validEmail) {
-                          checkEmail(context);
+                          _checkEmail(context);
                         }
                       },
+                      // Note: disable to allow scroll
                       onTapOutside: (value) {
                         if (passwordFocus.hasFocus) {
-                          checkEmail(context);
-                          closeKeyboard();
+                          _checkEmail(context);
+                          _closeKeyboard();
                         }
                       },
                     ),
@@ -361,53 +309,42 @@ class _AuthenticationState extends State<Authentication> {
                       }
                     : null,
               ),
-              // ElevatedButton(
-              //   onPressed: !validEmail ||
-              //           (widget.isRegister &&
-              //               (!context
-              //                       .read<AuthenticationCubit>()
-              //                       .state
-              //                       .isRegisterValid ||
-              //                   !validPassword)) ||
-              //           (!widget.isRegister &&
-              //               !context
-              //                   .read<AuthenticationCubit>()
-              //                   .state
-              //                   .isLoginValid)
-              //       ? null
-              //       : () {
-              //           if (widget.isRegister) {
-              //             context.read<AuthBloc>().add(
-              //                   RegisterWithEmailAndPassword(
-              //                     email: state.email,
-              //                     name: state.name,
-              //                     password: state.password,
-              //                   ),
-              //                 );
-              //           } else {
-              //             context.read<AuthBloc>().add(
-              //                   LoginWithEmailAndPassword(
-              //                     email: state.email,
-              //                     password: state.password,
-              //                   ),
-              //                 );
-              //           }
-              //         },
-              //   style: ElevatedButton.styleFrom(
-              //     backgroundColor:
-              //         Theme.of(context).colorScheme.onSurfaceVariant,
-              //     elevation: 3,
-              //     foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              //     shadowColor: Theme.of(context).colorScheme.inverseSurface,
-              //     surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
-              //   ),
-              //   child: Text(
-              //     widget.isRegister ? 'Register' : 'Login',
-              //   ),
             ],
           ),
         );
       },
     );
+  }
+
+  void _checkEmail(BuildContext context) {
+    var email = context.read<AuthenticationCubit>().state.email;
+
+    if (EmailValidator.validate(email)) {
+      setState(() {
+        validEmail = true;
+      });
+    } else {
+      if (email != '') {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text("Enter a valid email."),
+            ),
+          );
+      }
+
+      setState(() {
+        validEmail = false;
+      });
+    }
+  }
+
+  void _closeKeyboard() {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+
+    if (!currentFocus.hasPrimaryFocus) {
+      currentFocus.unfocus();
+    }
   }
 }
