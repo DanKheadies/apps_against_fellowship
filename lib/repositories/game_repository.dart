@@ -146,13 +146,17 @@ class GameRepository {
 
   /// Return a list of games that you have joined in the past
   Stream<List<UserGame>> observeJoinedGames(User user) {
+    print('observe');
+    print(user);
     return _firestore
         .collection('users')
         .doc(user.id)
         .collection('games')
         .snapshots()
-        .map((querySnapshot) =>
-            querySnapshot.docs.map((e) => UserGame.fromSnapshot(e)).toList());
+        .map((querySnapshot) {
+      print('test');
+      return querySnapshot.docs.map((e) => UserGame.fromSnapshot(e)).toList();
+    });
   }
 
   /// Observe any changes to a game state by it's [gameDocumentId]

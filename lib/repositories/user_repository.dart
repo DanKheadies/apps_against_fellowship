@@ -27,13 +27,13 @@ class UserRepository {
     required String bucket,
     required User user,
   }) async {
-    print('update user picture');
+    // print('update user picture');
     String downloadUrl = await StorageRepository().getDatabaseUrl(
       bucket: bucket,
       imageName: imageName,
       user: user,
     );
-    print('succes?');
+    // print('succes?');
 
     try {
       await _firebaseFirestore.collection('users').doc(user.id).update({
@@ -50,7 +50,7 @@ class UserRepository {
   Future<bool> checkForUser({
     required String userId,
   }) async {
-    print('check for user..');
+    // print('check for user..');
     return (await _firebaseFirestore.collection('users').doc(userId).get())
         .exists;
   }
@@ -71,11 +71,11 @@ class UserRepository {
   Future<void> createUser({
     required User user,
   }) async {
-    print('create user');
+    // print('create user');
     if (!(await _firebaseFirestore.collection('users').doc(user.id).get())
         .exists) {
-      print('creating user for ${user.id}:');
-      print(user);
+      // print('creating user for ${user.id}:');
+      // print(user);
       await _firebaseFirestore.collection('users').doc(user.id).set(user.toJson(
             isFirebase: true,
           ));
@@ -99,28 +99,22 @@ class UserRepository {
   Future<void> updateUser({
     required User user,
   }) async {
-    return _firebaseFirestore
-        .collection('users')
-        .doc(user.id)
-        // .update(user.toSnap());
-        .set(user.toJson(
+    return _firebaseFirestore.collection('users').doc(user.id).set(user.toJson(
           isFirebase: true,
         ));
   }
 
-  // Stream<User> observeUser() {
-  //   return getUser()
-  // }
-
-  Stream<User> getUserStream({
+  Stream<User?> getUserStream({
     required String userId,
   }) {
     // Update: this is the main issue when registering a new user
     // Returning the {} is what's throwing the List<dynamic> but got null issue.
     // Would be better to return an empty user and handle post-fact.
+    // UPDATE: making getUser return nullable and handling downstream, i.e.
+    // in AuthBloc sub.
     return _firebaseFirestore.collection('users').doc(userId).snapshots().map(
-          (snap) =>
-              snap.data() == null ? User.emptyUser : User.fromSnapshot(snap),
+          (snap) => snap.data() == null ? null : User.fromSnapshot(snap),
+          // snap.data() == null ? User.emptyUser : User.fromSnapshot(snap),
         );
   }
 }

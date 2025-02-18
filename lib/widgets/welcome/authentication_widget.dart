@@ -56,6 +56,7 @@ class _AuthenticationState extends State<Authentication> {
             (widget.isRegister &&
                 (context.read<AuthenticationCubit>().state.isRegisterValid &&
                     validPassword));
+        double screenWidth = MediaQuery.of(context).size.width;
 
         return Padding(
           padding: EdgeInsets.only(
@@ -130,7 +131,7 @@ class _AuthenticationState extends State<Authentication> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   SizedBox(
-                    width: MediaQuery.of(context).size.width - 95,
+                    width: screenWidth < 500 ? screenWidth - 95 : 355,
                     child: CustomTextField(
                       label: 'Password',
                       cont: passwordCont,

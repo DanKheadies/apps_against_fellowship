@@ -80,7 +80,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
   Widget _buildScaffold() {
     return BlocBuilder<CreateGameBloc, CreateGameState>(
       builder: (context, state) {
-        return state.createGameStatus == CreateGameStatus.loaded
+        return state.createGameStatus != CreateGameStatus.loaded
             ? _buildLoading()
             : DefaultTabController(
                 length: 2,
@@ -258,6 +258,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
     return Container(
       height: double.maxFinite,
       width: double.maxFinite,
+      color: Theme.of(context).scaffoldBackgroundColor,
       alignment: Alignment.center,
       child: const CircularProgressIndicator(),
     );

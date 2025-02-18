@@ -9,17 +9,14 @@ abstract class AuthEvent extends Equatable {
 
 class AuthUserChanged extends AuthEvent {
   final auth.User? authUser;
-  final auth.UserCredential? authGoogleUser;
 
   const AuthUserChanged({
     this.authUser,
-    this.authGoogleUser,
   });
 
   @override
   List<Object?> get props => [
         authUser,
-        authGoogleUser,
       ];
 }
 

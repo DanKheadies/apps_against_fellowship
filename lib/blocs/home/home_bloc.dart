@@ -29,6 +29,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _joinedGamesSubscription = _gameRepository
         .observeJoinedGames(_userBloc.state.user)
         .listen((event) {
+      print('DACO');
+      print(_userBloc.state.user);
       add(
         JoinedGamesUpdated(games: event),
       );

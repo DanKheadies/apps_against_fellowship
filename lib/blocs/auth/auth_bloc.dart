@@ -49,14 +49,57 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       print('auth sub');
       if (authUser != null) {
         print('auth sub has user');
-        print(authUser);
-        add(
-          AuthUserChanged(
-            authUser: authUser,
-          ),
-        );
+        // print(authUser);
+        // Note: I think this is the issue, i.e. we have an Auth user, but we
+        // haven't gotten their data into the UserBloc, which is what goes BUMP
+        // b/c there's no id yet; however, we update the "lastUpdated" value now,
+        // which triggers the ScreenWrapper nav workflow. Hmmmm...
+        // Update: couldn't I just do this once we have the stream setup (?)
+        // add(
+        //   AuthUserChanged(
+        //     authUser: authUser,
+        //   ),
+        // );
+        print('setting up user sub w/ id: ${authUser.uid}');
+        _userSubscription =
+            _userRepository.getUserStream(userId: authUser.uid).listen((user) {
+          // Wait for an id from the stream before carrying on.
+          if (user != null) {
+            print('updating user: ${user.name}');
+            print('user:');
+            print(user);
+            _userBloc.add(
+              UpdateUser(
+                updateFirebase: false,
+                user: user,
+              ),
+            );
 
-        _setupUserSubscription(authUser.uid);
+            add(
+              AuthUserChanged(
+                authUser: authUser,
+              ),
+            );
+            // print('updating user: ${user.name}');
+            // print('user:');
+            // print(user);
+            // // Wait for an id from the stream before carrying on.
+            // if (user.id != '') {
+            //   _userBloc.add(
+            //     UpdateUser(
+            //       updateFirebase: false,
+            //       user: user,
+            //     ),
+            //   );
+
+            //   add(
+            //     AuthUserChanged(
+            //       authUser: authUser,
+            //     ),
+            //   );
+          }
+        });
+        // _setupUserSubscription(authUser.uid);
         // _userSubscription =
         //     _userRepository.getUserStream(userId: authUser.uid).listen((user) {
         //   _userBloc.add(
@@ -112,19 +155,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     // });
   }
 
-  void _setupUserSubscription(String id) {
-    print('setting up user sub w/ id: $id');
-    _userSubscription =
-        _userRepository.getUserStream(userId: id).listen((user) {
-      print('updating user: ${user.name}');
-      _userBloc.add(
-        UpdateUser(
-          updateFirebase: false,
-          user: user,
-        ),
-      );
-    });
-  }
+  // void _setupUserSubscription(String id) {
+  //   print('setting up user sub w/ id: $id');
+  //   _userSubscription =
+  //       _userRepository.getUserStream(userId: id).listen((user) {
+  //     print('updating user: ${user.name}');
+  //     _userBloc.add(
+  //       UpdateUser(
+  //         updateFirebase: false,
+  //         user: user,
+  //       ),
+  //     );
+  //   });
+  // }
 
   void _onAuthUserChanged(
     AuthUserChanged event,
@@ -230,11 +273,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     try {
+      print('did we get here?');
       var googleUser = await _authRepository.loginWithGoogle();
 
       emit(
         state.copyWith(
-          authGoogleUser: googleUser,
+          authUser: googleUser,
           lastUpdate: DateTime.now(),
           status: AuthStatus.authenticated,
         ),
