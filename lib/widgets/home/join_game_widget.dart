@@ -22,11 +22,16 @@ class JoinGameWidget extends StatelessWidget {
           gameCode: gameId,
         ),
       );
+      // } else {
+      //   homeCont.add(
+      //     RefreshHome(),
+      //   );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Note: UX has changed; don't see loading/loaded on mobile (?)
     return HomeOutlineButton(
       icon: state.joiningGame == ''
           ? Icon(

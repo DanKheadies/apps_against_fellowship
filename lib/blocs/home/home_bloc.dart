@@ -21,16 +21,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   })  : _gameRepository = gameRepository,
         _userBloc = userBloc,
         super(HomeState.loading()) {
-    on<JoinedGamesUpdated>(_onJoinedGamesUpdated);
-    on<UserUpdatedViaHome>(_onUserUpdatedViaHome);
-    on<LeaveGame>(_onLeaveGame);
     on<JoinGame>(_onJoinGame);
+    on<JoinedGamesUpdated>(_onJoinedGamesUpdated);
+    on<LeaveGame>(_onLeaveGame);
+    on<RefreshHome>(_onRefreshHome);
+    on<UserUpdatedViaHome>(_onUserUpdatedViaHome);
 
     _joinedGamesSubscription = _gameRepository
         .observeJoinedGames(_userBloc.state.user)
         .listen((event) {
-      print('DACO');
-      print(_userBloc.state.user);
+      print('observing / listening..');
+      add(
+        UserUpdatedViaHome(user: _userBloc.state.user),
+      );
       add(
         JoinedGamesUpdated(games: event),
       );
@@ -50,6 +53,56 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   //   }
   // }
 
+  void _onJoinGame(
+    JoinGame event,
+    Emitter<HomeState> emit,
+  ) async {
+    print('trying to join game in bloc');
+    try {
+      emit(
+        state.copyWith(
+          joiningGame: event.gameCode,
+          isLoading: true,
+        ),
+      );
+
+      var game = await _gameRepository.joinGame(
+        '', // Firebase Id
+        event.gameCode, // 5-digit
+        _userBloc.state.user,
+      );
+
+      // await Future.delayed(const Duration(seconds: 3));
+
+      emit(
+        state.copyWith(
+          isLoading: false,
+          joinedGame: game,
+          joiningGame: '',
+        ),
+      );
+
+      // emit(
+      //   state.copyWith(
+      //     error: 'and theres an error: $derp',
+      //     isLoading: false,
+      //     // joinedGame: null,
+      //     joiningGame: '',
+      //   ),
+      // );
+    } catch (err) {
+      print('home bloc: err joining game: $err');
+      emit(
+        state.copyWith(
+          error: '$err',
+          isLoading: false,
+          // joinedGame: null,
+          joiningGame: '',
+        ),
+      );
+    }
+  }
+
   void _onJoinedGamesUpdated(
     JoinedGamesUpdated event,
     Emitter<HomeState> emit,
@@ -57,6 +110,57 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(
       state.copyWith(
         games: event.games..sort((a, b) => b.joinedAt!.compareTo(a.joinedAt!)),
+      ),
+    );
+  }
+
+  void _onLeaveGame(
+    LeaveGame event,
+    Emitter<HomeState> emit,
+  ) async {
+    try {
+      print('trying to leave game');
+      emit(
+        state.copyWith(
+          isLoading: true,
+          games: state.games..remove(event.game),
+          leavingGame: event.game,
+        ),
+      );
+
+      await _gameRepository.leaveGame(
+        _userBloc.state.user,
+        event.game,
+      );
+
+      emit(
+        state.copyWith(
+          isLoading: false,
+          leavingGame: null,
+        ),
+      );
+    } catch (err) {
+      print('home bloc: leave game err: $err');
+      emit(
+        state.copyWith(
+          isLoading: false,
+          leavingGame: null,
+        ),
+      );
+    }
+  }
+
+  void _onRefreshHome(
+    RefreshHome event,
+    Emitter<HomeState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        error: '',
+        joinedGame: null,
+        joiningGame: '',
+        leavingGame: UserGame.emptyUserGame,
+        isLoading: false,
       ),
     );
   }
@@ -71,64 +175,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         user: event.user,
       ),
     );
-  }
-
-  void _onLeaveGame(
-    LeaveGame event,
-    Emitter<HomeState> emit,
-  ) async {
-    try {
-      emit(
-        state.copyWith(
-          games: state.games..remove(event.game),
-          leavingGame: event.game,
-        ),
-      );
-      // TODO
-      // await _gameRepository.leaveGame(event.game);
-      emit(
-        state.copyWith(
-          leavingGame: null,
-        ),
-      );
-    } catch (err) {
-      print('home bloc: leave game err: $err');
-      emit(
-        state.copyWith(
-          leavingGame: null,
-        ),
-      );
-    }
-  }
-
-  void _onJoinGame(
-    JoinGame event,
-    Emitter<HomeState> emit,
-  ) async {
-    try {
-      emit(
-        state.copyWith(
-          joiningGame: event.gameCode,
-        ),
-      );
-      // TODO
-      // var game = await _gameRepository.joinGame(event.gameCode);
-      emit(
-        state.copyWith(
-          // joinedGame: game,
-          joiningGame: null,
-        ),
-      );
-    } catch (err) {
-      print('home bloc: err joining game: $err');
-      emit(
-        state.copyWith(
-          error: '$err',
-          // joinedGame: null,
-          joiningGame: null,
-        ),
-      );
-    }
   }
 
   @override

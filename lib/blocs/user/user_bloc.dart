@@ -45,6 +45,7 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     Emitter<UserState> emit,
   ) {
     // TODO: update firebase (?)
+    // Note: never called; still needed?
     emit(
       state.copyWith(
         user: state.user.copyWith(
@@ -129,9 +130,7 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     UpdateUser event,
     Emitter<UserState> emit,
   ) async {
-    print('updating user?');
     if (state.userStatus == UserStatus.loading) return;
-    print('updating user.');
 
     emit(
       state.copyWith(
@@ -146,14 +145,11 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
         updatedAt: DateTime.now(),
       );
     } else {
-      print('creating and updating:');
       updatedUser = event.user;
-      print(updatedUser);
     }
 
     try {
       if (event.updateFirebase) {
-        print('update firebase');
         await _userRepository.updateUser(
           user: updatedUser,
         );

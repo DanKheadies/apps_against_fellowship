@@ -81,8 +81,7 @@ class HandCard extends StatelessWidget {
         text,
         textAlign: TextAlign.end,
         style: Theme.of(context).textTheme.bodySmall!.copyWith(
-              // color: context.secondaryColorOnCard,
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).canvasColor,
               fontStyle: FontStyle.italic,
             ),
       ),

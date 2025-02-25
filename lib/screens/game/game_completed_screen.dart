@@ -25,7 +25,7 @@ class CompletedGameScreen extends StatelessWidget {
                 child: Text(
                   'Winner',
                   style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.background,
+                        color: Theme.of(context).canvasColor,
                       ),
                 ),
               ),
@@ -37,7 +37,7 @@ class CompletedGameScreen extends StatelessWidget {
                       ? state.winner.name
                       : Player.defaultName,
                   style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                        color: Theme.of(context).colorScheme.background,
+                        color: Theme.of(context).canvasColor,
                       ),
                 ),
               ),
@@ -80,7 +80,7 @@ class CompletedGameScreen extends StatelessWidget {
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(
-                      color: Theme.of(context).colorScheme.background,
+                      color: Theme.of(context).canvasColor,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -95,7 +95,7 @@ class CompletedGameScreen extends StatelessWidget {
                   child: Text(
                     'QUIT',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.background,
+                      color: Theme.of(context).canvasColor,
                     ),
                   ),
                 ),
@@ -133,7 +133,7 @@ class CompletedGameScreen extends StatelessWidget {
               ),
               child: Icon(
                 MdiIcons.crown,
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
               ),
             ),
           )

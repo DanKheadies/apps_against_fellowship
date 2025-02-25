@@ -73,6 +73,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       print('result was true, so delete');
       // Analytics > setting - delete account
       try {
+        // TODO
         // await authRepository.deleteAccount();
 
         authBloc.add(
@@ -93,21 +94,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           authBloc.add(
             SignOut(),
           );
-          // TODO: verify that ScreenWrapper navigates
         }
       }
     }
   }
 
   Future<void> signOut(BuildContext context) async {
-    // var authBloc = context.read<AuthBloc>();
-    // var authRepository = context.read<AuthRepository>();
-
     await context.read<AuthRepository>().signOut();
 
-    // authBloc.add(
-    //   SignOut(),
-    // );
     if (context.mounted) {
       context.read<AuthBloc>().add(
             SignOut(),
@@ -119,7 +113,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return ScreenWrapper(
       screen: 'Settings',
-      // hideAppBar: true,
       goBackTo: 'home',
       child: ListView(
         children: [
@@ -152,7 +145,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Preference(
                 title: 'Sign Out',
                 icon: Icon(
-                  // Icons.logout,
                   MdiIcons.logout,
                   color: Theme.of(context).colorScheme.primary,
                 ),
@@ -187,7 +179,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Preference(
                 title: 'Terms of Service',
                 icon: Icon(
-                  // Icons.format_align_left,
                   MdiIcons.clipboard,
                   color: Theme.of(context).colorScheme.primary,
                 ),
@@ -330,7 +321,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                   ),
                                 );
-                            // setState(() {});
                           },
                         ),
                         Preference(
@@ -345,10 +335,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   'DISABLED',
                                   style: TextStyle(color: Colors.redAccent),
                                 ),
-                          // icon: Image.asset(
-                          //   'assets/ic_logo.png',
-                          //   color: context.secondaryColorOnCard,
-                          // ),
                           icon: Icon(
                             state.user.developerPackEnabled
                                 ? Icons.developer_board
@@ -396,9 +382,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       'assets/images/cc_by_nc_sa.png',
                       width: 96,
                     ),
-                    // child: const Icon(
-                    //   Icons.copyright,
-                    // ),
                   ),
                 ),
               ],

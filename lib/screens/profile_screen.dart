@@ -1,4 +1,6 @@
 import 'package:apps_against_fellowship/blocs/blocs.dart';
+// import 'package:apps_against_fellowship/models/models.dart';
+// import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,6 +13,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  bool creatingGod = false;
   final TextEditingController displayNameController = TextEditingController();
 
   @override
@@ -28,7 +31,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: BlocBuilder<UserBloc, UserState>(
         builder: (context, state) {
           if (state.userStatus == UserStatus.initial ||
-              state.userStatus == UserStatus.loading) {
+              state.userStatus == UserStatus.loading ||
+              creatingGod) {
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -59,6 +63,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       const ProfilePhoto(),
+                      // const SizedBox(height: 50),
+                      // TextButton(
+                      //   child: Text('Create God Usopp'),
+                      //   onPressed: () async {
+                      //     setState(() {
+                      //       creatingGod = true;
+                      //     });
+                      //     await context
+                      //         .read<UserRepository>()
+                      //         .createAGod(godUsopp);
+                      //     setState(() {
+                      //       creatingGod = false;
+                      //     });
+                      //   },
+                      // ),
                     ],
                   ),
                 ),

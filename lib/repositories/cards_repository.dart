@@ -37,7 +37,7 @@ class CardsRepository {
     } else {
       var snapshots = await _firestore.collection('cardSets').get();
 
-      print("${snapshots.docs.length} Card sets found");
+      // print("${snapshots.docs.length} Card sets found");
 
       final cardSets = snapshots.docs.map((e) {
         var cardSet = CardSet.fromJson(e.data());

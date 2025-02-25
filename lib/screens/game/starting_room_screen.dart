@@ -33,9 +33,10 @@ class StartingRoomScreen extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         "Game ID",
-                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                              color: Theme.of(context).colorScheme.background,
-                            ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyLarge!
+                            .copyWith(color: Theme.of(context).canvasColor,),
                       ),
                       Text(
                         state.game.gameId,

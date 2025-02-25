@@ -53,17 +53,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     titleOpacTimer;
 
     if (!kIsWeb) {
-      // context.read<AuthBloc>().add(
-      //       // LoginWithGoogleSilently(),
-      //       SignOut(),
-      //     );
+      context.read<AuthBloc>().add(
+            LoginWithGoogleSilently(),
+            // SignOut(),
+          );
     }
-    // Note: Google user is throwing a null issue / red screen
-    // Some values are set as null on creation for Google but not Register
-    // or anon?
-    // UPDATE: Google silent sign in is causing us to be validated, but homeBloc
-    // runs (and the subscription) without having a user Id to get data.
-    // Order of operations seems to have gone "bump," happens w/ anon too.
   }
 
   @override
@@ -76,19 +70,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    print('build welcome screen');
-    // return ScreenWrapper(
-    //   screen: 'Derp',
-    //   child: Center(
-    //     child: Text('Hello World',
-    //         style: TextStyle(
-    //           color: Colors.black,
-    //         )),
-    //   ),
-    // );
+    // print('build welcome screen');
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        print('auth bloc builder on welcome screen');
+        // print('auth bloc builder on welcome screen');
         if (state.status == AuthStatus.submitting) {
           return ScreenWrapper(
             screen: 'welcome',
@@ -99,12 +84,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           );
         } else if (state.status == AuthStatus.authenticated) {
           _checkAuthentication(state);
-          // print('auth state:');
-          // print(state);
-          // Update: hmmm.. At this point, AuthUserChanged has triggered, which
-          // means we updated the UserBloc, and ScreenWrapper has a new state.
-          // Going to convert the timer to a function and see what happens.
-          // Might just want to use the "execute when everything is built" trigger?
 
           return ScreenWrapper(
             screen: 'welcome',
@@ -267,7 +246,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           text: 'Sign Out',
                           onTap: buttOpacTimer.isActive
                               ? null
-                              // : () => context.goNamed('google'),
                               : () => context.read<AuthBloc>().add(
                                     SignOut(),
                                   ),
@@ -299,7 +277,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 text: 'Google',
                                 onTap: buttOpacTimer.isActive
                                     ? null
-                                    // : () => context.goNamed('google'),
                                     : () => context.read<AuthBloc>().add(
                                           LoginWithGoogle(),
                                         ),
@@ -428,41 +405,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   void _checkAuthentication(AuthState state) {
-    // if (!authenticationTimer.isActive) {
-    //   // print('not active so setting');
-    //   authenticationTimer = Timer(
-    //     const Duration(seconds: 3),
-    //     () {
-    //       print('its been 3 seconds and still here, sign out');
-    //       // Update: so at this point, we've validated the user, i.e. authSub,
-    //       // and we've gotten user data, i.e. userSub. If everything checks out,
-    //       // we should go ahead and send them in. If it don't, then we can sign
-    //       // out. Still not a big fan that the timer is the solution.
-    //       print(context.read<AuthBloc>().state);
-    //       context.read<AuthBloc>().add(
-    //             SignOut(),
-    //           );
-    //     },
-    //   );
-    // }
     if (state.authUser != null) {
-      // print('auth should be g2g, lets nav');
-      // context.goNamed('home');
       SchedulerBinding.instance
           .addPostFrameCallback((_) => context.goNamed('home'));
     } else {
-      // print('auth is not ready; chill but maybe include timer to sign out');
       if (!authenticationTimer.isActive) {
-        // print('not active so setting');
         authenticationTimer = Timer(
           const Duration(seconds: 3),
           () {
-            // print('its been 3 seconds and still here, sign out');
-            // Update: so at this point, we've validated the user, i.e. authSub,
-            // and we've gotten user data, i.e. userSub. If everything checks out,
-            // we should go ahead and send them in. If it don't, then we can sign
-            // out. Still not a big fan that the timer is the solution.
-            // print(context.read<AuthBloc>().state);
             context.read<AuthBloc>().add(
                   SignOut(),
                 );

@@ -139,7 +139,7 @@ class PromptContainer extends StatelessWidget {
         child: Text(
           promptCard.special.toUpperCase(),
           style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).canvasColor,
               ),
         ),
       );

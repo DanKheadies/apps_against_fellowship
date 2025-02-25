@@ -33,7 +33,10 @@ All [CAH or "Cards Against Humanity"](https://cardsagainsthumanity.com/) questio
 
 - [CAH Spreadsheet Curators](https://docs.google.com/spreadsheets/d/1lsy7lIwBe-DWOi2PALZPf5DgXHx9MEvKfRw1GaWQkzg/edit)
 - [Code Formatting w/ Swastik Dwivedi](https://dev.to/drunckj/setting-up-code-formatting-with-eslint-typescript-and-prettier-in-visual-studio-code-44an)
-- [gCloud auth help](https://stackoverflow.com/questions/42043611/could-not-load-the-default-credentials-node-js-google-compute-engine-tutorial)
+
+---
+
+## Additional Notes:
 
 ---
 

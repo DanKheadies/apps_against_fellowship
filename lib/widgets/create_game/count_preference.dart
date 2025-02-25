@@ -53,7 +53,7 @@ class CountPreference extends StatelessWidget {
             child: Text(
               value.toString(),
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context).canvasColor,
                   ),
             ),
           ),

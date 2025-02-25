@@ -20,7 +20,7 @@ class PlayerResponseCard extends StatelessWidget {
       margin: const EdgeInsets.all(8),
       child: Material(
         borderRadius: BorderRadius.circular(16),
-        color: Theme.of(context).colorScheme.onBackground,
+        color: Theme.of(context).cardColor,
         elevation: 2,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +60,7 @@ class PlayerResponseCard extends StatelessWidget {
                       )
                     : Icon(
                         MdiIcons.checkboxBlankCircleOutline,
-                        color: Theme.of(context).colorScheme.onBackground,
+                        color: Theme.of(context).colorScheme.onSurface,
                         size: 32,
                       ),
               ),

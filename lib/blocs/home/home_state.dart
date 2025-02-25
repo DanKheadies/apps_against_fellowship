@@ -5,7 +5,7 @@ class HomeState extends Equatable {
   final Game? joinedGame;
   final List<UserGame> games;
   final String error;
-  final String joiningGame;
+  final String joiningGame; // 5-digit game code
   final User user;
   final UserGame leavingGame;
 

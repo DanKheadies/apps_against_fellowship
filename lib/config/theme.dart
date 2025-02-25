@@ -53,11 +53,11 @@ ThemeData lightTheme() {
       onPrimary: primaryDark,
       primaryContainer: primaryLight,
       error: error,
-      background: white, // convert background to secondary
-      onBackground: whiteBright,
-      surface: black, // convert surface to tertiary
+      surface: black,
       onSurface: blackNight,
-
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: primary,
     ),
     iconTheme: const IconThemeData(
       color: primary,
@@ -66,10 +66,13 @@ ThemeData lightTheme() {
     scaffoldBackgroundColor: whiteBright,
     snackBarTheme: SnackBarThemeData(
       actionTextColor: primary,
-      backgroundColor: blackUltimate,
+      backgroundColor: black,
       contentTextStyle: Typography.material2018(platform: defaultTargetPlatform)
           .englishLike
-          .titleMedium,
+          .titleMedium!
+          .copyWith(
+            color: white,
+          ),
     ),
     textTheme: Typography.material2018(platform: defaultTargetPlatform).white,
   );
@@ -94,10 +97,11 @@ ThemeData darkTheme() {
       onPrimary: primary,
       primaryContainer: primaryDark,
       error: error,
-      background: black,
-      onBackground: blackNight,
       surface: white,
       onSurface: whiteBright,
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: primaryLight,
     ),
     iconTheme: const IconThemeData(
       color: primaryLight,
@@ -106,10 +110,13 @@ ThemeData darkTheme() {
     scaffoldBackgroundColor: blackNight,
     snackBarTheme: SnackBarThemeData(
       actionTextColor: primaryLight,
-      backgroundColor: whiteUltimate,
+      backgroundColor: white,
       contentTextStyle: Typography.material2018(platform: defaultTargetPlatform)
           .englishLike
-          .titleMedium,
+          .titleMedium!
+          .copyWith(
+            color: black,
+          ),
     ),
     textTheme: Typography.material2018(platform: defaultTargetPlatform).black,
   );

@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 
 class GameStatusTitle extends StatelessWidget {
+  const GameStatusTitle({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<GameBloc, GameState>(
@@ -30,7 +32,7 @@ class GameStatusTitle extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleLarge!.copyWith(
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).canvasColor,
           ),
     );
   }

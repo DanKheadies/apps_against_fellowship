@@ -9,6 +9,19 @@ abstract class HomeEvent extends Equatable {
 
 class HomeStarted extends HomeEvent {}
 
+class JoinGame extends HomeEvent {
+  final String gameCode;
+
+  const JoinGame({
+    required this.gameCode,
+  });
+
+  @override
+  List<Object?> get props => [
+        gameCode,
+      ];
+}
+
 class JoinedGamesUpdated extends HomeEvent {
   final List<UserGame> games;
 
@@ -19,19 +32,6 @@ class JoinedGamesUpdated extends HomeEvent {
   @override
   List<Object?> get props => [
         games,
-      ];
-}
-
-class UserUpdatedViaHome extends HomeEvent {
-  final User user;
-
-  const UserUpdatedViaHome({
-    required this.user,
-  });
-
-  @override
-  List<Object?> get props => [
-        user,
       ];
 }
 
@@ -48,15 +48,22 @@ class LeaveGame extends HomeEvent {
       ];
 }
 
-class JoinGame extends HomeEvent {
-  final String gameCode;
+class RefreshHome extends HomeEvent {
+  const RefreshHome();
 
-  const JoinGame({
-    required this.gameCode,
+  @override
+  List<Object?> get props => [];
+}
+
+class UserUpdatedViaHome extends HomeEvent {
+  final User user;
+
+  const UserUpdatedViaHome({
+    required this.user,
   });
 
   @override
   List<Object?> get props => [
-        gameCode,
+        user,
       ];
 }

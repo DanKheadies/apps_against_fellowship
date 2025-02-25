@@ -28,7 +28,12 @@ class WaitingRoomScreen extends StatelessWidget {
                   Icons.arrow_back,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                onPressed: () => context.goNamed('home'),
+                onPressed: () {
+                  context.read<HomeBloc>().add(
+                        RefreshHome(),
+                      );
+                  context.goNamed('home');
+                },
               ),
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(72),

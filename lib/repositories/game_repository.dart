@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:apps_against_fellowship/models/models.dart';
@@ -68,6 +69,15 @@ class GameRepository {
       gameId: gameId,
       me: user,
     );
+    // try {
+    //   return await _addSelfToGame(
+    //     gameDocumentId: gameDocumentId,
+    //     gameId: gameId,
+    //     me: user,
+    //   );
+    // } catch (err) {
+    //   throw Exception('join game err: $err');
+    // }
   }
 
   /// Find an existing game using the [gameId] game id code
@@ -146,17 +156,15 @@ class GameRepository {
 
   /// Return a list of games that you have joined in the past
   Stream<List<UserGame>> observeJoinedGames(User user) {
-    print('observe');
-    print(user);
+    // print('observe');
+    // print(user);
     return _firestore
         .collection('users')
         .doc(user.id)
         .collection('games')
         .snapshots()
-        .map((querySnapshot) {
-      print('test');
-      return querySnapshot.docs.map((e) => UserGame.fromSnapshot(e)).toList();
-    });
+        .map((querySnapshot) =>
+            querySnapshot.docs.map((e) => UserGame.fromSnapshot(e)).toList());
   }
 
   /// Observe any changes to a game state by it's [gameDocumentId]
@@ -352,6 +360,34 @@ class GameRepository {
       gameId: jsonResponse['id'],
     );
     return game;
+    // try {
+    //   var user = await _userRepository.getUser(
+    //     userId: me.id,
+    //   );
+
+    //   HttpsCallableResult response =
+    //       await FirebaseFunctions.instance.httpsCallable('joinGame').call(
+    //     {
+    //       'game_doc_id': gameDocumentId,
+    //       'game_id': gameId.toUpperCase(),
+    //       'uid': user.id,
+    //       'name': user.name,
+    //       'avatar': user.avatarUrl,
+    //     },
+    //   );
+
+    //   print('got a response');
+    //   var jsonResponse = Map<String, dynamic>.from(response.data);
+    //   print(jsonResponse['id']);
+    //   var game = Game.fromJson(jsonResponse);
+    //   print(game);
+    //   game.copyWith(
+    //     gameId: jsonResponse['id'],
+    //   );
+    //   return game;
+    // } catch (err) {
+    //   throw Exception('add self err: $err');
+    // }
   }
 
   //////////////////////

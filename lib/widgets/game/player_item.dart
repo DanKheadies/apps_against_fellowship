@@ -51,7 +51,7 @@ class PlayerItem extends StatelessWidget {
           child: Icon(
             MdiIcons.humanGreeting,
             // color: Colors.white,
-            color: Theme.of(context).colorScheme.background,
+            color: Theme.of(context).canvasColor,
           ),
         ),
         child: _buildPlayerListTile(context),
@@ -76,7 +76,7 @@ class PlayerItem extends StatelessWidget {
         playerName,
         style: Theme.of(context).textTheme.titleMedium!.copyWith(
               // color: Colors.white,
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
             ),
       ),
       subtitle: isJudge

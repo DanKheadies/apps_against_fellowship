@@ -38,13 +38,6 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
                       SnackBar(
-                        // content: Row(
-                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //   children: [
-                        //     Text(state.error),
-                        //     const Icon(Icons.error)
-                        //   ],
-                        // ),
                         content: Text(state.error),
                         backgroundColor: Theme.of(context).colorScheme.error,
                       ),
@@ -123,7 +116,6 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
-                                // state.isLoading
                                 state.createGameStatus ==
                                         CreateGameStatus.loading
                                     ? "Loading..."
@@ -149,7 +141,7 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
                           foregroundColor:
-                              Theme.of(context).colorScheme.surface,
+                              Theme.of(context).scaffoldBackgroundColor,
                           shape: const CircleBorder(),
                           onPressed: () async {
                             // Analytics().logSelectContent(

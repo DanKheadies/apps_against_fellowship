@@ -85,12 +85,12 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
                   ),
                   filled: true,
                   fillColor: isEditing
-                      ? Theme.of(context).colorScheme.onBackground
-                      : Theme.of(context).colorScheme.background,
+                      ? Theme.of(context).cardColor
+                      : Theme.of(context).canvasColor,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.onBackground,
+                      color: Theme.of(context).cardColor,
                       width: 1,
                     ),
                   ),
@@ -111,7 +111,7 @@ class _ProfileTextFieldState extends State<ProfileTextField> {
                   disabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.background,
+                      color: Theme.of(context).canvasColor,
                       width: 0,
                     ),
                   ),

@@ -4,13 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
-import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
-const List<String> googleScopes = <String>[
-  'email',
-  'https://www.googleapis.com/auth/contacts.readonly',
-];
 
 class AuthRepository {
   final auth.FirebaseAuth _firebaseAuth;
@@ -24,7 +18,7 @@ class AuthRepository {
   })  : _firebaseAuth = firebaseAuth ?? auth.FirebaseAuth.instance,
         _googleSignIn = googleSignIn ??
             GoogleSignIn(
-              scopes: googleScopes,
+              scopes: ['email'],
             ),
         _userRepository = userRepository;
 
@@ -46,28 +40,27 @@ class AuthRepository {
   Stream<GoogleSignInAccount?> get userGoogle =>
       _googleSignIn.onCurrentUserChanged;
 
-  /// Authenticate with Google's web access.
-  Future<bool> authorizeGoogleScopesForWeb({
-    required GoogleSignInAccount account,
-  }) async {
-    try {
-      return await _googleSignIn.requestScopes(googleScopes);
-    } catch (err) {
-      print('google error: $err');
-      throw Exception(err);
-    }
-  }
+  // /// Authenticate with Google's web access.
+  // Future<bool> authorizeGoogleScopesForWeb({
+  //   required GoogleSignInAccount account,
+  // }) async {
+  //   try {
+  //     return await _googleSignIn.requestScopes(['email']);
+  //   } catch (err) {
+  //     print('google error: $err');
+  //     throw Exception(err);
+  //   }
+  // }
 
   /// Authenticate with Google's service.
   Future<auth.User?> loginWithGoogle() async {
     try {
-      print('try');
-      // UPDATE: Google on Web is a bit of an issue; we're not even getting to 
+      // UPDATE: Google on Web is a bit of an issue; we're not even getting to
       // this point in the Bloc/Repo flow because it has to use a web-specific
-      // button from google sign in. We'll then have to figure out some way to 
+      // button from google sign in. We'll then have to figure out some way to
       // incorporate this workflow to maintain the consistent access, etc.
       // Going to leave but ignore for now.
-      
+
       // if (kIsWeb) {
       //   print('google sub has user for web');
       //   GoogleSignInAccount? account = await _googleSignIn.signInSilently();
@@ -84,23 +77,6 @@ class AuthRepository {
       //   }
       // }
       GoogleSignInAccount? account = await _googleSignIn.signIn();
-      print('good?');
-      print(account);
-
-      // UPDATE: move before signIn
-      // // TODO: figure out if kWeb check goes here or...
-      // if (account != null && kIsWeb) {
-      //   print('google sub has user for web');
-      //   // await _googleSignIn.canAccessScopes(scopes);
-      //   bool continueWithSetup = await authorizeGoogleScopesForWeb(
-      //     account: account,
-      //   );
-
-      //   if (!continueWithSetup) {
-      //     print('Google account (for web) changed but didn\'t pass scopes.');
-      //     return null;
-      //   }
-      // }
 
       GoogleSignInAuthentication? googleAuth = await account?.authentication;
 
@@ -113,24 +89,14 @@ class AuthRepository {
       auth.UserCredential googleUser =
           await _firebaseAuth.signInWithCredential(googleCredentials);
 
-      // print(googleUser.user);
-      // print(googleUser.user?.displayName);
-      // print(googleUser.user?.email);
-
-      // TODO: figure out if kWeb check goes here.
-      // See auth bloc for more.
-
       // If successful, check if the user already exists; otherwise, create a
       // user.
       if (account != null && googleUser.user != null) {
-        // print('most likely an issue here..');
         bool exists = await _userRepository.checkForUser(
           userId: googleUser.user!.uid,
         );
-        // print('yea it cant call cuz not firebase');
 
         if (!exists) {
-          // print('doesn\'t exist, so create');
           await _userRepository.createUser(
             user: User.emptyUser.copyWith(
               id: googleUser.user?.uid,
@@ -143,18 +109,15 @@ class AuthRepository {
         }
       }
 
-      // print('all done, return');
       return googleUser.user;
     } catch (err) {
       print('google err: $err');
       throw Exception(err);
-      // return null;
     }
   }
 
   /// Authenticate with Google's service, shhhhhhhhhhh...
   Future<void> loginWithGoogleSilently() async {
-    print('shhhhh');
     try {
       await _googleSignIn.signInSilently();
     } catch (err) {
@@ -207,14 +170,12 @@ class AuthRepository {
     String? name,
   }) async {
     try {
-      print('register user');
       final userCredentials =
           await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      print('creating user:');
-      print(userCredentials.user);
+
       await _userRepository.createUser(
         user: User.emptyUser.copyWith(
           id: userCredentials.user!.uid,

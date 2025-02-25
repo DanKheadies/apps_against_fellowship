@@ -20,19 +20,6 @@ class AuthUserChanged extends AuthEvent {
       ];
 }
 
-// class AuthGoogleUserChanged extends AuthEvent {
-//   final GoogleSignInAccount authGoogleUser;
-
-//   const AuthGoogleUserChanged({
-//     required this.authGoogleUser,
-//   });
-
-//   @override
-//   List<Object?> get props => [
-//         authGoogleUser,
-//       ];
-// }
-
 class LoginWithEmailAndPassword extends AuthEvent {
   final String email;
   final String password;

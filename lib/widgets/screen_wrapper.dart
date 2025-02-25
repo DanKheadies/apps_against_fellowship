@@ -34,43 +34,20 @@ class ScreenWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // print('build wrapper');
-
-    // Update: this logic is kinda problematic, i.e. we navigate as soon as we
-    // get the Auth g2g but we're still getting user data. So when we go to Home
-    // and start loading up that bloc, we don't have the userId to accurately sub
-    // / stream to.
-    // Fix(?)
-    // 1. Add a timer here--should solve 95-99% of use cases--to delay nav.
-    // 2. Listen to Auth and User, which will cause this to re-build a good bit.
-    // 3. Keep as is, but focus on the AuthBloc and don't trigger authenticated
-    // until we have user info there.
-    // return Title(
-    //   title: 'test',
-    //   color: Colors.blue,
-    //   child: Scaffold(
-    //     body: Center(
-    //       child: Text(
-    //         'Hello World 2',
-    //         style: TextStyle(
-    //           color: Colors.black,
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // );
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
-        print('trigger screen wrapper - auth');
+        // print('trigger screen wrapper - auth');
         String screen =
             GoRouter.of(context).routeInformationProvider.value.uri.toString();
-        print(screen);
+        // print(screen);
         if (state.status == AuthStatus.unauthenticated ||
-            state.status == AuthStatus.unknown) {
-          print('not auth\'d, stay at welcome');
+            state.status == AuthStatus.unknown ||
+            state.authUser == null) {
+          // print('not auth\'d, stay at welcome');
           context.goNamed('welcome');
         } else if (state.status == AuthStatus.authenticated &&
             screen == '/welcome') {
-          print('auth\'d, to home');
+          // print('auth\'d, to home');
           context.goNamed('home');
         }
         // TODO: TOS, et al

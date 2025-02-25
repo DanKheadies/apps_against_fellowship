@@ -23,7 +23,7 @@ class CardSetListItem extends StatelessWidget {
       leading: Checkbox(
         value: isSelected,
         activeColor: Theme.of(context).colorScheme.primary,
-        checkColor: Theme.of(context).colorScheme.background,
+        checkColor: Theme.of(context).canvasColor,
         onChanged: (value) {
           // Analytics()
           //     .logSelectContent(contentType: 'card_set', itemId: cardSet.name);
