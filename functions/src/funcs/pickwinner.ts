@@ -29,9 +29,9 @@ import FieldValue = admin.firestore.FieldValue;
  */
 export async function handlePickWinner(data: any) {
   // const uid = context.auth?.uid;
-  const uid = data.uid;
-  const gameId = data.game_id;
-  const winningPlayerId = data.player_id;
+  const uid = data.data["uid"];
+  const gameId = data.data["game_id"];
+  const winningPlayerId = data.data["player_id"];
 
   if (uid) {
     if (gameId) {

@@ -50,14 +50,14 @@ export const startGame = onCall(async (data) => handleStartGame(data));
  *    d. Draw Rando-Cardrissian, if present
  * 4. Draw new cards for all players
  */
-exports.pickWinner = onCall(handlePickWinner);
+export const pickWinner = onCall(async (data) => handlePickWinner(data));
 
 /**
  * Re-Deal Hand - [Callable Function]
  *
  * This function will re-deal a user's hand in exchange for 1 prize card
  */
-exports.reDealHand = onCall(handleReDealHand);
+export const reDealHand = onCall(async (data) => handleReDealHand(data));
 
 /**
  * Join Game - [Callable Function]
@@ -76,7 +76,7 @@ export const joinGame = onCall(async (data) => handleJoinGame(data));
  * the game reference is deleted, otherwise the player is set to inactive, removed from judging, and
  * any responses in the turn removed
  */
-exports.leaveGame = onCall(handleLeaveGame);
+export const leaveGame = onCall(async (data) => handleLeaveGame(data));
 
 /**
  * Kick Player - [Callable Function]
@@ -84,14 +84,16 @@ exports.leaveGame = onCall(handleLeaveGame);
  * Kick a player from your game, only possible for game owner, and this will effectively ban them
  * from that game so they can't re-join
  */
-exports.kickPlayer = onCall(handleKickPlayer);
+export const kickPlayer = onCall(async (data) => handleKickPlayer(data));
 
 /**
  * Submit Response - [Callable Function]
  *
  * This function will be used by players to be able to submit a response to an ongoing game
  */
-exports.submitResponses = onCall(handleSubmitResponses);
+export const submitResponses = onCall(async (data) =>
+  handleSubmitResponses(data)
+);
 
 /**
  * Wave at a player - [Callable Function]
@@ -102,7 +104,7 @@ exports.submitResponses = onCall(handleSubmitResponses);
  *     'game_id': the Firestore Document Id of the game you want to start
  *     'player_id': the id of the player you want to wave to
  */
-exports.wave = onCall(handleWave);
+export const wave = onCall(async (data) => handleWave(data));
 
 /**
  * Downvotes - [Firestore onUpdate Trigger]
@@ -119,7 +121,7 @@ exports.wave = onCall(handleWave);
  * 4. Draw a new prompt card
  * 5. Reset the turn with new prompt, no downvotes, and no responses but keep the same judge
  */
-exports.downvotePrompt = onDocumentUpdated(
+export const downvotePrompt = onDocumentUpdated(
   "games/{gameId}/downvotes/tally",
   (event) => handleDownVote(event)
 );
@@ -138,7 +140,7 @@ exports.downvotePrompt = onDocumentUpdated(
 // exports.updateUserProfile = functions.firestore
 //   .document("users/{userId}")
 //   .onUpdate(handleUserUpdates);
-exports.updateUserProfile = onDocumentUpdated("users/{userId}", (event) =>
+export const updateUserProfile = onDocumentUpdated("users/{userId}", (event) =>
   handleUserUpdates(event)
 );
 

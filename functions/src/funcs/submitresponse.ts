@@ -16,10 +16,11 @@ import {Player} from "../models/player";
  */
 export async function handleSubmitResponses(data: any) {
   // const uid = context.auth?.uid;
-  const uid = data.uid;
-  const gameId = data.game_id;
-  const responses: string[] = data.responses;
-  const indexedResponses: { [index: string]: string } = data.indexed_responses;
+  const uid = data.data["uid"];
+  const gameId = data.data["game_id"];
+  const responses: string[] = data.data["responses"];
+  const indexedResponses: { [index: string]: string } =
+    data.data["indexed_responses"];
 
   // Pre-conditions
   if (!uid) {
@@ -101,7 +102,8 @@ export async function handleSubmitResponses(data: any) {
           const judgePlayer = players.find((p) => p.id === game.turn?.judgeId);
           if (judgePlayer) {
             console.log(`Notifying the judge: ${judgePlayer.name}`);
-            await firebase.push.sendAllResponsesInMessage(game, judgePlayer);
+            // TODO
+            // await firebase.push.sendAllResponsesInMessage(game, judgePlayer);
           }
         }
       }

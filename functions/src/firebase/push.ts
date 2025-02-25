@@ -54,6 +54,7 @@ export async function sendWaveToPlayer(
  * @param {string} playerName the name of the player that joined
  */
 export async function sendPlayerJoinedMessage(game: Game, playerName: string) {
+  // TODO: convert to subscription topic (?)
   const tokens = await getPlayerPushTokens([
     {
       id: game.ownerId,

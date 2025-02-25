@@ -14,9 +14,9 @@ import {nextJudge} from "../models/game";
  */
 export async function handleKickPlayer(data: any) {
   // const uid = context.auth?.uid;
-  const uid = data.uid;
-  const gameId = data.game_id;
-  const playerId = data.player_id;
+  const uid = data.data["uid"];
+  const gameId = data.data["game_id"];
+  const playerId = data.data["player_id"];
 
   if (!uid) {
     error("unauthenticated", "You must be authenticated to use this endpoint");

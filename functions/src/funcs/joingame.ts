@@ -110,7 +110,8 @@ export async function handleJoinGame(data: any) {
 
         // Notify game owner that someone has joined their game
         if (uid !== game!.ownerId) {
-          await firebase.push.sendPlayerJoinedMessage(game!, name);
+          // TODO: convert to subscription topic then re-activate
+          // await firebase.push.sendPlayerJoinedMessage(game!, name);
         }
       });
 

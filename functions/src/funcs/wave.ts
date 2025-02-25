@@ -17,10 +17,10 @@ import * as firebase from "../firebase/firebase.js";
  */
 export async function handleWave(data: any) {
   // const uid = context.auth?.uid;
-  const uid = data.uid;
-  const gameId = data.game_id;
-  const playerId = data.player_id;
-  const message = data.message || null;
+  const uid = data.data["uid"];
+  const gameId = data.data["game_id"];
+  const playerId = data.data["player_id"];
+  // const message = data.message || null;
 
   // Pre-conditions
   if (!uid) {
@@ -40,7 +40,8 @@ export async function handleWave(data: any) {
   }
 
   // Send push notification to this user's devices
-  await firebase.push.sendWaveToPlayer(gameId, from, to, message);
+  // TODO
+  // await firebase.push.sendWaveToPlayer(gameId, from, to, message);
 
   console.log(`Wave was sent to Player(${to.id}) from Player(${uid})`);
 }

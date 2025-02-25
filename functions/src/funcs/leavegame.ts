@@ -15,8 +15,8 @@ import {error} from "../util/error";
  */
 export async function handleLeaveGame(data: any) {
   // const uid = context.auth?.uid;
-  const uid = data.uid;
-  const gameId = data.game_id;
+  const uid = data.data["uid"];
+  const gameId = data.data["game_id"];
 
   if (!uid) {
     error("unauthenticated", "You must be authenticated to use this endpoint");

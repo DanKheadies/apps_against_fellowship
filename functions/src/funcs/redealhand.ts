@@ -12,8 +12,8 @@ import * as firestore from "../firebase/firebase";
  */
 export async function handleReDealHand(data: any) {
   // const uid = context.auth?.uid;
-  const uid = data.uid;
-  const gameId = data.game_id;
+  const uid = data.data["uid"];
+  const gameId = data.data["game_id"];
 
   if (uid) {
     if (gameId) {

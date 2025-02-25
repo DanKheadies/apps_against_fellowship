@@ -78,7 +78,9 @@ export async function handleStartGame(data: any) {
             /*
              * Generate the turn
              */
-            const firstTurn = await generateFirstTurn(game, players, cardPool);
+            // TODO
+            // const firstTurn = await generateFirstTurn(game, players, cardPool);
+            await generateFirstTurn(game, players, cardPool);
 
             /*
              * Seed Card Pool
@@ -101,11 +103,12 @@ export async function handleStartGame(data: any) {
             await firebase.games.updateState(gameId, "inProgress", players);
 
             // Send push notification to participants
-            await firebase.push.sendGameStartedMessage(
-              game,
-              players,
-              firstTurn
-            );
+            // TODO
+            // await firebase.push.sendGameStartedMessage(
+            //   game,
+            //   players,
+            //   firstTurn
+            // );
 
             // FINISH! Return some arbitrary result that the app won't deal with.
             return {
