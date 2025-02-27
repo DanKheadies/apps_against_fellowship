@@ -4,9 +4,9 @@ import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+// import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:go_router/go_router.dart';
 // import 'package:google_sign_in_web/web_only.dart' as web;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -30,63 +30,67 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   double buttonOpacity = 0;
   double titleOpacity = 0.420;
 
-  late Timer authenticationTimer;
-  late Timer buttOpacTimer = Timer(
-    const Duration(milliseconds: 300),
-    () => setState(() {
-      buttonOpacity = 1.0;
-    }),
-  );
-  late Timer titleOpacTimer = Timer(
-    const Duration(milliseconds: 100),
-    () => setState(() {
-      titleOpacity = 1.0;
-    }),
-  );
+  // late Timer authenticationTimer;
+  // late Timer buttOpacTimer = Timer(
+  //   const Duration(milliseconds: 300),
+  //   () => setState(() {
+  //     buttonOpacity = 1.0;
+  //   }),
+  // );
+  // late Timer titleOpacTimer = Timer(
+  //   const Duration(milliseconds: 100),
+  //   () => setState(() {
+  //     titleOpacity = 1.0;
+  //   }),
+  // );
 
   @override
   void initState() {
     super.initState();
 
-    authenticationTimer = Timer(Duration.zero, () {});
-    buttOpacTimer;
-    titleOpacTimer;
+    // authenticationTimer = Timer(Duration.zero, () {});
+    // buttOpacTimer;
+    // titleOpacTimer;
 
-    if (!kIsWeb) {
-      context.read<AuthBloc>().add(
-            LoginWithGoogleSilently(),
-            // SignOut(),
-          );
-    }
+    // if (!kIsWeb) {
+    //   context.read<AuthBloc>().add(
+    //         LoginWithGoogle(isSilent: true),
+    //         // LoginWithGoogleSilently(),
+    //         // SignOut(),
+    //       );
+    // }
   }
 
   @override
   void dispose() {
-    authenticationTimer.cancel();
-    buttOpacTimer.cancel();
-    titleOpacTimer.cancel();
+    // authenticationTimer.cancel();
+    // buttOpacTimer.cancel();
+    // titleOpacTimer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // print('build welcome screen');
+    print('build welcome screen');
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         // print('auth bloc builder on welcome screen');
         if (state.status == AuthStatus.submitting) {
           return ScreenWrapper(
-            screen: 'welcome',
+            screen: 'AAF Welcome',
             hideAppBar: true,
             child: Center(
               child: CircularProgressIndicator(),
             ),
           );
         } else if (state.status == AuthStatus.authenticated) {
-          _checkAuthentication(state);
+          // _checkAuthentication(state);
+          // Note: this is the case where the cache has us as authenticated,
+          // but w/ the GoogleSilentSignIn as a "catch-all" when the sub/stream
+          // has no authUser, we emit the status to unauth.
 
           return ScreenWrapper(
-            screen: 'welcome',
+            screen: 'AAF Welcome',
             hideAppBar: true,
             child: Center(
               child: GestureDetector(
@@ -194,8 +198,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       width: size.width,
       child: GestureDetector(
         onTap: () {
-          buttOpacTimer.cancel();
-          titleOpacTimer.cancel();
+          // buttOpacTimer.cancel();
+          // titleOpacTimer.cancel();
 
           setState(() {
             buttonOpacity = 1;
@@ -209,50 +213,81 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 Positioned(
                   top: 80,
                   left: 0,
-                  child: AnimatedOpacity(
-                    opacity: titleOpacity,
-                    duration: const Duration(seconds: 1),
-                    child: Container(
-                      width: size.width,
-                      padding: const EdgeInsets.only(
-                        left: 24,
-                        right: 24,
-                      ),
-                      child: Text(
-                        // TODO: convert for internationalization
-                        'Apps Against Fellowship',
-                        style:
-                            Theme.of(context).textTheme.displayLarge!.copyWith(
-                                  color: Theme.of(context).colorScheme.surface,
-                                ),
-                      ),
+                  child: Container(
+                    width: size.width,
+                    padding: const EdgeInsets.only(
+                      left: 24,
+                      right: 24,
+                    ),
+                    child: Text(
+                      // TODO: convert for internationalization
+                      'Apps Against Fellowship',
+                      style: Theme.of(context).textTheme.displayLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
                     ),
                   ),
+                  // child: AnimatedOpacity(
+                  //   opacity: titleOpacity,
+                  //   duration: const Duration(seconds: 1),
+                  //   child: Container(
+                  //     width: size.width,
+                  //     padding: const EdgeInsets.only(
+                  //       left: 24,
+                  //       right: 24,
+                  //     ),
+                  //     child: Text(
+                  //       // TODO: convert for internationalization
+                  //       'Apps Against Fellowship',
+                  //       style:
+                  //           Theme.of(context).textTheme.displayLarge!.copyWith(
+                  //                 color: Theme.of(context).colorScheme.surface,
+                  //               ),
+                  //     ),
+                  //   ),
+                  // ),
                 ),
                 Positioned(
                   top: size.height / 2 - 50,
                   left: 0,
-                  child: AnimatedOpacity(
-                    opacity: buttonOpacity,
-                    duration: const Duration(seconds: 1),
-                    child: SizedBox(
-                      width: size.width,
-                      child: Center(
-                        child: HomeOutlineButton(
-                          icon: Icon(
-                            MdiIcons.logout,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          text: 'Sign Out',
-                          onTap: buttOpacTimer.isActive
-                              ? null
-                              : () => context.read<AuthBloc>().add(
-                                    SignOut(),
-                                  ),
+                  child: SizedBox(
+                    width: size.width,
+                    child: Center(
+                      child: HomeOutlineButton(
+                        icon: Icon(
+                          MdiIcons.logout,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
+                        text: 'Sign Out',
+                        onTap: 1 + 1 == 3 // buttOpacTimer.isActive
+                            ? null
+                            : () => context.read<AuthBloc>().add(
+                                  SignOut(),
+                                ),
                       ),
                     ),
                   ),
+                  // child: AnimatedOpacity(
+                  //   opacity: buttonOpacity,
+                  //   duration: const Duration(seconds: 1),
+                  //   child: SizedBox(
+                  //     width: size.width,
+                  //     child: Center(
+                  //       child: HomeOutlineButton(
+                  //         icon: Icon(
+                  //           MdiIcons.logout,
+                  //           color: Theme.of(context).colorScheme.primary,
+                  //         ),
+                  //         text: 'Sign Out',
+                  //         onTap: buttOpacTimer.isActive
+                  //             ? null
+                  //             : () => context.read<AuthBloc>().add(
+                  //                   SignOut(),
+                  //                 ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ),
                 // TODO: add Apple auth (and then Apple auth for web)
                 kIsWeb
@@ -260,115 +295,196 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     : Positioned(
                         top: size.height / 2 + 25,
                         left: 0,
-                        child: AnimatedOpacity(
-                          opacity: buttonOpacity,
-                          duration: const Duration(seconds: 1),
-                          child: SizedBox(
-                            width: size.width,
-                            child: Center(
-                              child:
-                                  // TODO: add Google sign-in for web
-                                  // kIsWeb ? web.renderButton() :
-                                  HomeOutlineButton(
-                                icon: Icon(
-                                  MdiIcons.google,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                text: 'Google',
-                                onTap: buttOpacTimer.isActive
-                                    ? null
-                                    : () => context.read<AuthBloc>().add(
-                                          LoginWithGoogle(),
-                                        ),
+                        child: SizedBox(
+                          width: size.width,
+                          child: Center(
+                            child:
+                                // TODO: add Google sign-in for web
+                                // kIsWeb ? web.renderButton() :
+                                HomeOutlineButton(
+                              icon: Icon(
+                                MdiIcons.google,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
+                              text: 'Google',
+                              onTap: 1 + 1 == 3 // buttOpacTimer.isActive
+                                  ? null
+                                  : () => context.read<AuthBloc>().add(
+                                        LoginWithGoogle(),
+                                      ),
                             ),
                           ),
                         ),
+                        // child: AnimatedOpacity(
+                        //   opacity: buttonOpacity,
+                        //   duration: const Duration(seconds: 1),
+                        //   child: SizedBox(
+                        //     width: size.width,
+                        //     child: Center(
+                        //       child:
+                        //           // TODO: add Google sign-in for web
+                        //           // kIsWeb ? web.renderButton() :
+                        //           HomeOutlineButton(
+                        //         icon: Icon(
+                        //           MdiIcons.google,
+                        //           color: Theme.of(context).colorScheme.primary,
+                        //         ),
+                        //         text: 'Google',
+                        //         onTap: buttOpacTimer.isActive
+                        //             ? null
+                        //             : () => context.read<AuthBloc>().add(
+                        //                   LoginWithGoogle(),
+                        //                 ),
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ),
                 Positioned(
                   top: size.height / 2 + 100,
                   left: 0,
-                  child: AnimatedOpacity(
-                    opacity: buttonOpacity,
-                    duration: const Duration(seconds: 1),
-                    child: SizedBox(
-                      width: size.width,
-                      child: Center(
-                        child: HomeOutlineButton(
-                          icon: Icon(
-                            MdiIcons.login,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          text: 'Login',
-                          onTap: buttOpacTimer.isActive
-                              ? null
-                              : () {
-                                  setState(() {
-                                    method = AuthMethod.login;
-                                  });
-                                },
+                  child: SizedBox(
+                    width: size.width,
+                    child: Center(
+                      child: HomeOutlineButton(
+                        icon: Icon(
+                          MdiIcons.login,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
+                        text: 'Login',
+                        onTap: 1 + 1 == 3 // buttOpacTimer.isActive
+                            ? null
+                            : () {
+                                setState(() {
+                                  method = AuthMethod.login;
+                                });
+                              },
                       ),
                     ),
                   ),
+                  // child: AnimatedOpacity(
+                  //   opacity: buttonOpacity,
+                  //   duration: const Duration(seconds: 1),
+                  //   child: SizedBox(
+                  //     width: size.width,
+                  //     child: Center(
+                  //       child: HomeOutlineButton(
+                  //         icon: Icon(
+                  //           MdiIcons.login,
+                  //           color: Theme.of(context).colorScheme.primary,
+                  //         ),
+                  //         text: 'Login',
+                  //         onTap: buttOpacTimer.isActive
+                  //             ? null
+                  //             : () {
+                  //                 setState(() {
+                  //                   method = AuthMethod.login;
+                  //                 });
+                  //               },
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ),
                 Positioned(
                   top: size.height / 2 + 175,
                   left: 0,
-                  child: AnimatedOpacity(
-                    opacity: buttonOpacity,
-                    duration: const Duration(seconds: 1),
-                    child: SizedBox(
-                      width: size.width,
-                      child: Center(
-                        child: HomeOutlineButton(
-                          icon: Icon(
-                            MdiIcons.creation,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          text: 'Register',
-                          onTap: buttOpacTimer.isActive
-                              ? null
-                              : () {
-                                  setState(() {
-                                    method = AuthMethod.register;
-                                  });
-                                },
+                  child: SizedBox(
+                    width: size.width,
+                    child: Center(
+                      child: HomeOutlineButton(
+                        icon: Icon(
+                          MdiIcons.creation,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
+                        text: 'Register',
+                        onTap: 1 + 1 == 3 // buttOpacTimer.isActive
+                            ? null
+                            : () {
+                                setState(() {
+                                  method = AuthMethod.register;
+                                });
+                              },
                       ),
                     ),
                   ),
+                  // child: AnimatedOpacity(
+                  //   opacity: buttonOpacity,
+                  //   duration: const Duration(seconds: 1),
+                  //   child: SizedBox(
+                  //     width: size.width,
+                  //     child: Center(
+                  //       child: HomeOutlineButton(
+                  //         icon: Icon(
+                  //           MdiIcons.creation,
+                  //           color: Theme.of(context).colorScheme.primary,
+                  //         ),
+                  //         text: 'Register',
+                  //         onTap: buttOpacTimer.isActive
+                  //             ? null
+                  //             : () {
+                  //                 setState(() {
+                  //                   method = AuthMethod.register;
+                  //                 });
+                  //               },
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ),
                 Positioned(
                   top: size.height / 2 + 250,
                   left: 0,
-                  child: AnimatedOpacity(
-                    opacity: buttonOpacity,
-                    duration: const Duration(seconds: 1),
-                    child: SizedBox(
-                      width: size.width,
-                      child: Center(
-                        child: TextButton(
-                          onPressed: buttOpacTimer.isActive
-                              ? null
-                              : () {
-                                  context.read<AuthBloc>().add(
-                                        RegisterAnonymously(),
-                                      );
-                                },
-                          child: Text(
-                            'Maybe Later, Play Now',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                          ),
+                  child: SizedBox(
+                    width: size.width,
+                    child: Center(
+                      child: TextButton(
+                        onPressed: 1 + 1 == 3 // buttOpacTimer.isActive
+                            ? null
+                            : () {
+                                context.read<AuthBloc>().add(
+                                      RegisterAnonymously(),
+                                    );
+                              },
+                        child: Text(
+                          'Maybe Later, Play Now',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall!
+                              .copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                       ),
                     ),
                   ),
+                  // child: AnimatedOpacity(
+                  //   opacity: buttonOpacity,
+                  //   duration: const Duration(seconds: 1),
+                  //   child: SizedBox(
+                  //     width: size.width,
+                  //     child: Center(
+                  //       child: TextButton(
+                  //         onPressed: buttOpacTimer.isActive
+                  //             ? null
+                  //             : () {
+                  //                 context.read<AuthBloc>().add(
+                  //                       RegisterAnonymously(),
+                  //                     );
+                  //               },
+                  //         child: Text(
+                  //           'Maybe Later, Play Now',
+                  //           style: Theme.of(context)
+                  //               .textTheme
+                  //               .titleSmall!
+                  //               .copyWith(
+                  //                 color: Theme.of(context).colorScheme.primary,
+                  //               ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ),
               ],
             );
@@ -404,21 +520,37 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     }
   }
 
-  void _checkAuthentication(AuthState state) {
-    if (state.authUser != null) {
-      SchedulerBinding.instance
-          .addPostFrameCallback((_) => context.goNamed('home'));
-    } else {
-      if (!authenticationTimer.isActive) {
-        authenticationTimer = Timer(
-          const Duration(seconds: 3),
-          () {
-            context.read<AuthBloc>().add(
-                  SignOut(),
-                );
-          },
-        );
-      }
-    }
-  }
+  // void _checkAuthentication(AuthState state) {
+  //   if (state.authUser != null) {
+  //     // Note: this works as expected, but not sure if needed.. The authTimer
+  //     // still seems like a smart idea for when the system is caught up on
+  //     // itself.
+  //     // Note: it may not catch on itself anymore if GoogleSilentSignIn runs
+  //     // and always triggers an auth update? Going to avoid the whole check
+  //     // for now.
+  //     print('authUser present; go to home');
+  //     SchedulerBinding.instance.addPostFrameCallback((_) {
+  //       print('post frame callback triggerd');
+  //       String goScreen =
+  //           GoRouter.of(context).routeInformationProvider.value.uri.toString();
+  //       print('we going to $goScreen');
+  //       if (goScreen != '/home') {
+  //         print('current goScreen isn\'t home, so go home');
+  //         context.goNamed('home');
+  //       }
+  //     });
+  //   } else {
+  //     print('no authUser, set timer; but not really now');
+  //     // if (!authenticationTimer.isActive) {
+  //     //   authenticationTimer = Timer(
+  //     //     const Duration(seconds: 2),
+  //     //     () {
+  //     //       context.read<AuthBloc>().add(
+  //     //             SignOut(),
+  //     //           );
+  //     //     },
+  //     //   );
+  //     // }
+  //   }
+  // }
 }

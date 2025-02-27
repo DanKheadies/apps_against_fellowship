@@ -57,6 +57,8 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
         }
 
         print('updating via profile photo');
+        // TODO: issue while using flutter web locally.. Exception by Image
+        // Resource Service
 
         userBlocContext.add(
           UpdateUserImage(
@@ -85,6 +87,7 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
   Widget build(BuildContext context) {
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
+        print(state.user.avatarUrl);
         return SizedBox(
           width: double.infinity,
           child: Column(

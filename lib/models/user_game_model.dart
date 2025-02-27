@@ -38,9 +38,7 @@ class UserGame extends Equatable {
   }
 
   factory UserGame.fromSnapshot(DocumentSnapshot snap) {
-    print('from SNAP');
     dynamic data = snap.data();
-    print(data);
 
     DateTime joined = data['joinedAt'] != null
         ? DateTime.parse(data['joinedAt'])

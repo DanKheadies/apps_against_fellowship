@@ -192,6 +192,9 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
       user: state.user,
     );
 
+    // TODO: run cloud function to update user profile pic in all current
+    // games
+
     emit(
       state.copyWith(
         user: state.user.copyWith(

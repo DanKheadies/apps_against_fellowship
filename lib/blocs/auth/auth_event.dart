@@ -20,6 +20,19 @@ class AuthUserChanged extends AuthEvent {
       ];
 }
 
+class AuthGoogleUserChanged extends AuthEvent {
+  final GoogleSignInAccount? account;
+
+  const AuthGoogleUserChanged({
+    this.account,
+  });
+
+  @override
+  List<Object?> get props => [
+        account,
+      ];
+}
+
 class LoginWithEmailAndPassword extends AuthEvent {
   final String email;
   final String password;
@@ -37,18 +50,24 @@ class LoginWithEmailAndPassword extends AuthEvent {
 }
 
 class LoginWithGoogle extends AuthEvent {
-  const LoginWithGoogle();
+  final bool isSilent;
+
+  const LoginWithGoogle({
+    this.isSilent = false,
+  });
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+        isSilent,
+      ];
 }
 
-class LoginWithGoogleSilently extends AuthEvent {
-  const LoginWithGoogleSilently();
+// class LoginWithGoogleSilently extends AuthEvent {
+//   const LoginWithGoogleSilently();
 
-  @override
-  List<Object?> get props => [];
-}
+//   @override
+//   List<Object?> get props => [];
+// }
 
 class LoginWithLink extends AuthEvent {
   final String email;

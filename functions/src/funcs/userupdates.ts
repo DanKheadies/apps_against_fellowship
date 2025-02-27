@@ -10,7 +10,7 @@ import {
   FirestoreEvent,
   QueryDocumentSnapshot,
 } from "firebase-functions/v2/firestore";
-import {User} from "../models/user";
+import { User } from "../models/user";
 import * as firebase from "../firebase/firebase";
 
 /**
@@ -40,6 +40,7 @@ export async function handleUserUpdates(
 
   console.log(`Previous User(${JSON.stringify(previousUser)})`);
   console.log(`Current User(${JSON.stringify(newUser)})`);
+  // Update: avatarUrl didn't appear to come thru, i.e. it's gone in newUser.
 
   if (
     newUser.name !== previousUser.name ||

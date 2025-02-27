@@ -1,6 +1,6 @@
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
+// import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -99,15 +99,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> signOut(BuildContext context) async {
-    await context.read<AuthRepository>().signOut();
+  // Future<void> signOut(BuildContext context) async {
+  //   await context.read<AuthRepository>().signOut();
 
-    if (context.mounted) {
-      context.read<AuthBloc>().add(
-            SignOut(),
-          );
-    }
-  }
+  //   if (context.mounted) {
+  //     context.read<AuthBloc>().add(
+  //           SignOut(),
+  //         );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +148,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   MdiIcons.logout,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                onTap: () => signOut(context),
+                // onTap: () => signOut(context),
+                onTap: () => context.read<AuthBloc>().add(
+                      SignOut(),
+                    ),
               ),
               Preference(
                 title: 'Delete Account',

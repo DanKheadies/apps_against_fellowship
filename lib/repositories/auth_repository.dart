@@ -53,7 +53,9 @@ class AuthRepository {
   // }
 
   /// Authenticate with Google's service.
-  Future<auth.User?> loginWithGoogle() async {
+  Future<void> loginWithGoogle({
+    required bool isSilently,
+  }) async {
     try {
       // UPDATE: Google on Web is a bit of an issue; we're not even getting to
       // this point in the Bloc/Repo flow because it has to use a web-specific
@@ -76,14 +78,118 @@ class AuthRepository {
       //     }
       //   }
       // }
-      GoogleSignInAccount? account = await _googleSignIn.signIn();
+      late GoogleSignInAccount? account;
+      if (isSilently) {
+        account = await _googleSignIn.signInSilently();
+      } else {
+        account = await _googleSignIn.signIn();
+      }
+      print('contining w/ the info..');
+      print(account);
 
-      GoogleSignInAuthentication? googleAuth = await account?.authentication;
+      // if (account == null) {
+      //   print('null account, bail');
+      //   // return null;
+      // }
+
+      // // TODO: the rest of this could (should?) go in to the authSub, i.e.
+      // // run this logic once the sub/stream says to
+      // GoogleSignInAuthentication? googleAuth = await account.authentication;
+      // print('now w/ googleAuth');
+      // print(googleAuth);
+      // print(googleAuth.accessToken);
+      // print(googleAuth.idToken);
+      // print('prob fail');
+
+      // auth.OAuthCredential googleCredentials =
+      //     auth.GoogleAuthProvider.credential(
+      //   accessToken: googleAuth.accessToken,
+      //   idToken: googleAuth.idToken,
+      // );
+
+      // auth.UserCredential googleUser =
+      //     await _firebaseAuth.signInWithCredential(googleCredentials);
+
+      // // If successful, check if the user already exists; otherwise, create a
+      // // user.
+      // if (googleUser.user != null) {
+      //   bool exists = await _userRepository.checkForUser(
+      //     userId: googleUser.user!.uid,
+      //   );
+
+      //   if (!exists) {
+      //     await _userRepository.createUser(
+      //       user: User.emptyUser.copyWith(
+      //         id: googleUser.user?.uid,
+      //         name: googleUser.user?.displayName,
+      //         email: googleUser.user?.email,
+      //         avatarUrl: account.photoUrl,
+      //         updatedAt: DateTime.now(),
+      //       ),
+      //     );
+      //   }
+      // }
+
+      // return googleUser.user;
+    } catch (err) {
+      print('google err: $err');
+      throw Exception(err);
+    }
+  }
+
+  /// Authenticate with Google's service.
+  Future<auth.User?> getGoogleUser({
+    required GoogleSignInAccount account,
+  }) async {
+    try {
+      // UPDATE: Google on Web is a bit of an issue; we're not even getting to
+      // this point in the Bloc/Repo flow because it has to use a web-specific
+      // button from google sign in. We'll then have to figure out some way to
+      // incorporate this workflow to maintain the consistent access, etc.
+      // Going to leave but ignore for now.
+
+      // if (kIsWeb) {
+      //   print('google sub has user for web');
+      //   GoogleSignInAccount? account = await _googleSignIn.signInSilently();
+      //   if (account != null) {
+      //     print('has account');
+      //     bool continueWithSetup = await authorizeGoogleScopesForWeb(
+      //       account: account,
+      //     );
+
+      //     if (!continueWithSetup) {
+      //       print('Google account (for web) changed but didn\'t pass scopes.');
+      //       return null;
+      //     }
+      //   }
+      // }
+      // late GoogleSignInAccount? account;
+      // if (isSilently) {
+      //   account = await _googleSignIn.signInSilently();
+      // } else {
+      //   account = await _googleSignIn.signIn();
+      // }
+      // print('contining w/ the info..');
+      // print(account);
+
+      // if (account == null) {
+      //   print('null account, bail');
+      //   return null;
+      // }
+
+      // TODO: the rest of this could (should?) go in to the authSub, i.e.
+      // run this logic once the sub/stream says to
+      GoogleSignInAuthentication? googleAuth = await account.authentication;
+      print('now w/ googleAuth');
+      print(googleAuth);
+      print(googleAuth.accessToken);
+      print(googleAuth.idToken);
+      print('prob fail');
 
       auth.OAuthCredential googleCredentials =
           auth.GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
 
       auth.UserCredential googleUser =
@@ -91,7 +197,7 @@ class AuthRepository {
 
       // If successful, check if the user already exists; otherwise, create a
       // user.
-      if (account != null && googleUser.user != null) {
+      if (googleUser.user != null) {
         bool exists = await _userRepository.checkForUser(
           userId: googleUser.user!.uid,
         );
@@ -117,14 +223,22 @@ class AuthRepository {
   }
 
   /// Authenticate with Google's service, shhhhhhhhhhh...
-  Future<void> loginWithGoogleSilently() async {
-    try {
-      await _googleSignIn.signInSilently();
-    } catch (err) {
-      print('google err: $err');
-      throw Exception(err);
-    }
-  }
+  // Future<auth.User?> loginWithGoogleSilently() async {
+  //   try {
+  //     GoogleSignInAccount? account = await _googleSignIn.signInSilently();
+  //   } catch (err) {
+  //     print('google err: $err');
+  //     throw Exception(err);
+  //   }
+  // }
+  // Future<void> loginWithGoogleSilently() async {
+  //   try {
+  //     await _googleSignIn.signInSilently();
+  //   } catch (err) {
+  //     print('google err: $err');
+  //     throw Exception(err);
+  //   }
+  // }
 
   /// Authenticate with Firebase's email-password.
   Future<auth.User?> loginWithEmailAndPassword({
@@ -244,6 +358,31 @@ class AuthRepository {
 
   /// Log out
   Future<void> signOut() async {
-    await _firebaseAuth.signOut();
+    // try {
+    //   await _firebaseAuth.signOut();
+    //   if (_googleSignIn.currentUser != null) {
+    //     await _googleSignIn.signOut();
+    //     await _googleSignIn.disconnect();
+    //   }
+    // } catch (err) {
+    //   print('error signing out: $err');
+    // }
+    if (_googleSignIn.currentUser != null) {
+      print('have google user');
+      try {
+        await _googleSignIn.signOut();
+        await _googleSignIn.disconnect();
+      } catch (err) {
+        print('google error signing out: $err');
+      }
+    }
+    if (_firebaseAuth.currentUser != null) {
+      print('have firebase user');
+      try {
+        await _firebaseAuth.signOut();
+      } catch (err) {
+        print('firebase error signing out: $err');
+      }
+    }
   }
 }

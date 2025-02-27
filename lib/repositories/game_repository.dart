@@ -359,35 +359,8 @@ class GameRepository {
     game.copyWith(
       gameId: jsonResponse['id'],
     );
+
     return game;
-    // try {
-    //   var user = await _userRepository.getUser(
-    //     userId: me.id,
-    //   );
-
-    //   HttpsCallableResult response =
-    //       await FirebaseFunctions.instance.httpsCallable('joinGame').call(
-    //     {
-    //       'game_doc_id': gameDocumentId,
-    //       'game_id': gameId.toUpperCase(),
-    //       'uid': user.id,
-    //       'name': user.name,
-    //       'avatar': user.avatarUrl,
-    //     },
-    //   );
-
-    //   print('got a response');
-    //   var jsonResponse = Map<String, dynamic>.from(response.data);
-    //   print(jsonResponse['id']);
-    //   var game = Game.fromJson(jsonResponse);
-    //   print(game);
-    //   game.copyWith(
-    //     gameId: jsonResponse['id'],
-    //   );
-    //   return game;
-    // } catch (err) {
-    //   throw Exception('add self err: $err');
-    // }
   }
 
   //////////////////////

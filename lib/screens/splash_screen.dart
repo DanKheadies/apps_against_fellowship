@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/services/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
+// import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -59,30 +59,43 @@ class _SplashScreenState extends State<SplashScreen>
         body: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, authState) {
             return BlocBuilder<UserBloc, UserState>(
-              builder: (context, userState) {
+              builder: (_, userState) {
                 return InkWell(
                   // onTap: () => decideRoute(context, authState, userState),
-                  onTap: () => context.goNamed('welcome'),
+                  // onTap: () {
+                  //   print('derp');
+                  //   // context.goNamed('welcome');
+                  // },
+                  onTap: () {
+                    print('derp');
+                    authenticationNavigator(
+                      context,
+                      context.read<AuthBloc>().state,
+                    );
+                  },
+                  // onTap: () => print('derp'),
                   child: Center(
-                    child: Center(
-                      child: Lottie.asset(
-                        'assets/images/splash/${files[fileIndex]}.json',
-                        controller: aniCont,
-                        onLoaded: (composition) {
-                          aniCont
-                            ..duration = fileIndex == 0
-                                ? composition.duration * 2
-                                : composition.duration
-                            ..forward();
-                          navTimer = Timer(
-                            fileIndex == 0
-                                ? composition.duration * 2
-                                : composition.duration,
-                            // () => decideRoute(context, authState, userState),
-                            () => context.goNamed('welcome'),
-                          );
-                        },
-                      ),
+                    child: Lottie.asset(
+                      'assets/images/splash/${files[fileIndex]}.json',
+                      controller: aniCont,
+                      onLoaded: (composition) {
+                        aniCont
+                          ..duration = fileIndex == 0
+                              ? composition.duration * 2
+                              : composition.duration
+                          ..forward();
+                        navTimer = Timer(
+                          fileIndex == 0
+                              ? composition.duration * 2
+                              : composition.duration,
+                          // () => decideRoute(context, authState, userState),
+                          // () => context.goNamed('welcome'),
+                          () => authenticationNavigator(
+                            context,
+                            context.read<AuthBloc>().state,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 );

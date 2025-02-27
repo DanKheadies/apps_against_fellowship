@@ -126,8 +126,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     GameUpdated event,
     Emitter<GameState> emit,
   ) {
-    print('updating game w/');
-    print(event.game);
     emit(
       state.copyWith(
         game: event.game,
