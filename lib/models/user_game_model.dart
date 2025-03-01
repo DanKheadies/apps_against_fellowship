@@ -1,15 +1,16 @@
-import 'package:apps_against_fellowship/blocs/blocs.dart';
+// import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class UserGame extends Equatable {
   final DateTime? joinedAt;
-  final GameState gameState;
+  final GameStatus gameStatus;
   final String gameId;
   final String id;
 
   const UserGame({
-    required this.gameState,
+    required this.gameStatus,
     required this.gameId,
     required this.id,
     this.joinedAt,
@@ -17,7 +18,7 @@ class UserGame extends Equatable {
 
   @override
   List<Object?> get props => [
-        gameState,
+        gameStatus,
         gameId,
         id,
         joinedAt,
@@ -25,12 +26,12 @@ class UserGame extends Equatable {
 
   UserGame copyWith({
     DateTime? joinedAt,
-    GameState? gameState,
+    GameStatus? gameStatus,
     String? gameId,
     String? id,
   }) {
     return UserGame(
-      gameState: gameState ?? this.gameState,
+      gameStatus: gameStatus ?? this.gameStatus,
       gameId: gameId ?? this.gameId,
       id: id ?? this.id,
       joinedAt: joinedAt ?? this.joinedAt,
@@ -40,12 +41,16 @@ class UserGame extends Equatable {
   factory UserGame.fromSnapshot(DocumentSnapshot snap) {
     dynamic data = snap.data();
 
-    DateTime joined = data['joinedAt'] != null
+    DateTime? joined = data['joinedAt'] != null
         ? DateTime.parse(data['joinedAt'])
-        : DateTime.now();
+        // : DateTime.now();
+        : null;
+    GameStatus status = GameStatus.values.firstWhere(
+      (stat) => stat.name.toString() == data['gameStatus'],
+    );
 
     return UserGame(
-      gameState: data['gameState'] ?? GameState.emptyGame,
+      gameStatus: status,
       gameId: data['gameId'] ?? '',
       id: snap.id,
       joinedAt: joined,
@@ -53,12 +58,16 @@ class UserGame extends Equatable {
   }
 
   factory UserGame.fromJson(Map<String, dynamic> json) {
-    DateTime joined = json['joinedAt'] != null
+    DateTime? joined = json['joinedAt'] != null
         ? (json['joinedAt'] as Timestamp).toDate()
-        : DateTime.now();
+        // : DateTime.now();
+        : null;
+    GameStatus status = GameStatus.values.firstWhere(
+      (stat) => stat.name.toString() == json['gameStatus'],
+    );
 
     return UserGame(
-      gameState: json['gameState'] ?? GameState.emptyGame,
+      gameStatus: status,
       gameId: json['gameId'] ?? '',
       id: json['id'] ?? '',
       joinedAt: joined,
@@ -67,7 +76,7 @@ class UserGame extends Equatable {
 
   Map<String, dynamic> toSnap() {
     return {
-      'gameState': gameState.toJson(),
+      'gameState': gameStatus.name,
       'gameId': gameId,
       'id': id,
       'joinedAt': joinedAt?.toUtc(),
@@ -76,7 +85,7 @@ class UserGame extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
-      'gameState': gameState.toJson(),
+      'gameState': gameStatus.name,
       'gameId': gameId,
       'id': id,
       'joinedAt': joinedAt.toString(),
@@ -84,7 +93,7 @@ class UserGame extends Equatable {
   }
 
   static const emptyUserGame = UserGame(
-    gameState: GameState.emptyGame,
+    gameStatus: GameStatus.waitingRoom,
     gameId: '',
     id: '',
     // joinedAt: DateTime.now(),

@@ -152,7 +152,7 @@ class PromptContainer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Material(
-        color: Theme.of(context).colorScheme.onSurface,
+        color: Theme.of(context).colorScheme.onInverseSurface,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
@@ -187,8 +187,9 @@ class PromptContainer extends StatelessWidget {
           builder: (context, state) {
             return Text(
               state.currentPromptText,
-              // style: context.cardTextStyle(Colors.white),
-              // TODO
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.inverseSurface,
+              ),
             );
           },
         ),

@@ -383,6 +383,7 @@ async function processBatchResponse(response: BatchResponse) {
  */
 async function invalidatePushToken(token: string) {
   // Find the token
+  // TODO: create an index in Firestore (use testQuery as needed)
   const snapshot = await firebase.firestore
     .collectionGroup(COLLECTION_DEVICES)
     .where("token", "==", token)

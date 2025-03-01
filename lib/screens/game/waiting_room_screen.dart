@@ -12,164 +12,155 @@ class WaitingRoomScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenWrapper(
-      screen: 'Waiting Room',
-      hideAppBar: true,
-      child: BlocBuilder<GameBloc, GameState>(
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              // brightness: Brightness.dark,
-              // textTheme: context.theme.textTheme,
-              // iconTheme: context.theme.iconTheme,
-              title: const Text("Waiting for players"),
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                onPressed: () {
-                  context.read<HomeBloc>().add(
-                        RefreshHome(),
-                      );
-                  context.goNamed('home');
-                },
-              ),
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(72),
-                child: Container(
-                  height: 72,
-                  padding: const EdgeInsets.only(bottom: 8),
-                  alignment: Alignment.center,
-                  child: Row(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(left: 72),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Game ID",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyLarge!
-                                  .copyWith(
-                                    color:
-                                        Theme.of(context).colorScheme.surface,
-                                  ),
-                            ),
-                            Text(
-                              state.game.gameId,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
-                                  .copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(right: 16, top: 4),
-                              // child: ElevatedButton(
-                              //   onPressed: () {},
-                              //   child: const Text('INVITE'),
-                              // ),
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  // color: context.primaryColor,
-                                  textStyle: TextStyle(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  // textColor: context.primaryColor,
-                                  // highlightedBorderColor: context.primaryColor,
-                                  backgroundColor: Theme.of(context)
-                                      .colorScheme
-                                      .primary
-                                      .withValues(alpha: 0.420),
-                                  // splashColor:
-                                  //     context.primaryColor.withOpacity(0.40),
-                                  side: BorderSide(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                  // borderSide:
-                                  //     BorderSide(color: context.primaryColor),
-                                ),
-                                onPressed: () async {
-                                  // TODO: invite
-                                  print('TODO: invite');
-                                  // Analytics().logShare(
-                                  //     contentType: 'game',
-                                  //     itemId: 'invite',
-                                  //     method: 'dynamic_link');
-                                  // var link = await DynamicLinks.createLink(
-                                  //     state.game.id);
-                                  // await Share.share(link.toString());
-                                },
-                                child: const Text("INVITE"),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              //        actions: [
-              //          IconButton(
-              //            icon: Icon(Icons.group_add),
-              //            onPressed: () async {
-              //              var link = await DynamicLinks.createLink(state.game.id);
-              //              await Share.share(link.toString());
-              //            },
-              //          )
-              //        ],
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-            floatingActionButton: state.isOurGame
-                ? FloatingActionButton.extended(
-                    icon: Icon(MdiIcons.play),
-                    label: const Text("START GAME"),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    onPressed: state.players.length > 2
-                        ? () async {
-                            // Analytics().logSelectContent(
-                            //     contentType: 'action', itemId: 'start_game');
-                            context.read<GameBloc>().add(StartGame());
-                          }
-                        : () {},
+    return BlocBuilder<GameBloc, GameState>(
+      builder: (context, state) {
+        bool isStarting = state.gameStateStatus == GameStateStatus.submitting ||
+            state.game.gameStatus == GameStatus.starting;
+
+        return ScreenWrapper(
+          screen: 'Waiting Room',
+          // hideAppBar: false,
+          customAppBar: _buildAppBar(isStarting, context, state),
+          flaction: state.isOurGame && !isStarting
+              ? FloatingActionButton.extended(
+                  icon: Icon(MdiIcons.play),
+                  label: const Text("START GAME"),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  onPressed: state.players.length > 2
+                      ? () async {
+                          // Analytics().logSelectContent(
+                          //     contentType: 'action', itemId: 'start_game');
+                          context.read<GameBloc>().add(
+                                StartGame(),
+                              );
+                        }
+                      : () {},
+                )
+              : null,
+          flactionLocation: FloatingActionButtonLocation.centerFloat,
+          child: BlocListener<GameBloc, GameState>(
+            listener: (context, state) {
+              // TODO: see if this can be handled differently or is ideal
+              if (state.error != '') {
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text(state.error),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                    ),
+                  );
+              }
+            },
+            child: state.gameStateStatus == GameStateStatus.submitting
+                ? Center(
+                    child: CircularProgressIndicator(),
                   )
-                : null,
-            body: BlocListener<GameBloc, GameState>(
-              listener: (context, state) {
-                if (state.error != '') {
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Text(state.error),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                      ),
+                : _buildPlayerList(context, state),
+          ),
+        );
+      },
+    );
+  }
+
+  AppBar _buildAppBar(
+    bool isStarting,
+    BuildContext context,
+    GameState state,
+  ) {
+    return AppBar(
+      title: Text(
+        isStarting ? 'Game is starting...' : 'Waiting for players',
+      ),
+      leading: isStarting
+          ? const SizedBox()
+          : IconButton(
+              icon: Icon(
+                Icons.arrow_back,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              onPressed: () {
+                // TODO Needed still (?)
+                context.read<HomeBloc>().add(
+                      RefreshHome(),
                     );
-                }
+                context.goNamed('home');
               },
-              child: _buildPlayerList(context, state),
             ),
-          );
-        },
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(72),
+        child: Container(
+          height: 72,
+          padding: const EdgeInsets.only(bottom: 8),
+          alignment: Alignment.center,
+          child: Row(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 72),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Game ID",
+                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
+                    ),
+                    Text(
+                      state.game.gameId,
+                      style:
+                          Theme.of(context).textTheme.headlineMedium!.copyWith(
+                                color: Theme.of(context).primaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                    )
+                  ],
+                ),
+              ),
+              isStarting
+                  ? const SizedBox()
+                  : Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(right: 16, top: 4),
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                textStyle: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.420),
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              onPressed: () async {
+                                // TODO: invite
+                                print('TODO: invite');
+                                // Analytics().logShare(
+                                //     contentType: 'game',
+                                //     itemId: 'invite',
+                                //     method: 'dynamic_link');
+                                // var link = await DynamicLinks.createLink(
+                                //     state.game.id);
+                                // await Share.share(link.toString());
+                              },
+                              child: const Text("INVITE"),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -197,7 +188,11 @@ class WaitingRoomScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPlayerTile(BuildContext context, Player player, int index) {
+  Widget _buildPlayerTile(
+    BuildContext context,
+    Player player,
+    int index,
+  ) {
     var playerName = player.name != '' ? player.name : Player.defaultName;
     if (playerName.trim().isEmpty) {
       playerName = Player.defaultName;
@@ -222,7 +217,9 @@ class WaitingRoomScreen extends StatelessWidget {
   }
 
   Widget _buildRandoCardrissianInvite(
-      BuildContext context, String gameDocumentId) {
+    BuildContext context,
+    String gameDocumentId,
+  ) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
       title: Text(

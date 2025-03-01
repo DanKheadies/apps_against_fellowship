@@ -55,6 +55,9 @@ ThemeData lightTheme() {
       error: error,
       surface: black,
       onSurface: blackNight,
+      surfaceBright: blackUltimate,
+      inverseSurface: whiteUltimate,
+      onInverseSurface: blackUltimate,
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: primary,
@@ -99,6 +102,9 @@ ThemeData darkTheme() {
       error: error,
       surface: white,
       onSurface: whiteBright,
+      surfaceBright: whiteUltimate,
+      inverseSurface: white,
+      onInverseSurface: blackUltimate,
     ),
     floatingActionButtonTheme: FloatingActionButtonThemeData(
       backgroundColor: primaryLight,

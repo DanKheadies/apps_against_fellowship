@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
@@ -20,8 +21,11 @@ class GamePlayScreen extends StatefulWidget {
 class _GamePlayScreenState extends State<GamePlayScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: BottomAppBar(
+    return ScreenWrapper(
+      screen: 'Game On',
+      // avoidThemeChange: true,
+      hideAppBar: true,
+      customBottAppBar: BottomAppBar(
         notchMargin: 8,
         shape: const CircularNotchedRectangle(),
         child: SizedBox(
@@ -32,9 +36,13 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
                 margin: const EdgeInsets.only(left: 8),
                 child: IconButton(
                   icon: const Icon(Icons.close),
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onPrimary,
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    // Navigator.of(context).pop();
+                    context.read<HomeBloc>().add(
+                          RefreshHome(),
+                        );
+                    context.goNamed('home');
                   },
                 ),
               ),
@@ -56,7 +64,7 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
                     ),
                     IconButton(
                       icon: Icon(MdiIcons.accountGroup),
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       onPressed: () {
                         _showPlayerBottomSheet(context);
                       },
@@ -68,7 +76,7 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
           ),
         ),
       ),
-      body: BlocListener<GameBloc, GameState>(
+      child: BlocListener<GameBloc, GameState>(
         listenWhen: (previous, current) {
           return current.game.turn?.winner != previous.game.turn?.winner;
         },
@@ -154,7 +162,6 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
                   child: Text(
                     widget.state.game.gameId,
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          // color: AppColors.primaryVariant,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                   ),

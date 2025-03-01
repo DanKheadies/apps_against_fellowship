@@ -103,21 +103,33 @@ class God extends Equatable {
     DateTime? firstDT = json['firstMention'] != null && isTimestamp == null
         ? DateTime.parse(json['firstMention'])
         : null;
-    List<Event>? actsList =
-        (json['majorActs'] as List).map((act) => Event.fromJson(act)).toList();
-    List<Subscriber>? followersList = (json['followers'] as List)
-        .map((fellow) => Subscriber.fromJson(fellow))
-        .toList();
+    List<Event>? actsList = json['majorActs'] != null
+        ? (json['majorActs'] as List).map((act) => Event.fromJson(act)).toList()
+        : null;
+    List<Subscriber>? followersList = json['followers'] != null
+        ? (json['followers'] as List)
+            .map((fellow) => Subscriber.fromJson(fellow))
+            .toList()
+        : null;
     List<String> commandmentsList =
         (json['commandments'] as List).map((comm) => comm as String).toList();
     Map<String, List<Prayer>>? prayersMap = json['prayers'] != null
-        ? (json['prayers'] as Map<String, List<Event>>).map(
+        ? (json['prayers'] as Map).map(
             (k, v) => MapEntry(
               k,
-              v.map((dynamic prayer) => Prayer.fromJson(prayer)).toList(),
+              (v as List)
+                  .map((dynamic prayer) => Prayer.fromJson(prayer))
+                  .toList(),
             ),
           )
         : null;
+    // ? (json['prayers'] as Map<String, List<Event>>).map(
+    //     (k, v) => MapEntry(
+    //       k,
+    //       v.map((dynamic prayer) => Prayer.fromJson(prayer)).toList(),
+    //     ),
+    //   )
+    // : null;
     Map<String, String> testamoniesMap =
         (json['testamonies'] as Map<String, String>).map(
       (k, v) => MapEntry(
@@ -567,7 +579,7 @@ class Prayer extends Equatable {
     );
   }
 
-  factory Prayer.fromSubcription(DocumentSnapshot snap) {
+  factory Prayer.fromSnapshot(DocumentSnapshot snap) {
     dynamic data = snap.data();
     return Prayer.fromJson(data).copyWith(
       id: snap.id,

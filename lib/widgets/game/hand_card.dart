@@ -21,11 +21,11 @@ class HandCard extends StatelessWidget {
       width: double.maxFinite,
       child: Material(
         // color: context.responseCardHandColor,
-        color: Colors.red,
-        shape: const RoundedRectangleBorder(
+        color: Theme.of(context).colorScheme.inverseSurface,
+        shape: RoundedRectangleBorder(
           side: BorderSide(
             // color: context.responseBorderColor,
-            color: Colors.blue,
+            color: Theme.of(context).colorScheme.onInverseSurface,
             width: 1.0,
           ),
           borderRadius: BorderRadius.only(
@@ -34,18 +34,21 @@ class HandCard extends StatelessWidget {
           ),
         ),
         elevation: 4,
-        shadowColor: Colors.black,
+        shadowColor: Theme.of(context).colorScheme.surface,
         clipBehavior: Clip.hardEdge,
         child: InkWell(
           // highlightColor: AppColors.primary.withOpacity(0.26),
-          highlightColor:
-              Theme.of(context).colorScheme.primary.withOpacity(0.26),
+          highlightColor: Theme.of(context).colorScheme.primary.withAlpha(50),
           // splashColor: AppColors.primary.withOpacity(0.26),
-          splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.26),
+          splashColor: Theme.of(context).colorScheme.primary.withAlpha(50),
           onTap: () {
             // Analytics().logSelectContent(
             //     contentType: 'action', itemId: 'picked_response');
-            context.read<GameBloc>().add(PickResponseCard(card: card));
+            context.read<GameBloc>().add(
+                  PickResponseCard(
+                    card: card,
+                  ),
+                );
           },
           child: Column(
             children: <Widget>[
@@ -66,8 +69,9 @@ class HandCard extends StatelessWidget {
       margin: const EdgeInsets.all(textPadding),
       child: Text(
         text,
-        // style: context.cardTextStyle(context.colorOnCard),
-        // TODO
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onInverseSurface,
+        ),
       ),
     );
   }
@@ -81,7 +85,8 @@ class HandCard extends StatelessWidget {
         text,
         textAlign: TextAlign.end,
         style: Theme.of(context).textTheme.bodySmall!.copyWith(
-              color: Theme.of(context).canvasColor,
+              color:
+                  Theme.of(context).colorScheme.onInverseSurface.withAlpha(175),
               fontStyle: FontStyle.italic,
             ),
       ),

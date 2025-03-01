@@ -177,9 +177,15 @@ class GameState extends Equatable {
       currentPlayer.hand?.where((c) => !selectedCards.contains(c)).toList() ??
       [];
 
-  Player get currentJudge => players.firstWhere(
-        (p) => p.id == game.turn?.judgeId,
-      );
+  // Issue: need to handle differently when we don't have data yet..
+  Player get currentJudge {
+    print('CURRENT JUDGE!');
+    print(players.length);
+    return players.firstWhere(
+      (p) => p.id == game.turn?.judgeId,
+    );
+  }
+
   Player get currentPlayer => players.firstWhere(
         (p) => p.id == userId,
       );

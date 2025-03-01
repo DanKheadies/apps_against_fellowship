@@ -26,8 +26,7 @@ class GameBottomSheet extends StatelessWidget {
           topLeft: Radius.circular(32),
           topRight: Radius.circular(32),
         ),
-        // color: AppColors.surface,
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(context).scaffoldBackgroundColor,
         elevation: 4,
         child: Container(
           margin: const EdgeInsets.only(top: 8),
@@ -38,9 +37,6 @@ class GameBottomSheet extends StatelessWidget {
               elevation: 0,
               actions: actions,
               centerTitle: false,
-              // iconTheme: context.theme.iconTheme,
-              // iconTheme: Theme.of(context).iconTheme,
-              // textTheme: context.theme.textTheme,
               leading: Container(
                 margin: const EdgeInsets.only(left: 8),
                 child: IconButton(
@@ -70,7 +66,7 @@ class GameBottomSheet extends StatelessWidget {
               Text(
                 subtitle ?? '',
                 style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Colors.black38,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
               )
             ],

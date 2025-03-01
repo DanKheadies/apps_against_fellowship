@@ -1,7 +1,6 @@
+import 'package:apps_against_fellowship/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-
-import 'package:apps_against_fellowship/models/models.dart';
 
 class TurnWinner extends Equatable {
   final bool isRandoCardrissian;
@@ -54,16 +53,26 @@ class TurnWinner extends Equatable {
   }
 
   factory TurnWinner.fromJson(Map<String, dynamic> json) {
+    print('turn winner fromJson TODO');
     List<ResponseCard> responseList = (json['response'] as List)
         .map((card) => ResponseCard.fromJson(card))
         .toList();
-    Map<String, List<ResponseCard>> responsesMap = {}; // TODO (?)
-    if (json['responses'] != null) {
+
+    Map<String, List<ResponseCard>> responsesMap = {};
+    if (json['responses'] != null || json['responses'] != {}) {
       print('not null');
-      responsesMap = (json['responses'] as Map<String, List<ResponseCard>>).map(
+      // responsesMap = (json['responses'] as Map<String, List<ResponseCard>>).map(
+      //   (k, v) => MapEntry(
+      //     k,
+      //     v.map((dynamic card) => ResponseCard.fromJson(card)).toList(),
+      //   ),
+      // );
+      responsesMap = (json['responses'] as Map).map(
         (k, v) => MapEntry(
           k,
-          v.map((dynamic card) => ResponseCard.fromJson(card)).toList(),
+          (v as List)
+              .map((dynamic card) => ResponseCard.fromJson(card))
+              .toList(),
         ),
       );
     }
@@ -88,12 +97,20 @@ class TurnWinner extends Equatable {
     Map<String, List<ResponseCard>> responsesMap = {}; // TODO (?)
     if (data['responses'] != null) {
       print('not null');
-      responsesMap = (data['responses'] as Map<String, List<ResponseCard>>).map(
+      // responsesMap = (data['responses'] as Map<String, List<ResponseCard>>).map(
+      //   (k, v) => MapEntry(
+      //     k,
+      //     // (v) => ResponseCard.fromJson(v),
+      //     // (v).map((card) => ResponseCard.fromJson(card)).toList()
+      //     v.map((dynamic card) => ResponseCard.fromJson(card)).toList(),
+      //   ),
+      // );
+      responsesMap = (data['responses'] as Map).map(
         (k, v) => MapEntry(
           k,
-          // (v) => ResponseCard.fromJson(v),
-          // (v).map((card) => ResponseCard.fromJson(card)).toList()
-          v.map((dynamic card) => ResponseCard.fromJson(card)).toList(),
+          (v as List)
+              .map((dynamic card) => ResponseCard.fromJson(card))
+              .toList(),
         ),
       );
     }

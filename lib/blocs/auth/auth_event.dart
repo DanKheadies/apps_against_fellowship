@@ -62,13 +62,6 @@ class LoginWithGoogle extends AuthEvent {
       ];
 }
 
-// class LoginWithGoogleSilently extends AuthEvent {
-//   const LoginWithGoogleSilently();
-
-//   @override
-//   List<Object?> get props => [];
-// }
-
 class LoginWithLink extends AuthEvent {
   final String email;
   final String emailLink;

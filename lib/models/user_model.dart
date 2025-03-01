@@ -90,9 +90,9 @@ class User extends Equatable {
       id: json['id'] ?? '',
       isDarkTheme: json['isDarkTheme'] ?? false,
       name: json['name'] ?? '',
-      playerLimit: json['playerLimit'] ?? 0,
-      prizesToWin: json['prizesToWin'] ?? 0,
-      pushToken: json['pushToken'] ?? '',
+      playerLimit: json['playerLimit'],
+      prizesToWin: json['prizesToWin'],
+      pushToken: json['pushToken'],
       updatedAt: updatedTime,
     );
   }
@@ -117,9 +117,9 @@ class User extends Equatable {
       id: snap.id,
       isDarkTheme: data['isDarkTheme'] ?? false,
       name: data['name'] ?? '',
-      playerLimit: data['playerLimit'] ?? 0,
-      prizesToWin: data['prizesToWin'] ?? 0,
-      pushToken: data['pushToken'] ?? '',
+      playerLimit: data['playerLimit'],
+      prizesToWin: data['prizesToWin'],
+      pushToken: data['pushToken'],
       updatedAt: updatedTime,
     );
   }

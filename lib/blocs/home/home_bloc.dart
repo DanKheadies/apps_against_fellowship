@@ -34,6 +34,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       add(
         UserUpdatedViaHome(user: _userBloc.state.user),
       );
+      // print('event:');
+      // print(event);
       add(
         JoinedGamesUpdated(games: event),
       );
@@ -72,8 +74,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         _userBloc.state.user,
       );
 
-      // await Future.delayed(const Duration(seconds: 3));
-
       emit(
         state.copyWith(
           isLoading: false,
@@ -81,15 +81,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           joiningGame: '',
         ),
       );
-
-      // emit(
-      //   state.copyWith(
-      //     error: 'and theres an error: $derp',
-      //     isLoading: false,
-      //     // joinedGame: null,
-      //     joiningGame: '',
-      //   ),
-      // );
     } catch (err) {
       print('home bloc: err joining game: $err');
       emit(
@@ -107,6 +98,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     JoinedGamesUpdated event,
     Emitter<HomeState> emit,
   ) {
+    print('joined games updated');
+    // TODO: the upstream of this isn't triggering here, i.e. in-progress game
+    // hasn't been updated and still shows Waiting Room. Follow this upstream to
+    // ... Cloud Functions (?)
     emit(
       state.copyWith(
         games: event.games..sort((a, b) => b.joinedAt!.compareTo(a.joinedAt!)),
@@ -157,7 +152,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     emit(
       state.copyWith(
         error: '',
-        joinedGame: null,
+        joinedGame: Game.emptyGame,
         joiningGame: '',
         leavingGame: UserGame.emptyUserGame,
         isLoading: false,

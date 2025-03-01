@@ -18,7 +18,10 @@
 
     <meta charset="UTF-8" />
     <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
-    <meta name="description" content="A new Flutter project." />
+    <meta
+      name="description"
+      content="Why have cards against humanity when you can have apps against fellowship? A Flutter Cards Against Humanity app for Android, iOS, and Web."
+    />
 
     <!-- iOS meta tags & icons -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -53,10 +56,23 @@
           serviceWorker: {
             serviceWorkerVersion: serviceWorkerVersion,
           },
-          onEntrypointLoaded: function (engineInitializer) {
-            engineInitializer.initializeEngine().then(function (appRunner) {
-              appRunner.runApp();
-            });
+          // Note: not sure if this worked / was needed; had to add CORS ref
+          // in Google Cloud
+          // https://stackoverflow.com/questions/37760695/firebase-storage-and-access-control-allow-origin/37765371
+          // onEntrypointLoaded: function (engineInitializer) {
+          //   engineInitializer.initializeEngine().then(function (appRunner) {
+          //     appRunner.runApp();
+          //   });
+          // },
+          onEntrypointLoaded: async function (engineInitializer) {
+            let appRunner = await engineInitializer
+              .initializeEngine({
+                hostElement: document.querySelector("#flutter_app"),
+                renderer: "html",
+              })
+              .then(function (appRunner) {
+                return appRunner.runApp();
+              });
           },
         });
       });

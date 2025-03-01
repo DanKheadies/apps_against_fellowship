@@ -18,6 +18,49 @@ class GameRepository {
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
         _userRepository = userRepository;
 
+  // /// To test
+  // Future<void> testQuery({
+  //   required String id,
+  //   // required List<String> ids,
+  //   // required String userId,
+  //   // required dynamic user,
+  // }) async {
+  //   // var snapshot = await _firestore
+  //   //     .collectionGroup('players')
+  //   //     .where('id', isEqualTo: userId)
+  //   //     .get()
+  //   //     .then(
+  //   //   (res) {
+  //   //     print('res:');
+  //   //     print(res);
+  //   //   },
+  //   //   onError: (err) => print(err),
+  //   // );
+  //   // var snapshot = await _firestore
+  //   //     .collectionGroup('responses')
+  //   //     .where('cid', whereIn: ids)
+  //   //     .get()
+  //   //     .then(
+  //   //   (res) {
+  //   //     print('res:');
+  //   //     print(res);
+  //   //   },
+  //   //   onError: (err) => print(err),
+  //   // );
+  //   var snapshot = await _firestore
+  //       .collectionGroup('prompts')
+  //       .where('cid', isEqualTo: id)
+  //       .get()
+  //       .then(
+  //     (res) {
+  //       print('res:');
+  //       print(res);
+  //     },
+  //     onError: (err) => print(err),
+  //   );
+  //   print(snapshot);
+  // }
+
   /// Create a new game with the provided list of card sets
   Future<Game> createGame(
     User user,
@@ -60,7 +103,7 @@ class GameRepository {
 
   /// Join an existing game using the [gameId] game id code
   Future<Game> joinGame(
-    String gameDocumentId, // TODO: is firebase where implemented (?)
+    String gameDocumentId,
     String gameId,
     User user,
   ) async {
@@ -107,10 +150,15 @@ class GameRepository {
     User user, {
     bool andJoin = false,
   }) async {
+    // print('getting game..');
+    // print(gameDocumentId);
     var gameDocument = _firestore.collection('games').doc(gameDocumentId);
+    // print('has gameDoc');
 
     try {
+      // print('trying for snapshot');
       var snapshot = await gameDocument.get();
+      // print('should be g2g, going to convert');
       return Game.fromSnapshot(snapshot);
     } catch (e) {
       if (e is PlatformException && andJoin) {
@@ -131,7 +179,8 @@ class GameRepository {
 
   /// Leave a game. This will flag the 'player' on the game as 'inActive'
   Future<void> leaveGame(User user, UserGame game) async {
-    if (game.gameState.gameStatus == GameStatus.completed) {
+    // if (game.gameState.gameStatus == GameStatus.completed) {
+    if (game.gameStatus == GameStatus.completed) {
       // We should just delete the usergame ourselfs
       await _firestore
           .collection('users')
@@ -232,7 +281,8 @@ class GameRepository {
         'game_id': gameDocumentId,
         'uid': uid,
       });
-      print("Start game Successful! $response");
+      print("Start game Successful!");
+      print(response);
     } catch (err) {
       print('error starting game: $err');
     }

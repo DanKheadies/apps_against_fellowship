@@ -56,9 +56,23 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
                 if (state.createdGame != Game.emptyGame) {
                   // Navigator.of(context)
                   //     .pushReplacement(GamePageRoute(state.createdGame));
+                  // context.read<GameBloc>().add(
+                  //   OpenGame(
+                  //     gameId: game.id,
+                  //     user: context.read<UserBloc>().state.user,
+                  //   ),
+                  // );
+                  print('creating game; have created game');
+                  // I think this was all g2g.
+                  context.read<GameBloc>().add(
+                        GameUpdated(game: state.createdGame),
+                      );
+                  context.read<GameBloc>().add(
+                        Subscribe(gameId: state.createdGame.id),
+                      );
                   context.goNamed(
                     'game',
-                    extra: state.createdGame,
+                    // extra: state.createdGame,
                   );
                 }
               },

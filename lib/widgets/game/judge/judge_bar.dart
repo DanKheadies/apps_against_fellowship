@@ -13,14 +13,28 @@ class JudgeBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GameBloc, GameState>(
       builder: (context, state) {
-        var judge = state.currentJudge;
-        var hasDownvoted = state.downvotes.contains(state.userId);
-        if (judge != Player.emptyPlayer) {
-          return _buildHeader(
-            context,
-            judge,
-            hasDownvoted: hasDownvoted,
-          );
+        print('build judge bar');
+        // print(state);
+        // print(state.)
+        // TODO: state.currentJudge is null atm; not sure if game_state.dart
+        // is setting it correctly / at all
+        print(state.players.length);
+        print('judgeId: ${state.game.turn?.judgeId}');
+        if (state.players.isNotEmpty) {
+          print('we have players..');
+          var judge = state.currentJudge;
+          print('judge: $judge');
+          var hasDownvoted = state.downvotes.contains(state.userId);
+          print(hasDownvoted);
+          if (judge != Player.emptyPlayer) {
+            return _buildHeader(
+              context,
+              judge,
+              hasDownvoted: hasDownvoted,
+            );
+          } else {
+            return Container(height: 72);
+          }
         } else {
           return Container(height: 72);
         }
@@ -38,11 +52,10 @@ class JudgeBar extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 12),
       title: Text(playerName),
       subtitle: Text(
-        "Current judge",
-        style: Theme.of(context)
-            .textTheme
-            .bodyMedium!
-            .copyWith(color: Colors.white60),
+        'Current judge',
+        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+              color: Theme.of(context).colorScheme.surface.withAlpha(175),
+            ),
       ),
       leading: _buildJudgeAvatar(context, player),
       trailing: Row(
@@ -53,14 +66,17 @@ class JudgeBar extends StatelessWidget {
           IconButton(
             icon: Icon(
               MdiIcons.humanGreeting,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: () {
               // Analytics()
               //     .logSelectContent(contentType: 'action', itemId: 'wave');
-              context
-                  .read<GameBloc>()
-                  .add(WaveAtPlayer(message: '', playerId: player.id));
+              context.read<GameBloc>().add(
+                    WaveAtPlayer(
+                      message: '',
+                      playerId: player.id,
+                    ),
+                  );
             },
           ),
           Container(
@@ -70,8 +86,8 @@ class JudgeBar extends StatelessWidget {
             icon: Icon(
               hasDownvoted ? MdiIcons.thumbDown : MdiIcons.thumbDownOutline,
               color: hasDownvoted
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.white,
+                  ? Theme.of(context).colorScheme.surface
+                  : Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: !hasDownvoted
                 ? () {

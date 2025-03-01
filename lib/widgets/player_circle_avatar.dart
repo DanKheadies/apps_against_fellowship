@@ -42,17 +42,15 @@ class PlayerCircleAvatar extends StatelessWidget {
                 : null,
             // backgroundColor: AppColors.primary,
             backgroundColor: Theme.of(context).colorScheme.primary,
-            child: player.avatarUrl == null || player.avatarUrl != ''
-                ? player.name != ''
-                    ? Text(
-                        playerInitials,
-                        style:
-                            Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  // color: Colors.white,
-                                  color: Theme.of(context).colorScheme.surface,
-                                ),
-                      )
-                    : null
+            child: (player.avatarUrl == null || player.avatarUrl == '') &&
+                    player.name != ''
+                ? Text(
+                    playerInitials,
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          // color: Colors.white,
+                          color: Theme.of(context).scaffoldBackgroundColor,
+                        ),
+                  )
                 : null,
           );
   }

@@ -41,6 +41,7 @@ class PromptCard extends Equatable {
   }
 
   factory PromptCard.fromJson(Map<String, dynamic> json) {
+    // print('prompt fromJson');
     return PromptCard(
       cardId: json['cardId'] ?? '',
       set: json['set'] ?? '',

@@ -10,7 +10,7 @@ import {
   FirestoreEvent,
   QueryDocumentSnapshot,
 } from "firebase-functions/v2/firestore";
-import { User } from "../models/user";
+import {User} from "../models/user";
 import * as firebase from "../firebase/firebase";
 
 /**

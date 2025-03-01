@@ -27,6 +27,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         _gameRepository = gameRepository,
         _userBloc = userBloc,
         super(const GameState()) {
+    // super(GameState.empty()) {
     on<ClearError>(_onClearError);
     on<ClearPickedResponseCards>(_onClearPickedResponseCards);
     on<ClearSubmitting>(_onClearSubmitting);
@@ -34,6 +35,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<DownvotesUpdated>(_onDownvotesUpdated);
     on<GameUpdated>(_onGameUpdated);
     on<KickPlayer>(_onKickPlayer);
+    on<OpenGame>(_onOpenGame);
     on<PickResponseCard>(_onPickResponseCard);
     on<PickWinner>(_onPickWinner);
     on<PlayersUpdated>(_onPlayersUpdated);
@@ -138,6 +140,52 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     KickPlayer event,
     Emitter<GameState> emit,
   ) {}
+
+  void _onOpenGame(
+    OpenGame event,
+    Emitter<GameState> emit,
+  ) async {
+    if (state.gameStateStatus == GameStateStatus.loading) return;
+    emit(
+      state.copyWith(
+        gameStateStatus: GameStateStatus.loading,
+      ),
+    );
+
+    try {
+      // print('open game');
+      var existingGame = await _gameRepository.getGame(
+        event.gameId,
+        event.user,
+      );
+
+      // print('have game');
+      // print(event.gameId);
+      // print(existingGame);
+      add(
+        GameUpdated(game: existingGame),
+      );
+      add(
+        Subscribe(gameId: existingGame.id),
+      );
+
+      emit(
+        state.copyWith(
+          game: existingGame,
+          gameStateStatus: GameStateStatus.goodToGo,
+        ),
+      );
+    } catch (err) {
+      print('opening game err: $err');
+
+      emit(
+        state.copyWith(
+          error: err.toString(),
+          gameStateStatus: GameStateStatus.error,
+        ),
+      );
+    }
+  }
 
   void _onPickResponseCard(
     PickResponseCard event,
@@ -341,36 +389,50 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         userId: user!.uid,
       ),
     );
-
+    print('user g2g');
+    print(event.gameId);
     _gameSubcription?.cancel();
     _gameSubcription = _gameRepository.observeGame(event.gameId).listen((game) {
+      print('game sub listenting w/ game..');
+      // TODO: shouldn't I be passing info on the game in here and not the user (?)
+      add(
+        GameUpdated(
+          game: game,
+        ),
+      );
       add(
         UserUpdated(
           userId: user.uid,
         ),
       );
     });
+    print('game sub g2g');
 
     _playersSubscription?.cancel();
     _playersSubscription =
         _gameRepository.observePlayers(event.gameId).listen((players) {
       print('observing players...');
+      print('PLAYERS');
+      print(players);
       add(
         PlayersUpdated(
           players: players,
         ),
       );
     });
+    print('player sub g2g');
 
     _downvoteSubscription?.cancel();
     _downvoteSubscription =
         _gameRepository.observeDownvotes(event.gameId).listen((downvotes) {
+      print('downvotes..');
       add(
         DownvotesUpdated(
           downvotes: downvotes,
         ),
       );
     });
+    print('downvote sub g2g');
   }
 
   void _onUserUpdated(

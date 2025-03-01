@@ -1,7 +1,6 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
 
 class GameStatusTitle extends StatelessWidget {
   const GameStatusTitle({super.key});
@@ -32,7 +31,7 @@ class GameStatusTitle extends StatelessWidget {
     return Text(
       title,
       style: Theme.of(context).textTheme.titleLarge!.copyWith(
-            color: Theme.of(context).canvasColor,
+            color: Theme.of(context).colorScheme.surface,
           ),
     );
   }

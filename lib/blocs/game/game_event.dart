@@ -54,6 +54,22 @@ class KickPlayer extends GameEvent {
       ];
 }
 
+class OpenGame extends GameEvent {
+  final String gameId;
+  final User user;
+
+  const OpenGame({
+    required this.gameId,
+    required this.user,
+  });
+
+  @override
+  List<Object> get props => [
+        gameId,
+        user,
+      ];
+}
+
 class PlayersUpdated extends GameEvent {
   final List<Player> players;
 

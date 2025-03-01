@@ -108,12 +108,24 @@ class Game extends Equatable {
   }
 
   factory Game.fromJson(Map<String, dynamic> json) {
+    // print('game fromJson');
+    // print(json);
     List<String> judgeRotationList = [];
+    Turn turnt = Turn.emptyTurn;
+
     if (json['judgeRotation'] != null) {
       judgeRotationList = (json['judgeRotation'] as List)
           .map((judge) => judge as String)
           .toList();
     }
+    // print('going to try turn fromJson');
+    // print(json['turn']);
+    // print('fails in Turn, et al..');
+    // print(json['turn']);
+    if (json['turn'] != null) {
+      turnt = Turn.fromJson(json['turn']);
+    }
+    // print('turnt: $turnt');
 
     Set<String> cardSetsSet =
         (json['cardSets'] as List).map((set) => set as String).toSet();
@@ -132,13 +144,15 @@ class Game extends Equatable {
       playerLimit: json['playerLimit'] ?? initPlayerLimit,
       prizesToWin: json['prizesToWin'] ?? initPrizesToWin,
       round: json['round'] ?? 0, // 1,
-      turn: json['turn'] ?? Turn.emptyTurn,
+      turn: turnt,
       winner: json['winner'] ?? '',
     );
   }
 
   factory Game.fromSnapshot(DocumentSnapshot snap) {
+    // print('game fromSnapshot');
     dynamic data = snap.data();
+    // print(data);
 
     return Game.fromJson(data).copyWith(
       id: snap.id,

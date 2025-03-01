@@ -1,6 +1,6 @@
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
+// import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +17,25 @@ class PastGame extends StatelessWidget {
     required this.game,
     required this.isLeavingGame,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: Key(game.id),
+      background: buildBackground(context),
+      confirmDismiss: (_) => confirmDismiss(context),
+      direction: DismissDirection.horizontal,
+      onDismissed: (direction) {
+        // Analytics > past game leave
+        context.read<HomeBloc>().add(
+              LeaveGame(
+                game: game,
+              ),
+            );
+      },
+      child: buildListTile(context),
+    );
+  }
 
   Future<bool?> confirmDismiss(BuildContext context) {
     return showDialog<bool>(
@@ -63,36 +82,65 @@ class PastGame extends StatelessWidget {
     );
   }
 
-  void openGame(BuildContext context) async {
-    // Analytics > past game open
-    try {
-      var existingGame = await context.read<GameRepository>().getGame(
-            game.id,
-            context.read<UserBloc>().state.user,
-          );
+  // Future<void> openGame(BuildContext context) async {
+  //   // TODO: move this into bloc, but which one?
+  //   // Note: I believe if I visually show the home screen is loading the game
+  //   // and hide this / these Past Game(s), I don't think they'll be able to
+  //   // execute navigation. Perhaps a listener.
+  //   // Update: just gonna have GameBloc handle trying to get the game
+  //   // context.read<GameBloc>().add(
+  //   //       OpenGame(
+  //   //         gameId: game.id,
+  //   //         user: context.read<UserBloc>().state.user,
+  //   //       ),
+  //   //     );
+  //   // context.goNamed('game');
 
-      if (context.mounted) {
-        context.goNamed(
-          'game',
-          extra: existingGame,
-        );
-      } else {
-        print('context mounting error - go to Game screen');
-      }
-    } catch (err) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(
-            SnackBar(
-              content: Text('$err'),
-            ),
-          );
-      } else {
-        print('context mounting error - error message messenger');
-      }
-    }
-  }
+  //   // // Analytics > past game open
+  //   // try {
+  //   //   // print('trying to open game..');
+  //   //   // print(game.id);
+  //   //   // print(context.read<UserBloc>().state.user.id);
+  //   //   var existingGame = await context.read<GameRepository>().getGame(
+  //   //         game.id,
+  //   //         context.read<UserBloc>().state.user,
+  //   //       );
+
+  //   //   if (context.mounted) {
+  //   //     // print('going to..');
+  //   //     // print(existingGame);
+  //   //     // context.goNamed(
+  //   //     //   'game',
+  //   //     //   extra: existingGame,
+  //   //     // );
+  //   //     context.read<GameBloc>().add(
+  //   //           GameUpdated(
+  //   //             game: existingGame,
+  //   //           ),
+  //   //         );
+  //   //     context.read<GameBloc>().add(
+  //   //           Subscribe(
+  //   //             gameId: existingGame.id,
+  //   //           ),
+  //   //         );
+  //   //     context.goNamed('game');
+  //   //   } else {
+  //   //     print('context mounting error - go to Game screen');
+  //   //   }
+  //   // } catch (err) {
+  //   //   if (context.mounted) {
+  //   //     ScaffoldMessenger.of(context)
+  //   //       ..clearSnackBars()
+  //   //       ..showSnackBar(
+  //   //         SnackBar(
+  //   //           content: Text('$err'),
+  //   //         ),
+  //   //       );
+  //   //   } else {
+  //   //     print('context mounting error - error message messenger');
+  //   //   }
+  //   // }
+  // }
 
   Widget buildBackground(BuildContext context) {
     return Container(
@@ -131,7 +179,7 @@ class PastGame extends StatelessWidget {
             ),
       ),
       subtitle: Text(
-        isLeavingGame ? 'Leaving...' : game.gameState.gameStatus.label,
+        isLeavingGame ? 'Leaving...' : game.gameStatus.label,
         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
               color: Theme.of(context).colorScheme.onSurface,
             ),
@@ -144,35 +192,25 @@ class PastGame extends StatelessWidget {
             )
           : Text(
               game.joinedAt != null
-                  ? DateFormat('MMM d @ H:m').format(game.joinedAt!)
+                  ? DateFormat('MMM d @ HH:mm').format(game.joinedAt!.toLocal())
                   : '???',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                     color: Theme.of(context).colorScheme.surface,
                   ),
             ),
-      onTap: game.gameState.gameStatus == GameStatus.inProgress ||
-              game.gameState.gameStatus == GameStatus.waitingRoom
-          ? () => openGame(context)
+      onTap: game.gameStatus == GameStatus.inProgress ||
+              game.gameStatus == GameStatus.waitingRoom
+          // ? () => openGame(context)
+          ? () {
+              context.read<GameBloc>().add(
+                    OpenGame(
+                      gameId: game.id,
+                      user: context.read<UserBloc>().state.user,
+                    ),
+                  );
+              context.goNamed('game');
+            }
           : () {},
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(game.id),
-      background: buildBackground(context),
-      confirmDismiss: (_) => confirmDismiss(context),
-      direction: DismissDirection.horizontal,
-      onDismissed: (direction) {
-        // Analytics > past game leave
-        context.read<HomeBloc>().add(
-              LeaveGame(
-                game: game,
-              ),
-            );
-      },
-      child: buildListTile(context),
     );
   }
 }

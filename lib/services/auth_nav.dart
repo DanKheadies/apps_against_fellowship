@@ -1,24 +1,19 @@
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 void authenticationNavigator(
   BuildContext context,
-  AuthState state,
+  AuthState stateHolder, // Not giving up-to-date info; use context instead
+  // Need to keep to facilitate ScreenWrapper's Listener
 ) {
   print('trigger auth nav');
-  // print(state.status);
-  // print(context.read<AuthBloc>().state.status);
-  // AuthState state = context.read<AuthBloc>().state;
-  // print(state);
   String currentScreen =
       GoRouter.of(context).routeInformationProvider.value.uri.toString();
-  print(currentScreen);
-  // if ((state.status == AuthStatus.unauthenticated ||
-  //         state.status == AuthStatus.unknown ||
-  //         state.authUser == null) &&
-  //     goScreen != '/welcome') {
+  // print(currentScreen);
+  AuthState state = context.read<AuthBloc>().state;
+
   if ((state.status == AuthStatus.unauthenticated ||
           state.status == AuthStatus.unknown ||
           state.authUser == null) &&
@@ -26,8 +21,13 @@ void authenticationNavigator(
     print('not auth\'d, go to welcome from $currentScreen');
     context.goNamed('welcome');
   } else if (state.status == AuthStatus.authenticated &&
-      state.authUser != null &&
-      currentScreen != '/home') {
+          state.authUser != null
+          // && currentScreen != '/home'
+          &&
+          (currentScreen == '/' || currentScreen == '/welcome')
+      // Note: helps avoid spamming on home, but will cause a nav back to home
+      // on other screens, e.g. uploading a new profile photo.
+      ) {
     print('auth\'d, to home from $currentScreen');
     context.goNamed('home');
   } else {
@@ -35,4 +35,5 @@ void authenticationNavigator(
   }
   // TODO: TOS, et al
   // Note: Splash is passing UserState down; ScreenWrapper only AuthState
+  // Can use context.read to get accurate info here
 }

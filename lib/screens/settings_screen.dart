@@ -84,11 +84,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         if (err is PlatformException) {
           print('is platform exception, so probably google');
           if (err.code == 'ERROR_REQUIRES_RECENT_LOGIN') {}
-          // await authRepository.loginWithGoogle(
-          //   email: email,
-          //   password: password,
-          // );
-
           // await authRepository.deleteAccount();
 
           authBloc.add(
@@ -98,16 +93,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     }
   }
-
-  // Future<void> signOut(BuildContext context) async {
-  //   await context.read<AuthRepository>().signOut();
-
-  //   if (context.mounted) {
-  //     context.read<AuthBloc>().add(
-  //           SignOut(),
-  //         );
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {

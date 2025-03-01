@@ -5,7 +5,7 @@ import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
@@ -35,7 +35,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginWithLink>(_onLoginWithLink);
     on<LoginWithEmailAndPassword>(_onLoginWithEmailAndPassword);
     on<LoginWithGoogle>(_onLoginWithGoogle);
-    // on<LoginWithGoogleSilently>(_onLoginWithGoogleSilently);
     on<RegisterAnonymously>(_onRegisterAnonymously);
     on<RegisterWithEmailAndPassword>(_onRegisterWithEmailAndPassword);
     on<ResetError>(_onResetError);
@@ -62,11 +61,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               ),
             );
 
-            add(
-              AuthUserChanged(
-                authUser: authUser,
-              ),
-            );
+            if (state.authUser == null) {
+              add(
+                AuthUserChanged(
+                  authUser: authUser,
+                ),
+              );
+            }
           }
         });
       } else if (authUser == null && state.status == AuthStatus.authenticated) {
@@ -74,53 +75,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         add(
           SignOut(),
         );
-      } else {
-        // Note: not the right workflow to include here; should be in own
-        // Google Sub
-        // print('don\'t have authUser, so lets check google silently');
-        // if (!kIsWeb) {
-        //   add(
-        //     LoginWithGoogle(isSilent: true),
-        //   );
-        // }
       }
     });
 
-    // Note: online online once the Google workflow commences..
+    // Note: only online once the Google workflow commences..
+    // Which means we can't use it to initialize SilentSignIn
     _authUserGoogleSubscription =
         _authRepository.userGoogle.listen((googleUser) {
       print('google sub online');
       if (googleUser != null) {
         print('google sub has user');
 
-        // TODO: get auth.User? from googleUser
         add(
           AuthGoogleUserChanged(
             account: googleUser,
           ),
         );
-
-        // var authUser = await _authRepository.loginWithGoogle(
-        //     isSilently: kIsWeb ? false : true);
-
-        // _userSubscription =
-        //     _userRepository.getUserStream(userId: googleUser.id).listen((user) {
-        //   // Wait for an id from the stream before carrying on.
-        //   if (user != null) {
-        //     _userBloc.add(
-        //       UpdateUser(
-        //         updateFirebase: false,
-        //         user: user,
-        //       ),
-        //     );
-
-        //     add(
-        //       AuthUserChanged(
-        //         authUser: authUser,
-        //       ),
-        //     );
-        //   }
-        // });
       } else if (googleUser == null &&
           state.status == AuthStatus.authenticated) {
         print('no auth, but have local cache so Sign Out');
@@ -135,14 +105,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthUserChanged event,
     Emitter<AuthState> emit,
   ) {
+    // Note: this is triggering AuthNav, e.g. change apps and come back (?)
     print('auth user changed: authenticating');
-    print('prev lastUpdate: ${state.lastUpdate}');
-    print('curr lastUpdate: ${DateTime.now()}');
+    // print('prev lastUpdate: ${state.lastUpdate}');
+    // print('curr lastUpdate: ${DateTime.now()}');
     emit(
       state.copyWith(
         authUser: event.authUser,
         errorMessage: '',
-        lastUpdate: DateTime.now(),
+        // lastUpdate: DateTime.now(),
         status: AuthStatus.authenticated,
       ),
     );
@@ -153,6 +124,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     if (state.status == AuthStatus.submitting) return;
+    print('auth google user changed: authenticating');
 
     emit(
       state.copyWith(
@@ -161,22 +133,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     try {
-      // var googleUser = await _authRepository.loginWithGoogle(
-      //   isSilently: event.isSilent,
-      // );
       var googleUser = await _authRepository.getGoogleUser(
         account: event.account!,
       );
 
       if (googleUser != null) {
+        // print('prev lastUpdate: ${state.lastUpdate}');
+        // print('curr lastUpdate: ${DateTime.now()}');
         emit(
           state.copyWith(
             authUser: googleUser,
-            lastUpdate: DateTime.now(),
+            // lastUpdate: DateTime.now(),
             status: AuthStatus.authenticated,
           ),
         );
       } else {
+        print('nope');
         emit(
           state.copyWith(
             authUser: null,
@@ -209,7 +181,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         status: AuthStatus.submitting,
       ),
     );
-    print('login w/ email pass');
 
     try {
       var authUser = await _authRepository.loginWithEmailAndPassword(
@@ -270,34 +241,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ),
     );
 
+    // TODO: handle kIsWeb
+    // if (!kIsWeb) {
+    //   add(
+    //     LoginWithGoogle(isSilent: true),
+    //   );
+    // }
+    // Not sure where tho..
     try {
-      // var googleUser = await _authRepository.loginWithGoogle(
-      //   isSilently: event.isSilent,
-      // );
       await _authRepository.loginWithGoogle(
         isSilently: event.isSilent,
       );
 
-      // if (googleUser != null) {
-      //   emit(
-      //     state.copyWith(
-      //       authUser: googleUser,
-      //       lastUpdate: DateTime.now(),
-      //       status: AuthStatus.authenticated,
-      //     ),
-      //   );
-      // } else {
-      //   emit(
-      //     state.copyWith(
-      //       authUser: null,
-      //       // errorMessage: event.isSilent
-      //       //     ? 'Google validation failed. Please try again.'
-      //       //     : '',
-      //       errorMessage: '',
-      //       status: AuthStatus.unauthenticated,
-      //     ),
-      //   );
-      // }
       emit(
         state.copyWith(
           status: AuthStatus.unknown,
@@ -314,42 +269,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     }
   }
-
-  // void _onLoginWithGoogleSilently(
-  //   LoginWithGoogleSilently event,
-  //   Emitter<AuthState> emit,
-  // ) async {
-  //   if (state.status == AuthStatus.submitting) return;
-  //   print('login w/ google silently');
-
-  //   emit(
-  //     state.copyWith(
-  //       status: AuthStatus.submitting,
-  //     ),
-  //   );
-
-  //   try {
-  //     // await _authRepository.loginWithGoogleSilently();
-  //     var googleUser = await _authRepository.loginWithGoogle(isSilently: true);
-
-  //     emit(
-  //       state.copyWith(
-  //         authUser: googleUser,
-  //         lastUpdate: DateTime.now(),
-  //         status: AuthStatus.authenticated,
-  //       ),
-  //     );
-  //   } catch (err) {
-  //     print('login (google) error: $err');
-  //     emit(
-  //       state.copyWith(
-  //         authUser: null,
-  //         errorMessage: err.toString(),
-  //         status: AuthStatus.unauthenticated,
-  //       ),
-  //     );
-  //   }
-  // }
 
   void _onLoginWithLink(
     LoginWithLink event,
@@ -505,6 +424,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     try {
+      // Note: I believe the exception about permission-denied is coming from
+      // the order of operations here. I think if I scrub the user first, it
+      // won't come up, but I'm concerned that if something fails the sign out
+      // process, I'll be in a weird state.
+      // Update: order of operations didn't make the difference here (might
+      // still be the right call), but there might be another sub/stream that
+      // is causing this issue, i.e. HomeBloc's joinedGames.
+      // TODO ...
+      // Note: on Hot Reload, Google auth takes a double tap on Sign Out to
+      // fully sign out. Not sure if this will reel it's head in other cases.
+
       print('trying to sign out');
       await _authRepository.signOut();
       print('done awaiting sign out');
@@ -515,6 +445,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       _userSubscription?.cancel();
       _userSubscription = null;
       print('user should be signed out via auth');
+
       emit(
         state.copyWith(
           authUser: null,

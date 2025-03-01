@@ -1,12 +1,9 @@
-//import 'dart:typed_data';
-
+import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
 
 class ProfilePhoto extends StatefulWidget {
   const ProfilePhoto({
@@ -18,12 +15,10 @@ class ProfilePhoto extends StatefulWidget {
 }
 
 class _ProfilePhotoState extends State<ProfilePhoto> {
-  // late XFile? image;
+  late XFile? image;
 
   Future<void> pickImage(BuildContext context) async {
     late dynamic pickedImage;
-    var scaffContext = ScaffoldMessenger.of(context);
-    var userBlocContext = BlocProvider.of<UserBloc>(context);
 
     try {
       if (kIsWeb) {
@@ -39,11 +34,15 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
       }
 
       if (pickedImage == null) {
-        scaffContext.showSnackBar(
-          const SnackBar(
-            content: Text('No image was selected.'),
-          ),
-        );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('No image was selected.'),
+            ),
+          );
+        } else {
+          print('No image; context not mounted.');
+        }
       } else {
         late Uint8List fileBytes;
         late String fileName;
@@ -56,24 +55,28 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
           fileName = pickedImage.name;
         }
 
-        print('updating via profile photo');
-        // TODO: issue while using flutter web locally.. Exception by Image
-        // Resource Service
-
-        userBlocContext.add(
-          UpdateUserImage(
-            bytes: fileBytes,
-            imageName: fileName,
-          ),
-        );
+        if (context.mounted) {
+          context.read<UserBloc>().add(
+                UpdateUserImage(
+                  bytes: fileBytes,
+                  imageName: fileName,
+                ),
+              );
+        } else {
+          print('Update error; context not mounted.');
+        }
       }
     } catch (err) {
       print('pick image err: $err');
-      scaffContext.showSnackBar(
-        const SnackBar(
-          content: Text('There was an error selecting your image.'),
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('There was an error selecting your image.'),
+          ),
+        );
+      } else {
+        print('Image pick issue; context not mounted.');
+      }
     }
   }
 
@@ -87,7 +90,6 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
   Widget build(BuildContext context) {
     return BlocBuilder<UserBloc, UserState>(
       builder: (context, state) {
-        print(state.user.avatarUrl);
         return SizedBox(
           width: double.infinity,
           child: Column(
@@ -121,9 +123,6 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
                   onPressed: state.userStatus == UserStatus.photoUpload
                       ? null
                       : () => pickImage(context),
-                  // : kIsWeb
-                  //     ? () => pickImageWeb(context)
-                  //     : () => pickImageDevice(context),
                   child: const Text('Upload Photo'),
                 ),
               ),

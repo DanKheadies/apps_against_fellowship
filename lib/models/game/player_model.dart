@@ -80,12 +80,12 @@ class Player extends Equatable {
     List<ResponseCard> handList = [];
 
     if (data['prizes'] != null) {
-      (data['prizes'] as List)
+      prizesList = (data['prizes'] as List)
           .map((prize) => PromptCard.fromJson(prize))
           .toList();
     }
     if (data['hand'] != null) {
-      (data['hand'] as List)
+      handList = (data['hand'] as List)
           .map((card) => ResponseCard.fromJson(card))
           .toList();
     }

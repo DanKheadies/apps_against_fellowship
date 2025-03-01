@@ -365,13 +365,16 @@ export async function updateStateWithData(
 ): Promise<void> {
   // TODO: see if this form of data is correct or if it should just be data.gameStatus
   console.log("update state w/ data");
-  if (!data.data["gameStatus"]) {
+  console.log(data);
+  console.log(data["gameStatus"]);
+  console.log(data.data);
+  if (!data["gameStatus"]) {
     throw Error("You must pass a state when updating this way");
   }
 
   const gameDoc = firestore.collection(COLLECTION_GAMES).doc(gameId);
 
-  await gameDoc.update(data.data);
+  await gameDoc.update(data);
 
   // We should also update all the UserGame states for every player connected to the game
   if (players.length > 0) {
@@ -385,7 +388,7 @@ export async function updateStateWithData(
 
         try {
           await playerUserGameDoc.update({
-            gameStatus: data.data["gameStatus"],
+            gameStatus: data["gameStatus"],
           });
         } catch (e) {
           console.log(`Unable to update player's game state: ${e}`);

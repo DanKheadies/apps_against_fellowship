@@ -104,13 +104,14 @@ class PlayerItem extends StatelessWidget {
               ),
             Icon(
               MdiIcons.cardsPlayingOutline,
-              color: Colors.white70,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             Container(
               padding: const EdgeInsets.only(left: 16),
               child: Text(
                 '${player.prizes?.length ?? 0}',
                 style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      color: Theme.of(context).colorScheme.surfaceBright,
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -141,7 +142,7 @@ class PlayerItem extends StatelessWidget {
                       child: IconButton(
                         icon: Icon(
                           MdiIcons.karate,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                         onPressed: () {
                           // Kick Player

@@ -1,4 +1,4 @@
-import 'package:apps_against_fellowship/models/models.dart';
+// import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -41,8 +41,8 @@ final GoRouter goRouter = GoRouter(
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: GameScreen(
-          game: state.extra as Game,
-        ),
+            // game: state.extra != null ? state.extra as Game : Game.emptyGame,
+            ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(
           opacity: animation,

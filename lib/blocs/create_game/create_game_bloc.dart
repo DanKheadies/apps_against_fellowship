@@ -200,6 +200,8 @@ class CreateGameBloc extends Bloc<CreateGameEvent, CreateGameState> {
         state.copyWith(
           cardSets: filteredCardSets.toImmutableList(),
           createGameStatus: CreateGameStatus.loaded,
+          playerLimit: _userBloc.state.user.playerLimit ?? state.playerLimit,
+          prizesToWin: _userBloc.state.user.prizesToWin ?? state.prizesToWin,
         ),
       );
     } catch (err) {

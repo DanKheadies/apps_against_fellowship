@@ -1,5 +1,9 @@
 /* eslint-disable max-len */
-import {COLLECTION_CARD_SETS, COLLECTION_PROMPTS, COLLECTION_RESPONSES} from "../constants";
+import {
+  COLLECTION_CARD_SETS,
+  COLLECTION_PROMPTS,
+  COLLECTION_RESPONSES,
+} from "../constants";
 import {PromptCard, ResponseCard, CardSet} from "../../models/cards";
 import {chunkArray} from "../../util/chunk";
 import {firestore} from "../firebase";
@@ -39,7 +43,8 @@ export async function getCardSet(...ids: string[]): Promise<CardSet[]> {
  * The list of response card ids/indexes to fetch
  */
 export async function getResponseCards(ids: string[]): Promise<ResponseCard[]> {
-  const querySnap = await firestore.collectionGroup(COLLECTION_RESPONSES)
+  const querySnap = await firestore
+    .collectionGroup(COLLECTION_RESPONSES)
     .where("cid", "in", ids)
     .get();
 
@@ -51,7 +56,8 @@ export async function getResponseCards(ids: string[]): Promise<ResponseCard[]> {
  * @param {string} id the id of the prompt card you wish to fetch
  */
 export async function getPromptCard(id: string): Promise<PromptCard> {
-  const querySnap = await firestore.collectionGroup(COLLECTION_PROMPTS)
+  const querySnap = await firestore
+    .collectionGroup(COLLECTION_PROMPTS)
     .where("cid", "==", id)
     .limit(1)
     .get();
@@ -67,10 +73,10 @@ async function getCardSetsLimited(ids: string[]): Promise<CardSet[]> {
   let cardSetIds = ids;
   if (ids.length > 10) cardSetIds = ids.slice(0, 10);
 
-  const cardSetQuerySnap = await firestore.collection(COLLECTION_CARD_SETS)
+  const cardSetQuerySnap = await firestore
+    .collection(COLLECTION_CARD_SETS)
     .where(FieldPath.documentId(), "in", cardSetIds)
     .get();
 
-  return cardSetQuerySnap.docs
-    .map((snapshot) => snapshot.data() as CardSet);
+  return cardSetQuerySnap.docs.map((snapshot) => snapshot.data() as CardSet);
 }

@@ -38,23 +38,70 @@ class Turn extends Equatable {
   }
 
   factory Turn.fromJson(Map<String, dynamic> json) {
-    Map<String, List<ResponseCard>> responsesMap = {}; // TODO (?)
-    if (json['responses'] != null) {
-      print('not null');
-      responsesMap = (json['responses'] as Map<String, List<ResponseCard>>).map(
+    // print('turn fromJson');
+    // print(json);
+
+    Map<String, List<ResponseCard>> responsesMap = {};
+    PromptCard prompt = PromptCard.emptyPromptCard;
+    TurnWinner turnWin = TurnWinner.emptyTurnWinner;
+
+    // if (json['responses'] != null && json['responses'] != {}) {
+    // print('not null');
+    // print(json['responses']);
+    // print((json['responses'] as Map));
+    // print('do it..');
+    // Note: somehow this works.. clean up
+    // responsesMap = (json['responses'] as Map).map(
+    //   (k, v) {
+    //     print('derp');
+    //     print('key: $k');
+    //     print('value1: $v');
+    //     var value = (v as List);
+    //     print('value2: $value');
+    //     return MapEntry(
+    //       k,
+    //       value.map((dynamic card) {
+    //         print('test');
+    //         print(card);
+    //         return ResponseCard.fromJson(card);
+    //       }).toList(),
+    //     );
+    //   },
+    // );
+    if (json['responses'] != {}
+        // && json['responses'] != null
+        ) {
+      responsesMap = (json['responses'] as Map).map(
         (k, v) => MapEntry(
           k,
-          v.map((dynamic card) => ResponseCard.fromJson(card)).toList(),
+          (v as List)
+              .map((dynamic card) => ResponseCard.fromJson(card))
+              .toList(),
         ),
       );
     }
+    // print('alpha');
+    // print(responsesMap);
 
-    return Turn(
-      judgeId: json['judgeId'] ?? '',
-      promptCard: PromptCard.fromJson(json['promptCard']),
+    if (json['promptCard'] != null) {
+      prompt = PromptCard.fromJson(json['promptCard']);
+    }
+
+    if (json['winner'] != null) {
+      // print('beta');
+      turnWin = TurnWinner.fromJson(json['winner']);
+    }
+    // print('sending turn info');
+
+    Turn derp = Turn(
+      judgeId: json['judgeId'],
+      promptCard: prompt,
       responses: responsesMap,
-      winner: TurnWinner.fromJson(json['winner']),
+      winner: turnWin,
     );
+    // print('derp');
+    // print(derp);
+    return derp;
   }
 
   Map<String, dynamic> toJson() {
