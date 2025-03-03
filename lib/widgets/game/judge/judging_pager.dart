@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
-
 import 'package:flutter/material.dart';
 
 class JudgingPager extends StatelessWidget {
@@ -28,7 +27,11 @@ class JudgingPager extends StatelessWidget {
         .toList();
     playerResponses.shuffle(Random(state.game.round));
     controller.setCurrentResponse(
-        playerResponses[0], 0, playerResponses.length);
+      playerResponses[0],
+      0,
+      playerResponses.length,
+    );
+
     return PageView.builder(
       controller: controller.pageController,
       itemCount: playerResponses.length,

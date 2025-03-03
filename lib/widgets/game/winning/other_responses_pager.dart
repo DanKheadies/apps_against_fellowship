@@ -1,9 +1,8 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/material.dart';
 
 class OtherResponsesPager extends StatefulWidget {
   final int gameRound;

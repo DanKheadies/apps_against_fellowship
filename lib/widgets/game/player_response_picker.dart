@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'dart:ui';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PlayerResponsePicker extends StatefulWidget {
   const PlayerResponsePicker({super.key});
@@ -13,8 +14,9 @@ class PlayerResponsePicker extends StatefulWidget {
 }
 
 class PlayerResponsePickerState extends State<PlayerResponsePicker> {
-  final PageController _pageController =
-      PageController(viewportFraction: 0.945);
+  final PageController _pageController = PageController(
+    viewportFraction: 0.945,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +29,19 @@ class PlayerResponsePickerState extends State<PlayerResponsePicker> {
           return Stack(
             children: <Widget>[
               AnimatedOpacity(
-                // opacity: state.isSubmitting ? 0 : 1,
                 opacity:
                     state.gameStateStatus == GameStateStatus.submitting ? 0 : 1,
                 duration: const Duration(milliseconds: 150),
                 curve: Curves.easeIn,
                 child: PageView.builder(
                   controller: _pageController,
+                  scrollBehavior: const ScrollBehavior().copyWith(
+                    dragDevices: {
+                      PointerDeviceKind.mouse,
+                      PointerDeviceKind.touch,
+                      PointerDeviceKind.trackpad,
+                    },
+                  ),
                   itemCount: hand.length,
                   itemBuilder: (context, index) {
                     var card = hand[index];
@@ -76,17 +84,16 @@ class PlayerResponsePickerState extends State<PlayerResponsePicker> {
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         shape: const StadiumBorder(),
-        foregroundColor: Theme.of(context).colorScheme.primary,
-        disabledForegroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.surfaceDim,
+        disabledBackgroundColor: Theme.of(context).colorScheme.surfaceDim,
       ),
       onPressed: null,
       icon: SizedBox(
         width: 24,
         height: 24,
         child: CircularProgressIndicator(
-          // valueColor: AlwaysStoppedAnimation<Color>(AppColors.colorOnPrimary),
           valueColor: AlwaysStoppedAnimation<Color>(
-            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.surfaceTint,
           ),
         ),
       ),
@@ -96,7 +103,7 @@ class PlayerResponsePickerState extends State<PlayerResponsePicker> {
           'SUBMITTING...',
           style: Theme.of(context).textTheme.labelLarge!.copyWith(
                 // color: AppColors.colorOnPrimary,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.surfaceTint,
                 letterSpacing: 1,
               ),
         ),
@@ -112,8 +119,7 @@ class PlayerResponsePickerState extends State<PlayerResponsePicker> {
           horizontal: 16,
         ),
         shape: const StadiumBorder(),
-        // color: AppColors.primary,
-        foregroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       onPressed: () async {
         // Analytics().logSelectContent(
@@ -122,16 +128,14 @@ class PlayerResponsePickerState extends State<PlayerResponsePicker> {
       },
       icon: Icon(
         MdiIcons.uploadMultiple,
-        // color: AppColors.colorOnPrimary,
-        color: Theme.of(context).colorScheme.primary,
+        color: Theme.of(context).scaffoldBackgroundColor,
       ),
       label: Container(
         margin: const EdgeInsets.only(left: 8, right: 20),
         child: Text(
           'SUBMIT RESPONSE',
           style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                // color: AppColors.colorOnPrimary,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).scaffoldBackgroundColor,
                 letterSpacing: 1,
               ),
         ),

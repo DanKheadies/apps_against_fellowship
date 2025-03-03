@@ -1,9 +1,8 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-import 'package:apps_against_fellowship/repositories/repositories.dart';
 
 class ReDealButton extends StatelessWidget {
   const ReDealButton({super.key});
@@ -18,7 +17,7 @@ class ReDealButton extends StatelessWidget {
           return IconButton(
             icon: Icon(MdiIcons.cardsVariant),
             tooltip: 'Re-deal your hand',
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
             onPressed: () async {
               String userId = context.read<UserBloc>().state.user.id;
               final gameContext = context.read<GameRepository>();
@@ -26,21 +25,35 @@ class ReDealButton extends StatelessWidget {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      title: const Text('Deal new hand?'),
+                      title: Text(
+                        'Deal new hand?',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.surface,
+                        ),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                       content: RichText(
                         text: TextSpan(
                           text: 'Spend ',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.surface,
+                          ),
                           children: [
                             TextSpan(
                                 text:
                                     '1 of ${state.currentPlayer.prizes?.length} prize cards',
-                                style: const TextStyle(
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.surface,
                                   fontWeight: FontWeight.bold,
                                 )),
-                            const TextSpan(text: ' to deal you a new hand?'),
+                            TextSpan(
+                              text: ' to deal you a new hand?',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.surface,
+                              ),
+                            ),
                           ],
                         ),
                       ),

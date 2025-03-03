@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/material.dart';
 
 class JudgementController {
   static const double viewportFraction = 0.945;
 
-  final PageController pageController =
-      PageController(viewportFraction: viewportFraction);
+  final PageController pageController = PageController(
+    viewportFraction: viewportFraction,
+  );
   final StreamController<int> _pageChanges = StreamController.broadcast();
 
   late PlayerResponse _currentPlayerResponse;

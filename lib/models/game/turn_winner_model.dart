@@ -53,20 +53,12 @@ class TurnWinner extends Equatable {
   }
 
   factory TurnWinner.fromJson(Map<String, dynamic> json) {
-    print('turn winner fromJson TODO');
     List<ResponseCard> responseList = (json['response'] as List)
         .map((card) => ResponseCard.fromJson(card))
         .toList();
 
     Map<String, List<ResponseCard>> responsesMap = {};
     if (json['responses'] != null || json['responses'] != {}) {
-      print('not null');
-      // responsesMap = (json['responses'] as Map<String, List<ResponseCard>>).map(
-      //   (k, v) => MapEntry(
-      //     k,
-      //     v.map((dynamic card) => ResponseCard.fromJson(card)).toList(),
-      //   ),
-      // );
       responsesMap = (json['responses'] as Map).map(
         (k, v) => MapEntry(
           k,
@@ -94,17 +86,9 @@ class TurnWinner extends Equatable {
     List<ResponseCard> responseList = (data['response'] as List)
         .map((card) => ResponseCard.fromJson(card))
         .toList();
-    Map<String, List<ResponseCard>> responsesMap = {}; // TODO (?)
-    if (data['responses'] != null) {
-      print('not null');
-      // responsesMap = (data['responses'] as Map<String, List<ResponseCard>>).map(
-      //   (k, v) => MapEntry(
-      //     k,
-      //     // (v) => ResponseCard.fromJson(v),
-      //     // (v).map((card) => ResponseCard.fromJson(card)).toList()
-      //     v.map((dynamic card) => ResponseCard.fromJson(card)).toList(),
-      //   ),
-      // );
+    Map<String, List<ResponseCard>> responsesMap = {};
+    if (data['responses'] != null || data['responses'] != {}) {
+      // TODO - Added != {}; see if that messes anything up
       responsesMap = (data['responses'] as Map).map(
         (k, v) => MapEntry(
           k,
@@ -127,8 +111,6 @@ class TurnWinner extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    // TODO: the right route for a map like responses
-    // TODO: is this the right route for a complex list (?); List<CustomModel>
     var responseList = [];
 
     for (var card in response) {
@@ -142,7 +124,7 @@ class TurnWinner extends Equatable {
       'playerName': playerName,
       'promptCard': promptCard.toJson(),
       'response': responseList,
-      'responses': responses, // TODO
+      'responses': responses,
     };
   }
 

@@ -1,11 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
-// import 'package:apps_against_fellowship/screens/screens.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class CompletedGameScreen extends StatelessWidget {
   const CompletedGameScreen({super.key});
@@ -25,7 +24,7 @@ class CompletedGameScreen extends StatelessWidget {
                 child: Text(
                   'Winner',
                   style: Theme.of(context).textTheme.displayMedium!.copyWith(
-                        color: Theme.of(context).canvasColor,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                 ),
               ),
@@ -37,11 +36,13 @@ class CompletedGameScreen extends StatelessWidget {
                       ? state.winner.name
                       : Player.defaultName,
                   style: Theme.of(context).textTheme.headlineMedium!.copyWith(
-                        color: Theme.of(context).canvasColor,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                 ),
               ),
-              Expanded(child: Container()),
+              Expanded(
+                child: Container(),
+              ),
               if (state.isOurGame)
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 24),
@@ -56,10 +57,10 @@ class CompletedGameScreen extends StatelessWidget {
                     onPressed: () {
                       // Analytics().logSelectContent(
                       //     contentType: 'game', itemId: 'create_new_game');
-                      // TODO
-                      print('TODO: navigation');
-                      // Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      //     builder: (context) => const CreateGameScreen()));
+                      context.read<HomeBloc>().add(
+                            RefreshHome(),
+                          );
+                      context.goNamed('createGame');
                     },
                     child: Text(
                       'NEW GAME',
@@ -90,7 +91,10 @@ class CompletedGameScreen extends StatelessWidget {
                   onPressed: () {
                     // Analytics()
                     //     .logSelectContent(contentType: 'game', itemId: 'quit');
-                    Navigator.of(context).pop();
+                    context.read<HomeBloc>().add(
+                          RefreshHome(),
+                        );
+                    context.goNamed('home');
                   },
                   child: Text(
                     'QUIT',

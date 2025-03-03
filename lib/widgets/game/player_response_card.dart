@@ -55,12 +55,12 @@ class PlayerResponseCard extends StatelessWidget {
                 child: hasSubmittedResponse
                     ? Icon(
                         MdiIcons.checkboxMarkedCircleOutline,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.secondary,
                         size: 32,
                       )
                     : Icon(
                         MdiIcons.checkboxBlankCircleOutline,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: Theme.of(context).colorScheme.secondary,
                         size: 32,
                       ),
               ),

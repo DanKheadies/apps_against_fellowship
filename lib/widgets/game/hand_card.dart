@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HandCard extends StatelessWidget {
   final ResponseCard card;
@@ -20,11 +19,9 @@ class HandCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 4),
       width: double.maxFinite,
       child: Material(
-        // color: context.responseCardHandColor,
         color: Theme.of(context).colorScheme.inverseSurface,
         shape: RoundedRectangleBorder(
           side: BorderSide(
-            // color: context.responseBorderColor,
             color: Theme.of(context).colorScheme.onInverseSurface,
             width: 1.0,
           ),
@@ -37,9 +34,7 @@ class HandCard extends StatelessWidget {
         shadowColor: Theme.of(context).colorScheme.surface,
         clipBehavior: Clip.hardEdge,
         child: InkWell(
-          // highlightColor: AppColors.primary.withOpacity(0.26),
           highlightColor: Theme.of(context).colorScheme.primary.withAlpha(50),
-          // splashColor: AppColors.primary.withOpacity(0.26),
           splashColor: Theme.of(context).colorScheme.primary.withAlpha(50),
           onTap: () {
             // Analytics().logSelectContent(

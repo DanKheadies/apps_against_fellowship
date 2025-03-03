@@ -150,15 +150,11 @@ class GameRepository {
     User user, {
     bool andJoin = false,
   }) async {
-    // print('getting game..');
-    // print(gameDocumentId);
     var gameDocument = _firestore.collection('games').doc(gameDocumentId);
-    // print('has gameDoc');
 
     try {
-      // print('trying for snapshot');
       var snapshot = await gameDocument.get();
-      // print('should be g2g, going to convert');
+
       return Game.fromSnapshot(snapshot);
     } catch (e) {
       if (e is PlatformException && andJoin) {
@@ -179,7 +175,6 @@ class GameRepository {
 
   /// Leave a game. This will flag the 'player' on the game as 'inActive'
   Future<void> leaveGame(User user, UserGame game) async {
-    // if (game.gameState.gameStatus == GameStatus.completed) {
     if (game.gameStatus == GameStatus.completed) {
       // We should just delete the usergame ourselfs
       await _firestore
@@ -205,8 +200,6 @@ class GameRepository {
 
   /// Return a list of games that you have joined in the past
   Stream<List<UserGame>> observeJoinedGames(User user) {
-    // print('observe');
-    // print(user);
     return _firestore
         .collection('users')
         .doc(user.id)
@@ -274,15 +267,12 @@ class GameRepository {
   /// The gamescreen should pick up the game state change and update the UI
   /// accordingly
   Future<void> startGame(String gameDocumentId, String uid) async {
-    print('start game call');
     try {
-      dynamic response =
-          await FirebaseFunctions.instance.httpsCallable('startGame').call({
+      await FirebaseFunctions.instance.httpsCallable('startGame').call({
         'game_id': gameDocumentId,
         'uid': uid,
       });
       print("Start game Successful!");
-      print(response);
     } catch (err) {
       print('error starting game: $err');
     }
@@ -295,7 +285,7 @@ class GameRepository {
     String uid,
     List<ResponseCard> cards,
   ) async {
-    dynamic response =
+    HttpsCallableResult response =
         await FirebaseFunctions.instance.httpsCallable('submitResponses').call({
       'game_id': gameDocumentId,
       'uid': uid,
@@ -306,7 +296,7 @@ class GameRepository {
             ),
           )
     });
-    print("Responses Submitted! $response");
+    print("Responses Submitted! ${response.data}");
   }
 
   /// Downvote the current prompt card. If enough downvotes are casted
@@ -342,24 +332,24 @@ class GameRepository {
     String uid, [
     String? message,
   ]) async {
-    dynamic response =
+    HttpsCallableResult response =
         await FirebaseFunctions.instance.httpsCallable('wave').call({
       'game_id': gameDocumentId,
       'player_id': playerId,
       'uid': uid,
       if (message != null) 'message': message,
     });
-    print("Wave sent to player successfully! $response");
+    print("Wave sent to player successfully! ${response.data}");
   }
 
   /// Re-deal your hand in exchange for one prize card, if you have one
   Future<void> reDealHand(String gameDocumentId, String uid) async {
-    dynamic response =
+    HttpsCallableResult response =
         await FirebaseFunctions.instance.httpsCallable('reDealHand').call({
       'game_id': gameDocumentId,
       'uid': uid,
     });
-    print("Hand re-dealt successfully! $response");
+    print("Hand re-dealt successfully! ${response.data}");
   }
 
   //////////////////////
@@ -375,13 +365,13 @@ class GameRepository {
     String playerId,
     String uid,
   ) async {
-    dynamic response =
+    HttpsCallableResult response =
         await FirebaseFunctions.instance.httpsCallable('pickWinner').call({
       'game_id': gameDocumentId,
       'player_id': playerId,
       'uid': uid,
     });
-    print("Winner picked Successful! $response");
+    print("Winner picked Successful! ${response.data}");
   }
 
   Future<Game> _addSelfToGame({

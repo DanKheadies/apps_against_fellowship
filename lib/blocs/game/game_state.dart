@@ -1,30 +1,60 @@
 part of 'game_bloc.dart';
 
 enum GameStateStatus {
+  downvoting,
+  // true: downvote prompt
   error,
+  // true: any catch
   goodToGo,
+  // true: clear submitting (never called)
+  // true: done w/ downvoting prompt
+  // true: downvotes updated
+  // true: game updated (mostly from sub/stream or functions (?))
+  // true: done kicking player
+  // true: done picking winner
+  // true: players updated (mostly from sub/stream or functions (?))
+  // true: successfully submitted response(s)
+  // true: done waving at player
   initial,
+  // true: empty game state
   loading,
+  // true: game (full page loader) [this one is the axe > scapel]
+  // true: waiting room (spinner vs player list)
+  // true: kicking a player from the game
+  // UPDATE: use while functions run (i.e. the catch-all); won't affect
+  // GameScreen--just the components w/in them.
+  // Use in WaitingRoom to give more immediate "the game is starting" UI notice
+  // than waiting to hear back from the function.
   submitting,
+  // true: Judge (pick winner stuff)
+  // true: player response cards (hide if submitting)
+  // true: picking winner
+  // true: start game
+  // true: submit response
+  // true: wave at player
+  // UPDATE: use submitting to indicate players are / have submitted responses
+  // Judge Dredd & player response stuff visiblity changes when submitting is true.
 }
 
 class GameState extends Equatable {
   final Game game;
   final GameStateStatus gameStateStatus;
-  final GameStatus gameStatus;
+  // final GameStatus gameStatus; // Note: never called; removing
   final List<Player> players;
   final List<ResponseCard> selectedCards;
   final List<String> downvotes;
   final String error;
   final String kickingPlayerId;
   final String userId;
+  final bool canPickWinner;
 
   const GameState({
+    this.canPickWinner = false,
     this.downvotes = const [],
     this.error = '',
     this.game = Game.emptyGame,
     this.gameStateStatus = GameStateStatus.initial,
-    this.gameStatus = GameStatus.waitingRoom,
+    // this.gameStatus = GameStatus.waitingRoom,
     this.kickingPlayerId = '',
     this.players = const [],
     this.selectedCards = const [],
@@ -33,11 +63,12 @@ class GameState extends Equatable {
 
   @override
   List<Object> get props => [
+        canPickWinner,
         downvotes,
         error,
         game,
         gameStateStatus,
-        gameStatus,
+        // gameStatus,
         kickingPlayerId,
         players,
         selectedCards,
@@ -45,6 +76,7 @@ class GameState extends Equatable {
       ];
 
   GameState copyWith({
+    bool? canPickWinner,
     Game? game,
     GameStateStatus? gameStateStatus,
     GameStatus? gameStatus,
@@ -56,11 +88,12 @@ class GameState extends Equatable {
     String? userId,
   }) {
     return GameState(
+      canPickWinner: canPickWinner ?? this.canPickWinner,
       downvotes: downvotes ?? this.downvotes,
       error: error ?? this.error,
       game: game ?? this.game,
       gameStateStatus: gameStateStatus ?? this.gameStateStatus,
-      gameStatus: gameStatus ?? this.gameStatus,
+      // gameStatus: gameStatus ?? this.gameStatus,
       kickingPlayerId: kickingPlayerId ?? this.kickingPlayerId,
       players: players ?? this.players,
       selectedCards: selectedCards ?? this.selectedCards,
@@ -81,15 +114,16 @@ class GameState extends Equatable {
         .toList();
 
     return GameState(
+      canPickWinner: json['canPickWinner'],
       downvotes: downvotesList,
       error: json['error'],
       game: Game.fromJson(json['game']),
       gameStateStatus: GameStateStatus.values.firstWhere(
         (status) => status.name.toString() == json['gameStateStatus'],
       ),
-      gameStatus: GameStatus.values.firstWhere(
-        (status) => status.name.toString() == json['gameStatus'],
-      ),
+      // gameStatus: GameStatus.values.firstWhere(
+      //   (status) => status.name.toString() == json['gameStatus'],
+      // ),
       kickingPlayerId: json['kickingPlayerId'],
       players: playersList,
       selectedCards: selectedCardsList,
@@ -109,11 +143,12 @@ class GameState extends Equatable {
     }
 
     return {
+      'canPickWinner': canPickWinner,
       'downvotes': downvotes,
       'error': error,
       'game': game.toJson(),
       'gameStateStatus': gameStateStatus.name,
-      'gameStatus': gameStatus.name,
+      // 'gameStatus': gameStatus.name,
       'kickingPlayerId': kickingPlayerId,
       'players': playersList,
       'selectedCards': selectedCardsList,
@@ -122,11 +157,12 @@ class GameState extends Equatable {
   }
 
   static const emptyGame = GameState(
+    canPickWinner: false,
     downvotes: [],
     error: '',
     game: Game.emptyGame,
     gameStateStatus: GameStateStatus.initial,
-    gameStatus: GameStatus.waitingRoom,
+    // gameStatus: GameStatus.waitingRoom,
     kickingPlayerId: '',
     players: [],
     selectedCards: [],
@@ -144,8 +180,11 @@ class GameState extends Equatable {
           .toList();
       for (var value in allPlayersExcludingJudgeAndInactive) {
         if (game.turn?.responses.keys
-                .firstWhere((e) => e == value.id, orElse: () => '') ==
-            null) {
+                    .firstWhere((e) => e == value.id, orElse: () => '') ==
+                null ||
+            game.turn?.responses.keys
+                    .firstWhere((e) => e == value.id, orElse: () => '') ==
+                '') {
           return false;
         }
       }
@@ -178,13 +217,9 @@ class GameState extends Equatable {
       [];
 
   // Issue: need to handle differently when we don't have data yet..
-  Player get currentJudge {
-    print('CURRENT JUDGE!');
-    print(players.length);
-    return players.firstWhere(
-      (p) => p.id == game.turn?.judgeId,
-    );
-  }
+  Player get currentJudge => players.firstWhere(
+        (p) => p.id == game.turn?.judgeId,
+      );
 
   Player get currentPlayer => players.firstWhere(
         (p) => p.id == userId,

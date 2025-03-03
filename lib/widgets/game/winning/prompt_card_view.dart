@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
+import 'package:flutter/material.dart';
 
 class PromptCardView extends StatelessWidget {
   final EdgeInsets? margin;
@@ -16,7 +15,6 @@ class PromptCardView extends StatelessWidget {
     required this.child,
     this.margin = const EdgeInsets.symmetric(horizontal: 16),
   });
-  // : margin = margin ?? const EdgeInsets.symmetric(horizontal: 16);
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +54,7 @@ class PromptCardView extends StatelessWidget {
     return Container(
       margin: margin,
       child: Material(
-        color: Colors.black,
+        color: Theme.of(context).colorScheme.onInverseSurface,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
@@ -89,8 +87,9 @@ class PromptCardView extends StatelessWidget {
         ).add(margin ?? EdgeInsets.zero),
         child: Text(
           state.lastPromptText,
-          // style: context.cardTextStyle(Colors.white),
-          // TODO
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.inverseSurface,
+          ),
         ),
       ),
     );

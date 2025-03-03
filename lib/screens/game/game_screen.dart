@@ -13,47 +13,41 @@ class GameScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GameBloc, GameState>(
       builder: (context, state) {
-        print(state.game);
+        // TODO: would be good to Hydrate GameState so web could refresh page
+        // and have data. Would need to check if the wheels churn and Subscribe,
+        // et al.
         if (state.game.id == '') {
-          print('no game id; spin');
-          // TODO: empty room only (?); seems to be happening via web
-          // Should add a post frame nav or timer to bail; going to add manual
-          // for now.
-          return ScreenWrapper(
-            screen: 'Game',
-            hideAppBar: true,
-            child: InkWell(
-              onTap: () => context.goNamed('home'),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          );
-        } else if (state.gameStateStatus == GameStateStatus.loading) {
-          print('loading...');
-          return ScreenWrapper(
-            screen: 'Loading Game..',
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
+          // print('no game id; spin');
+          return screenWrapper(context);
         } else if (state.game.gameStatus == GameStatus.waitingRoom ||
             state.game.gameStatus == GameStatus.starting) {
-          print('game waiting / starting..');
-          // return StartingRoomScreen(state: state);
-          // TODO: merge w/ above
+          // print('game waiting / starting..');
           return const WaitingRoomScreen();
         } else if (state.game.gameStatus == GameStatus.inProgress) {
-          print('game in progress');
+          // print('game in progress');
           return GamePlayScreen(state: state);
         } else if (state.game.gameStatus == GameStatus.completed) {
-          print('game complete');
+          // print('game complete');
           return const CompletedGameScreen();
         } else {
-          print('idk');
-          return const SizedBox();
+          // print('idk');
+          return screenWrapper(context);
         }
       },
+    );
+  }
+
+  // TODO: add boolean check for "no game id" w/ timer vs "loading / fallback"
+  ScreenWrapper screenWrapper(BuildContext context) {
+    return ScreenWrapper(
+      screen: 'Game',
+      hideAppBar: true,
+      child: InkWell(
+        onTap: () => context.goNamed('home'),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
     );
   }
 }

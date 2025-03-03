@@ -1,4 +1,3 @@
-// import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
@@ -41,10 +40,8 @@ class UserGame extends Equatable {
   factory UserGame.fromSnapshot(DocumentSnapshot snap) {
     dynamic data = snap.data();
 
-    DateTime? joined = data['joinedAt'] != null
-        ? DateTime.parse(data['joinedAt'])
-        // : DateTime.now();
-        : null;
+    DateTime? joined =
+        data['joinedAt'] != null ? DateTime.parse(data['joinedAt']) : null;
     GameStatus status = GameStatus.values.firstWhere(
       (stat) => stat.name.toString() == data['gameStatus'],
     );
@@ -60,7 +57,6 @@ class UserGame extends Equatable {
   factory UserGame.fromJson(Map<String, dynamic> json) {
     DateTime? joined = json['joinedAt'] != null
         ? (json['joinedAt'] as Timestamp).toDate()
-        // : DateTime.now();
         : null;
     GameStatus status = GameStatus.values.firstWhere(
       (stat) => stat.name.toString() == json['gameStatus'],
@@ -96,6 +92,5 @@ class UserGame extends Equatable {
     gameStatus: GameStatus.waitingRoom,
     gameId: '',
     id: '',
-    // joinedAt: DateTime.now(),
   );
 }

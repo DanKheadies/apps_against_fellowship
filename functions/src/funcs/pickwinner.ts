@@ -161,13 +161,15 @@ export async function handlePickWinner(data: any) {
             players
           );
 
-          await firebase.push.sendGameOverMessage(
-            game,
-            players,
-            gameWinningPlayer
-          );
+          // TODO
+          // await firebase.push.sendGameOverMessage(
+          //   game,
+          //   players,
+          //   gameWinningPlayer
+          // );
         } else {
-          await firebase.push.sendNewRoundMessage(game, turn, players);
+          // TODO
+          // await firebase.push.sendNewRoundMessage(game, turn, players);
         }
 
         return {

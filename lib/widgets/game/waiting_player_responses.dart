@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/material.dart';
 
 class WaitingPlayerResponses extends StatelessWidget {
   final GameState state;
@@ -27,9 +26,9 @@ class WaitingPlayerResponses extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: <Widget>[
-          const Divider(
+          Divider(
             height: 1,
-            color: Colors.white38,
+            color: Theme.of(context).colorScheme.surface,
           ),
           Expanded(
             child: GridView.builder(

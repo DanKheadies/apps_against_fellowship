@@ -37,7 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
       hideAppBar: true,
       child: BlocListener<HomeBloc, HomeState>(
         listener: (context, state) {
-          if (state.joinedGame != null && state.joinedGame != Game.emptyGame) {
+          bool hasGame =
+              state.joinedGame != null && state.joinedGame != Game.emptyGame;
+          if (hasGame) {
             context.read<GameBloc>().add(
                   OpenGame(
                     gameId: state.joinedGame!.id,
@@ -50,6 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
+            bool hasGame =
+                state.joinedGame != null && state.joinedGame != Game.emptyGame;
             return Padding(
               padding: const EdgeInsets.only(
                 bottom: 10,
@@ -87,25 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         const SettingsWidget(),
                         const UserWidget(),
-                        // HomeOutlineButton(
-                        //   icon: Icon(
-                        //     MdiIcons.testTube,
-                        //     color: Theme.of(context).colorScheme.primary,
-                        //   ),
-                        //   text: 'Test',
-                        //   onTap: () => context.read<GameRepository>().testQuery(
-                        //         id: '0',
-                        //         // ids: [
-                        //         //   '1',
-                        //         //   '2',
-                        //         // ],
-                        //         // userId: context.read<UserBloc>().state.user.id,
-                        //         // user: {
-                        //         //   'id': '',
-
-                        //         // },
-                        //       ),
-                        // ),
                         HomeOutlineButton(
                           icon: Icon(
                             MdiIcons.gamepad,
@@ -126,9 +111,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  // Note: UX alt: show Joining Game loading w/ widgets here
-                  // Present error message
-                  if (!state.isLoading && state.joiningGame == '') ...[
+                  if (hasGame) ...[
+                    Expanded(
+                      child: Center(
+                        child: Icon(
+                          Icons.thumb_up_alt_outlined,
+                          color: Theme.of(context).colorScheme.surface,
+                          size: 50,
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (!hasGame &&
+                      !state.isLoading &&
+                      state.joiningGame == '') ...[
                     state.games.isNotEmpty
                         ? Container(
                             margin: const EdgeInsets.only(
@@ -213,17 +209,6 @@ class _HomeScreenState extends State<HomeScreen> {
               content: Text(
                 errMsg,
               ),
-              // content: Wrap(
-              //   direction: Axis.horizontal,
-              //   children: [
-              //     Icon(
-              //       Icons.error,
-              //     ),
-              //     Text(
-              //       errMsg,
-              //     ),
-              //   ],
-              // ),
             ),
           );
         errorTimer = Timer(

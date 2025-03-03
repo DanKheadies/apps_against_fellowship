@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PromptContainer extends StatelessWidget {
   const PromptContainer({super.key});
@@ -33,7 +32,7 @@ class PromptContainer extends StatelessWidget {
                       children: [
                         _buildPromptText(context, state),
                         Expanded(
-                          child: _buildPromptChild(context, state),
+                          child: _buildPromptChild(context),
                         )
                       ],
                     ),
@@ -48,7 +47,9 @@ class PromptContainer extends StatelessWidget {
   }
 
   /// Here we will build
-  Widget _buildPromptChild(BuildContext context, GameState state) {
+  Widget _buildPromptChild(
+    BuildContext context,
+  ) {
     // If Not Judge
     // If winner is null && not submitted response => Show selected cards
     // If winner is null && has submitted response => Show waiting on players tile
@@ -58,71 +59,74 @@ class PromptContainer extends StatelessWidget {
     // If not all responses are submitted => Show waiting on players tile
     // If all responses are submitted => Show Pager of all submissions for the judge to swipe between & Show 'pick winner' button
 
-    return BlocBuilder<GameBloc, GameState>(builder: (context, state) {
-      // Determine if you are judge
-      if (state.areWeJudge) {
-        if (state.allResponsesSubmitted) {
-          return JudgeDredd(
-            state: state,
-          );
-        } else {
-          return WaitingPlayerResponses(
-            state: state,
-          );
-        }
-      } else {
-        if (state.haveWeSubmittedResponse) {
-          return WaitingPlayerResponses(
-            state: state,
-          );
-        } else {
-          var responseCardStack = buildResponseCardStack(
-            state.selectedCards,
-            lastChild: const SizedBox(),
-          );
-          if (responseCardStack != const SizedBox()) {
-            return Dismissible(
-              key: const Key('responses'),
-              direction: DismissDirection.down,
-              movementDuration: Duration(milliseconds: 0),
-              background: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(top: 24),
-                    alignment: Alignment.topCenter,
-                    child: Text(
-                      'Clear Responses'.toUpperCase(),
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    child: Icon(
-                      MdiIcons.chevronTripleDown,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                ],
-              ),
-              onDismissed: (direction) {
-                // Analytics().logSelectContent(
-                //     contentType: 'action', itemId: 'clear_choices');
-                context.read<GameBloc>().add(ClearPickedResponseCards());
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                child: responseCardStack,
-              ),
+    return BlocBuilder<GameBloc, GameState>(
+      builder: (context, state) {
+        if (state.areWeJudge) {
+          if (state.allResponsesSubmitted) {
+            return JudgeDredd(
+              state: state,
             );
           } else {
-            return Container();
+            return WaitingPlayerResponses(
+              state: state,
+            );
+          }
+        } else {
+          if (state.haveWeSubmittedResponse) {
+            return WaitingPlayerResponses(
+              state: state,
+            );
+          } else {
+            var responseCardStack = buildResponseCardStack(
+              state.selectedCards,
+              lastChild: const SizedBox(),
+            );
+            if (responseCardStack != const SizedBox()) {
+              return Dismissible(
+                // key: const Key('responses'),
+                key: UniqueKey(),
+                direction: DismissDirection.down,
+                movementDuration: Duration(milliseconds: 0),
+                background: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 24),
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                        'Clear Responses'.toUpperCase(),
+                        style:
+                            Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      child: Icon(
+                        MdiIcons.chevronTripleDown,
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                      ),
+                    ),
+                  ],
+                ),
+                onDismissed: (direction) {
+                  // Analytics().logSelectContent(
+                  //     contentType: 'action', itemId: 'clear_choices');
+                  context.read<GameBloc>().add(ClearPickedResponseCards());
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  child: responseCardStack,
+                ),
+              );
+            } else {
+              return Container();
+            }
           }
         }
-      }
-    });
+      },
+    );
   }
 
   Widget _buildPromptSpecial(BuildContext context, PromptCard promptCard) {

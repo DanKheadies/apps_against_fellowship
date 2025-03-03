@@ -1,10 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PlayerItem extends StatelessWidget {
   final Player player;
@@ -23,7 +22,6 @@ class PlayerItem extends StatelessWidget {
     this.isKicking = false,
     this.hasDownvoted = false,
   });
-  // : isSelf = isSelf || player.id == 'rando-cardrissian';
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +42,11 @@ class PlayerItem extends StatelessWidget {
           return false;
         },
         background: Container(
-          // color: AppColors.primary,
           color: Theme.of(context).colorScheme.primary,
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Icon(
             MdiIcons.humanGreeting,
-            // color: Colors.white,
             color: Theme.of(context).canvasColor,
           ),
         ),
@@ -75,7 +71,6 @@ class PlayerItem extends StatelessWidget {
       title: Text(
         playerName,
         style: Theme.of(context).textTheme.titleMedium!.copyWith(
-              // color: Colors.white,
               color: Theme.of(context).colorScheme.surface,
             ),
       ),
@@ -83,7 +78,6 @@ class PlayerItem extends StatelessWidget {
           ? Text(
               'Judge',
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    // color: AppColors.primaryVariant,
                     color: Theme.of(context).colorScheme.primary,
                   ),
             )
@@ -98,7 +92,6 @@ class PlayerItem extends StatelessWidget {
                 margin: const EdgeInsets.only(right: 16),
                 child: Icon(
                   MdiIcons.thumbDown,
-                  // color: AppColors.primaryVariant,
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),

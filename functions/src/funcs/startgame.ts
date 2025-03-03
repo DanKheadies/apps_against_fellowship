@@ -1,14 +1,14 @@
 /* eslint-disable max-len */
 import * as firebase from "../firebase/firebase";
-import { CardSet, getSpecial } from "../models/cards";
-import { cut, shuffle } from "../util/shuffle";
-import { dealResponses, draw, drawN } from "../util/deal";
-import { Turn } from "../models/turn";
-import { Player, RANDO_CARDRISSIAN } from "../models/player";
-import { flatMap } from "../util/flatmap";
-import { error } from "../util/error";
-import { GameCardPool } from "../models/pool";
-import { Game } from "../models/game";
+import {CardSet, getSpecial} from "../models/cards";
+import {cut, shuffle} from "../util/shuffle";
+import {dealResponses, draw, drawN} from "../util/deal";
+import {Turn} from "../models/turn";
+import {Player, RANDO_CARDRISSIAN} from "../models/player";
+import {flatMap} from "../util/flatmap";
+import {error} from "../util/error";
+import {GameCardPool} from "../models/pool";
+import {Game} from "../models/game";
 
 /**
  * Start Game - [Callable Function]
@@ -143,7 +143,7 @@ export async function handleStartGame(data: any) {
     } else {
       error(
         "invalid-argument",
-        'The function must be called with a valid "game_id".'
+        "The function must be called with a valid \"game_id\"."
       );
     }
   } else {

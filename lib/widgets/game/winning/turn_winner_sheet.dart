@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
-
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/material.dart';
 
 class TurnWinnerSheet extends StatelessWidget {
   final GameState state;
-  final TurnWinner? turnWinner;
   final ScrollController scrollController;
+  final TurnWinner? turnWinner;
 
   const TurnWinnerSheet({
     super.key,
@@ -15,7 +14,6 @@ class TurnWinnerSheet extends StatelessWidget {
     required this.state,
     this.turnWinner,
   });
-  // : turnWinner = state.game.turn.winner;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +33,7 @@ class TurnWinnerSheet extends StatelessWidget {
               child: Text(
                 'Winner!',
                 style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
               ),
             ),
@@ -47,7 +45,7 @@ class TurnWinnerSheet extends StatelessWidget {
               child: Text(
                 playerName,
                 style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
               ),
             ),

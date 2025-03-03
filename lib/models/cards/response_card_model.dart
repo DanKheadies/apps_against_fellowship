@@ -36,8 +36,6 @@ class ResponseCard extends Equatable {
   }
 
   factory ResponseCard.fromJson(Map<String, dynamic> json) {
-    // print('response card fromJson');
-    // print(json);
     return ResponseCard(
       cardId: json['cid'] ?? '',
       set: json['set'] ?? '',

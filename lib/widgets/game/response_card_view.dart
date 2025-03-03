@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:apps_against_fellowship/models/models.dart';
+import 'package:flutter/material.dart';
 
 class ResponseCardView extends StatelessWidget {
   final ResponseCard card;
@@ -19,14 +18,11 @@ class ResponseCardView extends StatelessWidget {
     return SizedBox(
       width: double.maxFinite,
       child: Material(
-        // color: context.responseCardColor,
-        color: Colors.red,
-        // shadowColor: context.responseCardColor,
-        shadowColor: Colors.blue,
+        color: Theme.of(context).colorScheme.inverseSurface,
+        shadowColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(
           side: BorderSide(
-            // color: context.responseBorderColor,
-            color: Theme.of(context).colorScheme.primary,
+            color: Theme.of(context).colorScheme.onInverseSurface,
             width: 1.0,
           ),
           borderRadius: const BorderRadius.only(
@@ -54,8 +50,9 @@ class ResponseCardView extends StatelessWidget {
       margin: const EdgeInsets.all(textPadding),
       child: Text(
         text,
-        // style: context.cardTextStyle(context.colorOnCard),
-        // TODO
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onInverseSurface,
+        ),
       ),
     );
   }

@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 // import { CallableContext } from "firebase-functions/lib/common/providers/https";
 import * as firebase from "../firebase/firebase";
-import { error } from "../util/error";
-import { Player } from "../models/player";
-import { UserGame } from "../models/usergame";
-import { none } from "../util/array";
-import { Game } from "../models/game";
+import {error} from "../util/error";
+import {Player} from "../models/player";
+import {UserGame} from "../models/usergame";
+import {none} from "../util/array";
+import {Game} from "../models/game";
 
 /**
  * Join Game - [Callable Function]

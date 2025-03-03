@@ -30,12 +30,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     _joinedGamesSubscription = _gameRepository
         .observeJoinedGames(_userBloc.state.user)
         .listen((event) {
-      print('observing / listening..');
       add(
         UserUpdatedViaHome(user: _userBloc.state.user),
       );
-      // print('event:');
-      // print(event);
       add(
         JoinedGamesUpdated(games: event),
       );
@@ -82,7 +79,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
       );
     } catch (err) {
-      print('home bloc: err joining game: $err');
+      // print('home bloc: err joining game: $err');
+      // TODO: Append the error message at all?
       emit(
         state.copyWith(
           error: '$err',
@@ -98,10 +96,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     JoinedGamesUpdated event,
     Emitter<HomeState> emit,
   ) {
-    print('joined games updated');
-    // TODO: the upstream of this isn't triggering here, i.e. in-progress game
-    // hasn't been updated and still shows Waiting Room. Follow this upstream to
-    // ... Cloud Functions (?)
     emit(
       state.copyWith(
         games: event.games..sort((a, b) => b.joinedAt!.compareTo(a.joinedAt!)),
@@ -113,11 +107,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     LeaveGame event,
     Emitter<HomeState> emit,
   ) async {
+    // TODO: leaving and joining the same game multiple times causes an issue
+    // Something w/ the subscription I believe.
     try {
-      print('trying to leave game');
       emit(
         state.copyWith(
-          isLoading: true,
+          // isLoading: true,
           games: state.games..remove(event.game),
           leavingGame: event.game,
         ),
@@ -130,7 +125,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
       emit(
         state.copyWith(
-          isLoading: false,
+          // isLoading: false,
           leavingGame: null,
         ),
       );
@@ -138,7 +133,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       print('home bloc: leave game err: $err');
       emit(
         state.copyWith(
-          isLoading: false,
+          // isLoading: false,
           leavingGame: null,
         ),
       );

@@ -73,6 +73,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     Emitter<GameState> emit,
   ) {
     // TODO
+    print('g2g1');
     emit(
       state.copyWith(
         gameStateStatus: GameStateStatus.goodToGo,
@@ -86,7 +87,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   ) async {
     emit(
       state.copyWith(
-        gameStateStatus: GameStateStatus.submitting,
+        gameStateStatus: GameStateStatus.downvoting, // TODO: loading (?)
       ),
     );
 
@@ -96,6 +97,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         _userBloc.state.user,
       );
 
+      print('g2g2');
       emit(
         state.copyWith(
           gameStateStatus: GameStateStatus.goodToGo,
@@ -116,10 +118,11 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     DownvotesUpdated event,
     Emitter<GameState> emit,
   ) {
+    // print('g2g3');
     emit(
       state.copyWith(
         downvotes: event.downvotes,
-        gameStateStatus: GameStateStatus.goodToGo, // TODO
+        // gameStateStatus: GameStateStatus.goodToGo, // TODO
       ),
     );
   }
@@ -131,7 +134,10 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     emit(
       state.copyWith(
         game: event.game,
-        gameStateStatus: GameStateStatus.goodToGo, // TODO
+        // gameStateStatus: GameStateStatus.goodToGo, // TODO
+        // Note: if we don't g2g here, the sub can crunching and eventually
+        // get the players, which we can trigger as g2g. Not sure if that's
+        // ideal, but lets try it.
       ),
     );
   }
@@ -146,6 +152,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     Emitter<GameState> emit,
   ) async {
     if (state.gameStateStatus == GameStateStatus.loading) return;
+
     emit(
       state.copyWith(
         gameStateStatus: GameStateStatus.loading,
@@ -169,6 +176,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         Subscribe(gameId: existingGame.id),
       );
 
+      print('g2g4');
       emit(
         state.copyWith(
           game: existingGame,
@@ -191,6 +199,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     PickResponseCard event,
     Emitter<GameState> emit,
   ) {
+    // TODO: emit a status (?)
+    print('pick response card; TODO emit?');
+
     // Check prompt special to determine if we allow the user to pick two
     var special = promptSpecial(state.game.turn!.promptCard.special);
     if (special != PromptSpecial.notSpecial) {
@@ -251,11 +262,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     PickWinner event,
     Emitter<GameState> emit,
   ) async {
-    if (state.gameStateStatus == GameStateStatus.submitting) return;
+    // Note: was submitting; now loading
+    if (state.gameStateStatus == GameStateStatus.loading) return;
 
     emit(
       state.copyWith(
-        gameStateStatus: GameStateStatus.submitting,
+        gameStateStatus: GameStateStatus.loading,
       ),
     );
 
@@ -266,6 +278,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         _userBloc.state.user.id,
       );
 
+      print('g2g5');
       emit(
         state.copyWith(
           gameStateStatus: GameStateStatus.goodToGo,
@@ -288,9 +301,13 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     Emitter<GameState> emit,
   ) {
     print('players updated');
+    // print('g2g6');
     emit(
       state.copyWith(
-        gameStateStatus: GameStateStatus.goodToGo, // TODO
+        // gameStateStatus: GameStateStatus.goodToGo, // TODO
+        // Note: have this be the g2g might simplify the "we don't have players"
+        // issue, but honestly might not be needed / helpful here anyways, i.e.
+        // we aren't looking for g2g anywhere in the code yet...
         players: event.players,
       ),
     );
@@ -300,11 +317,13 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     StartGame event,
     Emitter<GameState> emit,
   ) async {
-    if (state.gameStateStatus == GameStateStatus.submitting) return;
+    // TODO: this should prob be loading or starting and not submitting
+    // Note: changed to loading, which drives the Wait vs Start screen UI
+    if (state.gameStateStatus == GameStateStatus.loading) return;
 
     emit(
       state.copyWith(
-        gameStateStatus: GameStateStatus.submitting,
+        gameStateStatus: GameStateStatus.loading,
       ),
     );
 
@@ -312,6 +331,17 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       await _gameRepository.startGame(
         state.game.id,
         _userBloc.state.user.id,
+      );
+      // function updates DB to inProgress when complete (sub/stream updates UI)
+      // but should emit g2g here ?
+      // TODO: make sure this works as expected
+      // Seems to work fine w/ no change, but I think it's cuz something in the
+      // Subscribe updates. Will prob want to re-activate here in a second...
+      print('start game & emit; g2gX');
+      emit(
+        state.copyWith(
+          gameStateStatus: GameStateStatus.goodToGo,
+        ),
       );
     } catch (err) {
       if (err is PlatformException) {
@@ -360,10 +390,14 @@ class GameBloc extends Bloc<GameEvent, GameState> {
           state.selectedCards,
         );
 
+        print('g2g7');
         emit(
           state.copyWith(
             selectedCards: [],
             gameStateStatus: GameStateStatus.goodToGo,
+            // canPickWinner
+            //     ? GameStateStatus.picking
+            //     : GameStateStatus.goodToGo,
           ),
         );
       } catch (err) {
@@ -412,8 +446,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     _playersSubscription =
         _gameRepository.observePlayers(event.gameId).listen((players) {
       print('observing players...');
-      print('PLAYERS');
-      print(players);
+      // print('PLAYERS');
+      // print(players);
       add(
         PlayersUpdated(
           players: players,
@@ -450,9 +484,12 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     WaveAtPlayer event,
     Emitter<GameState> emit,
   ) async {
+    // TODO: needed (?)
+    if (state.gameStateStatus == GameStateStatus.loading) return;
+
     emit(
       state.copyWith(
-        gameStateStatus: GameStateStatus.submitting,
+        gameStateStatus: GameStateStatus.loading,
       ),
     );
 
@@ -463,6 +500,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         event.message,
       );
 
+      print('g2g8');
       emit(
         state.copyWith(
           gameStateStatus: GameStateStatus.goodToGo,

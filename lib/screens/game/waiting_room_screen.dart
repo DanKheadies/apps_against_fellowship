@@ -14,14 +14,13 @@ class WaitingRoomScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GameBloc, GameState>(
       builder: (context, state) {
-        bool isStarting = state.gameStateStatus == GameStateStatus.submitting ||
+        bool isStarting = state.gameStateStatus == GameStateStatus.loading ||
             state.game.gameStatus == GameStatus.starting;
 
         return ScreenWrapper(
           screen: 'Waiting Room',
-          // hideAppBar: false,
           customAppBar: _buildAppBar(isStarting, context, state),
-          flaction: state.isOurGame && !isStarting
+          flaction: state.isOurGame && !isStarting && state.players.length > 2
               ? FloatingActionButton.extended(
                   icon: Icon(MdiIcons.play),
                   label: const Text("START GAME"),
@@ -52,7 +51,7 @@ class WaitingRoomScreen extends StatelessWidget {
                   );
               }
             },
-            child: state.gameStateStatus == GameStateStatus.submitting
+            child: isStarting
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
@@ -80,7 +79,6 @@ class WaitingRoomScreen extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
               ),
               onPressed: () {
-                // TODO Needed still (?)
                 context.read<HomeBloc>().add(
                       RefreshHome(),
                     );

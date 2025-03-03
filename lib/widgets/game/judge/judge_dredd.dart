@@ -1,9 +1,8 @@
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-import 'package:apps_against_fellowship/widgets/widgets.dart';
 
 class JudgeDredd extends StatefulWidget {
   final GameState state;
@@ -54,22 +53,32 @@ class JudgeDreddState extends State<JudgeDredd> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      _buildPageButton(
-                          context: context,
-                          iconData: Icons.keyboard_arrow_left,
-                          isVisible: showLeft),
-                      widget.state.gameStateStatus == GameStateStatus.submitting
+                      widget.state.gameStateStatus ==
+                                  GameStateStatus.submitting ||
+                              widget.state.gameStateStatus ==
+                                  GameStateStatus.loading
+                          ? const SizedBox()
+                          : _buildPageButton(
+                              context: context,
+                              iconData: Icons.keyboard_arrow_left,
+                              isVisible: showLeft,
+                            ),
+                      widget.state.gameStateStatus == GameStateStatus.loading
                           ? _buildPickingWinnerIndicator(context)
-                          : const SizedBox(),
-                      widget.state.gameStateStatus == GameStateStatus.submitting
-                          ? _buildPickWinnerButton(context)
-                          : const SizedBox(),
-                      _buildPageButton(
-                        context: context,
-                        iconData: Icons.keyboard_arrow_right,
-                        isLeft: false,
-                        isVisible: showRight,
-                      ),
+                          : widget.state.allResponsesSubmitted
+                              ? _buildPickWinnerButton(context)
+                              : const SizedBox(),
+                      widget.state.gameStateStatus ==
+                                  GameStateStatus.submitting ||
+                              widget.state.gameStateStatus ==
+                                  GameStateStatus.loading
+                          ? const SizedBox()
+                          : _buildPageButton(
+                              context: context,
+                              iconData: Icons.keyboard_arrow_right,
+                              isLeft: false,
+                              isVisible: showRight,
+                            ),
                     ],
                   );
                 }),
@@ -84,8 +93,7 @@ class JudgeDreddState extends State<JudgeDredd> {
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         shape: const StadiumBorder(),
-        // color: AppColors.primary,
-        foregroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       onPressed: () async {
         var currentPlayerResponse = controller.currentPlayerResponse;
@@ -102,16 +110,14 @@ class JudgeDreddState extends State<JudgeDredd> {
       },
       icon: Icon(
         MdiIcons.crown,
-        // color: AppColors.colorOnPrimary,
-        color: Theme.of(context).colorScheme.primary,
+        color: Theme.of(context).scaffoldBackgroundColor,
       ),
       label: Container(
         margin: const EdgeInsets.only(left: 16, right: 40),
         child: Text(
           'WINNER',
           style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                // color: AppColors.colorOnPrimary,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).scaffoldBackgroundColor,
                 letterSpacing: 1,
               ),
         ),
@@ -124,17 +130,15 @@ class JudgeDreddState extends State<JudgeDredd> {
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         shape: const StadiumBorder(),
-        // color: AppColors.primary,
-        foregroundColor: Theme.of(context).colorScheme.primary,
-        // disabledColor: AppColors.primary,
-        disabledForegroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Theme.of(context).colorScheme.surfaceDim,
+        disabledBackgroundColor: Theme.of(context).colorScheme.surfaceDim,
       ),
       icon: SizedBox(
         width: 24,
         height: 24,
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(
-            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.surfaceTint,
           ),
         ),
       ),
@@ -143,8 +147,7 @@ class JudgeDreddState extends State<JudgeDredd> {
         child: Text(
           'SUBMITTING...',
           style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                // color: AppColors.colorOnPrimary,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).colorScheme.surfaceTint,
                 letterSpacing: 1,
               ),
         ),
@@ -166,7 +169,6 @@ class JudgeDreddState extends State<JudgeDredd> {
         height: 48,
         width: 56,
         child: Material(
-          // color: AppColors.primary,
           color: Theme.of(context).colorScheme.primary,
           clipBehavior: Clip.hardEdge,
           shape: RoundedRectangleBorder(
@@ -198,8 +200,7 @@ class JudgeDreddState extends State<JudgeDredd> {
               alignment: Alignment.center,
               child: Icon(
                 iconData,
-                // color: AppColors.colorOnPrimary,
-                color: Theme.of(context).colorScheme.primary,
+                color: Theme.of(context).scaffoldBackgroundColor,
               ),
             ),
           ),

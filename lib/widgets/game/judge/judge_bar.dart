@@ -13,28 +13,14 @@ class JudgeBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<GameBloc, GameState>(
       builder: (context, state) {
-        print('build judge bar');
-        // print(state);
-        // print(state.)
-        // TODO: state.currentJudge is null atm; not sure if game_state.dart
-        // is setting it correctly / at all
-        print(state.players.length);
-        print('judgeId: ${state.game.turn?.judgeId}');
-        if (state.players.isNotEmpty) {
-          print('we have players..');
-          var judge = state.currentJudge;
-          print('judge: $judge');
-          var hasDownvoted = state.downvotes.contains(state.userId);
-          print(hasDownvoted);
-          if (judge != Player.emptyPlayer) {
-            return _buildHeader(
-              context,
-              judge,
-              hasDownvoted: hasDownvoted,
-            );
-          } else {
-            return Container(height: 72);
-          }
+        var judge = state.currentJudge;
+        var hasDownvoted = state.downvotes.contains(state.userId);
+        if (judge != Player.emptyPlayer) {
+          return _buildHeader(
+            context,
+            judge,
+            hasDownvoted: hasDownvoted,
+          );
         } else {
           return Container(height: 72);
         }
@@ -42,8 +28,11 @@ class JudgeBar extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, Player player,
-      {bool hasDownvoted = false}) {
+  Widget _buildHeader(
+    BuildContext context,
+    Player player, {
+    bool hasDownvoted = false,
+  }) {
     var playerName = player.name;
     if (playerName.trim().isEmpty) {
       playerName = Player.defaultName;

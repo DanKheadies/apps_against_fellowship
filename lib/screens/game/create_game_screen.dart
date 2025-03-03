@@ -87,7 +87,8 @@ class _CreateGameScreenState extends State<CreateGameScreen> {
   Widget _buildScaffold() {
     return BlocBuilder<CreateGameBloc, CreateGameState>(
       builder: (context, state) {
-        return state.createGameStatus != CreateGameStatus.loaded
+        return state.createGameStatus != CreateGameStatus.loaded ||
+                state.createdGame != Game.emptyGame
             ? _buildLoading()
             : DefaultTabController(
                 length: 2,
