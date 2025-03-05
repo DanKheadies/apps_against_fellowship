@@ -11,8 +11,9 @@ class GameOverScreen extends StatelessWidget {
     return Scaffold(
       body: BlocBuilder<GameBloc, GameState>(
         builder: (context, state) {
-          String errMsg =
-              state.error.split(']')[1].split('\n')[0].replaceFirst(' ', '');
+          String errMsg = state.error.contains(']')
+              ? state.error.split(']')[1].split('\n')[0].replaceFirst(' ', '')
+              : state.error;
 
           return Column(
             mainAxisSize: MainAxisSize.max,

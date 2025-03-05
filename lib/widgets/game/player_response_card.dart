@@ -51,7 +51,7 @@ class PlayerResponseCard extends StatelessWidget {
             ),
             Expanded(
               child: Container(
-                alignment: Alignment.topCenter,
+                alignment: Alignment.center,
                 child: hasSubmittedResponse
                     ? Icon(
                         MdiIcons.checkboxMarkedCircleOutline,

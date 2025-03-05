@@ -1,7 +1,6 @@
 /* eslint-disable max-len */
-// import {CallableContext} from "firebase-functions/lib/v1/providers/https";
 import * as firebase from "../firebase/firebase";
-import {error} from "../util/error";
+import { error } from "../util/error";
 
 /**
  * Leave Game - [Callable Function]
@@ -14,7 +13,6 @@ import {error} from "../util/error";
  * @param {any} data
  */
 export async function handleLeaveGame(data: any) {
-  // const uid = context.auth?.uid;
   const uid = data.data["uid"];
   const gameId = data.data["game_id"];
 

@@ -11,7 +11,7 @@ class ClearError extends GameEvent {}
 
 class ClearPickedResponseCards extends GameEvent {}
 
-class ClearSubmitting extends GameEvent {}
+class ClearKicking extends GameEvent {}
 
 class DownvotePrompt extends GameEvent {}
 
@@ -106,6 +106,22 @@ class PickWinner extends GameEvent {
   @override
   List<Object> get props => [
         winningPlayerId,
+      ];
+}
+
+class ReDealHand extends GameEvent {
+  final String gameDocId;
+  final String userId;
+
+  const ReDealHand({
+    required this.gameDocId,
+    required this.userId,
+  });
+
+  @override
+  List<Object> get props => [
+        gameDocId,
+        userId,
       ];
 }
 

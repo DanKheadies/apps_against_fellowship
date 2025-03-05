@@ -53,7 +53,6 @@ class OtherResponsesPagerState extends State<OtherResponsesPager> {
       itemCount: playerResponses.length,
       itemBuilder: (context, index) {
         var response = playerResponses[index];
-        // print(response.responses);
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 4),
           child: buildResponseCardStack(

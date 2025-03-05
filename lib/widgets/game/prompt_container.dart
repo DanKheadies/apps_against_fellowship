@@ -77,16 +77,12 @@ class PromptContainer extends StatelessWidget {
               state: state,
             );
           } else {
-            // Note: user selects their prompts; the list contains the correct
-            // order, i.e. Pick 2 - 1st one on top, 2nd below it.
-            // print(state.selectedCards);
             var responseCardStack = buildResponseCardStack(
               state.selectedCards,
               lastChild: const SizedBox(),
             );
             if (responseCardStack != const SizedBox()) {
               return Dismissible(
-                // key: const Key('responses'),
                 key: UniqueKey(),
                 direction: DismissDirection.down,
                 movementDuration: Duration(milliseconds: 0),

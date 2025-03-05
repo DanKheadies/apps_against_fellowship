@@ -30,7 +30,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     // super(GameState.empty()) {
     on<ClearError>(_onClearError);
     on<ClearPickedResponseCards>(_onClearPickedResponseCards);
-    on<ClearSubmitting>(_onClearSubmitting);
+    on<ClearKicking>(_onClearKicking);
     on<DownvotePrompt>(_onDownvotePrompt);
     on<DownvotesUpdated>(_onDownvotesUpdated);
     on<GameUpdated>(_onGameUpdated);
@@ -39,6 +39,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<PickResponseCard>(_onPickResponseCard);
     on<PickWinner>(_onPickWinner);
     on<PlayersUpdated>(_onPlayersUpdated);
+    on<ReDealHand>(_onReDealHand);
     on<StartGame>(_onStartGame);
     on<SubmitResponses>(_onSubmitResponses);
     on<Subscribe>(_onSubscribe);
@@ -65,19 +66,20 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     emit(
       state.copyWith(
         selectedCards: [],
+        // error: 'Test error',
+        // gameStateStatus: GameStateStatus.error,
       ),
     );
   }
 
-  void _onClearSubmitting(
-    ClearSubmitting event,
+  void _onClearKicking(
+    ClearKicking event,
     Emitter<GameState> emit,
   ) {
-    // TODO
-    print('g2g1');
     emit(
       state.copyWith(
         gameStateStatus: GameStateStatus.goodToGo,
+        kickingPlayerId: '',
       ),
     );
   }
@@ -86,38 +88,26 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     DownvotePrompt event,
     Emitter<GameState> emit,
   ) async {
-    emit(
-      state.copyWith(
-        error: '[firebase_derpions/resource-derped] Test error.',
-      ),
-    );
-    // emit(
-    //   state.copyWith(
-    //     gameStateStatus: GameStateStatus.downvoting, // TODO: loading (?)
-    //   ),
-    // );
+    try {
+      await _gameRepository.downVoteCurrentPrompt(
+        state.game.id,
+        _userBloc.state.user,
+      );
 
-    // try {
-    //   await _gameRepository.downVoteCurrentPrompt(
-    //     state.game.id,
-    //     _userBloc.state.user,
-    //   );
-
-    //   print('g2g2');
-    //   emit(
-    //     state.copyWith(
-    //       gameStateStatus: GameStateStatus.goodToGo,
-    //     ),
-    //   );
-    // } catch (err) {
-    //   print('error downvoting prompt');
-    //   emit(
-    //     state.copyWith(
-    //       error: '$err',
-    //       gameStateStatus: GameStateStatus.error,
-    //     ),
-    //   );
-    // }
+      emit(
+        state.copyWith(
+          gameStateStatus: GameStateStatus.goodToGo,
+        ),
+      );
+    } catch (err) {
+      print('error downvoting prompt');
+      emit(
+        state.copyWith(
+          error: '$err',
+          gameStateStatus: GameStateStatus.error,
+        ),
+      );
+    }
   }
 
   void _onDownvotesUpdated(
@@ -151,30 +141,47 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   void _onKickPlayer(
     KickPlayer event,
     Emitter<GameState> emit,
-  ) {}
+  ) async {
+    _checkAndEmit(emit, GameStateStatus.loading);
+
+    try {
+      await _gameRepository.kickPlayer(
+        state.game.id,
+        event.playerId,
+        _userBloc.state.user.id,
+      );
+
+      emit(
+        state.copyWith(
+          gameStateStatus: GameStateStatus.loading,
+          kickingPlayerId: '',
+        ),
+      );
+    } catch (err) {
+      print('kicking player err: $err');
+
+      emit(
+        state.copyWith(
+          error: err.toString(),
+          gameStateStatus: GameStateStatus.error,
+          kickingPlayerId: '',
+        ),
+      );
+    }
+  }
 
   void _onOpenGame(
     OpenGame event,
     Emitter<GameState> emit,
   ) async {
-    if (state.gameStateStatus == GameStateStatus.loading) return;
-
-    emit(
-      state.copyWith(
-        gameStateStatus: GameStateStatus.loading,
-      ),
-    );
+    _checkAndEmit(emit, GameStateStatus.loading);
 
     try {
-      // print('open game');
       var existingGame = await _gameRepository.getGame(
         event.gameId,
         event.user,
       );
 
-      // print('have game');
-      // print(event.gameId);
-      // print(existingGame);
       add(
         GameUpdated(game: existingGame),
       );
@@ -182,7 +189,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         Subscribe(gameId: existingGame.id),
       );
 
-      print('g2g4');
       emit(
         state.copyWith(
           game: existingGame,
@@ -265,13 +271,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     PickWinner event,
     Emitter<GameState> emit,
   ) async {
-    if (state.gameStateStatus == GameStateStatus.loading) return;
-
-    emit(
-      state.copyWith(
-        gameStateStatus: GameStateStatus.loading,
-      ),
-    );
+    _checkAndEmit(emit, GameStateStatus.loading);
 
     try {
       await _gameRepository.pickWinner(
@@ -291,7 +291,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         state.copyWith(
           error: '$err',
           gameStateStatus: GameStateStatus.error,
-          kickingPlayerId: '',
         ),
       );
     }
@@ -301,6 +300,21 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     PlayersUpdated event,
     Emitter<GameState> emit,
   ) {
+    for (var player in event.players) {
+      print(player.id);
+      print(player.isInactive);
+    }
+    print(_userBloc.state.user.id);
+    if (event.players.any((player) =>
+        player.id == _userBloc.state.user.id && player.isInactive)) {
+      print('we were kicked; leave game');
+      emit(
+        state.copyWith(
+          kickingPlayerId: _userBloc.state.user.id,
+        ),
+      );
+    }
+
     emit(
       state.copyWith(
         players: event.players,
@@ -308,31 +322,43 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     );
   }
 
+  void _onReDealHand(
+    ReDealHand event,
+    Emitter<GameState> emit,
+  ) async {
+    _checkAndEmit(emit, GameStateStatus.redealing);
+
+    try {
+      await _gameRepository.reDealHand(event.gameDocId, event.userId);
+
+      emit(
+        state.copyWith(
+          gameStateStatus: GameStateStatus.goodToGo,
+        ),
+      );
+    } catch (err) {
+      print('re-deal hand err: $err');
+      emit(
+        state.copyWith(
+          error: 'There was an error re-dealing your hand.',
+          gameStateStatus: GameStateStatus.error,
+        ),
+      );
+    }
+  }
+
   void _onStartGame(
     StartGame event,
     Emitter<GameState> emit,
   ) async {
-    // TODO: this should prob be loading or starting and not submitting
-    // Note: changed to loading, which drives the Wait vs Start screen UI
-    if (state.gameStateStatus == GameStateStatus.loading) return;
-
-    emit(
-      state.copyWith(
-        gameStateStatus: GameStateStatus.loading,
-      ),
-    );
+    _checkAndEmit(emit, GameStateStatus.loading);
 
     try {
       await _gameRepository.startGame(
         state.game.id,
         _userBloc.state.user.id,
       );
-      // function updates DB to inProgress when complete (sub/stream updates UI)
-      // but should emit g2g here ?
-      // TODO: make sure this works as expected
-      // Seems to work fine w/ no change, but I think it's cuz something in the
-      // Subscribe updates. Will prob want to re-activate here in a second...
-      print('start game & emit; g2gX');
+
       emit(
         state.copyWith(
           gameStateStatus: GameStateStatus.goodToGo,
@@ -344,7 +370,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         if (err.code == 'functionsError') {
           final Map<String, dynamic> details =
               Map<String, dynamic>.from(err.details);
-          print(details);
+
           emit(
             state.copyWith(
               error: details['message'],
@@ -369,13 +395,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     SubmitResponses event,
     Emitter<GameState> emit,
   ) async {
-    if (state.gameStateStatus == GameStateStatus.submitting) return;
-
-    emit(
-      state.copyWith(
-        gameStateStatus: GameStateStatus.submitting,
-      ),
-    );
+    _checkAndEmit(emit, GameStateStatus.submitting);
 
     if (state.selectedCards.isNotEmpty) {
       try {
@@ -385,14 +405,10 @@ class GameBloc extends Bloc<GameEvent, GameState> {
           state.selectedCards,
         );
 
-        print('g2g7');
         emit(
           state.copyWith(
             selectedCards: [],
             gameStateStatus: GameStateStatus.goodToGo,
-            // canPickWinner
-            //     ? GameStateStatus.picking
-            //     : GameStateStatus.goodToGo,
           ),
         );
       } catch (err) {
@@ -411,19 +427,15 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     Subscribe event,
     Emitter<GameState> emit,
   ) {
-    print('subscribing to game..');
     var user = _authRepository.getUser();
     add(
       UserUpdated(
         userId: user!.uid,
       ),
     );
-    print('user g2g');
-    print(event.gameId);
+
     _gameSubcription?.cancel();
     _gameSubcription = _gameRepository.observeGame(event.gameId).listen((game) {
-      print('game sub listenting w/ game..');
-      // TODO: shouldn't I be passing info on the game in here and not the user (?)
       add(
         GameUpdated(
           game: game,
@@ -435,33 +447,27 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         ),
       );
     });
-    print('game sub g2g');
 
     _playersSubscription?.cancel();
     _playersSubscription =
         _gameRepository.observePlayers(event.gameId).listen((players) {
-      print('observing players...');
-      // print('PLAYERS');
-      // print(players);
+      print('observing players..');
       add(
         PlayersUpdated(
           players: players,
         ),
       );
     });
-    print('player sub g2g');
 
     _downvoteSubscription?.cancel();
     _downvoteSubscription =
         _gameRepository.observeDownvotes(event.gameId).listen((downvotes) {
-      print('downvotes..');
       add(
         DownvotesUpdated(
           downvotes: downvotes,
         ),
       );
     });
-    print('downvote sub g2g');
   }
 
   void _onUserUpdated(
@@ -479,30 +485,22 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     WaveAtPlayer event,
     Emitter<GameState> emit,
   ) async {
-    // TODO: needed (?)
-    if (state.gameStateStatus == GameStateStatus.loading) return;
-
-    emit(
-      state.copyWith(
-        gameStateStatus: GameStateStatus.loading,
-      ),
-    );
+    _checkAndEmit(emit, GameStateStatus.waving);
 
     try {
       await _gameRepository.waveAtPlayer(
         state.game.id,
         event.playerId,
-        event.message,
+        _userBloc.state.user.id,
       );
 
-      print('g2g8');
       emit(
         state.copyWith(
           gameStateStatus: GameStateStatus.goodToGo,
         ),
       );
     } catch (err) {
-      print('error downvoting prompt');
+      print('error waving');
       emit(
         state.copyWith(
           error: '$err',
@@ -510,6 +508,20 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         ),
       );
     }
+  }
+
+  void _checkAndEmit(
+    Emitter<GameState> emit,
+    GameStateStatus status,
+  ) {
+    print('check for $status');
+    if (state.gameStateStatus == status) return;
+    print('emitting: $status');
+    emit(
+      state.copyWith(
+        gameStateStatus: status,
+      ),
+    );
   }
 
   @override

@@ -58,7 +58,7 @@ class TurnWinnerSheet extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 32),
                   child: buildResponseCardStack(
-                    turnWinner!.response, // TODO: check
+                    turnWinner!.response,
                     lastChild: Column(
                       children: [
                         const Divider(),

@@ -72,7 +72,7 @@ ThemeData lightTheme() {
     primaryColor: primary,
     scaffoldBackgroundColor: whiteBright,
     snackBarTheme: SnackBarThemeData(
-      actionTextColor: primary,
+      actionTextColor: primaryLight,
       backgroundColor: black,
       contentTextStyle: Typography.material2018(platform: defaultTargetPlatform)
           .englishLike
@@ -124,7 +124,7 @@ ThemeData darkTheme() {
     primaryColor: primaryLight,
     scaffoldBackgroundColor: blackNight,
     snackBarTheme: SnackBarThemeData(
-      actionTextColor: primaryLight,
+      actionTextColor: primary,
       backgroundColor: white,
       contentTextStyle: Typography.material2018(platform: defaultTargetPlatform)
           .englishLike

@@ -11,15 +11,15 @@ import {
   DOCUMENT_RESPONSES,
   DOCUMENT_TALLY,
 } from "../constants";
-import { Game, GameStatus } from "../../models/game";
-import { Player, RANDO_CARDRISSIAN } from "../../models/player";
-import { cards, firestore } from "../firebase";
-import { PromptCard, ResponseCard } from "../../models/cards";
-import { CardPool } from "../../models/pool";
-import { draw, drawN } from "../../util/deal";
+import {Game, GameStatus} from "../../models/game";
+import {Player, RANDO_CARDRISSIAN} from "../../models/player";
+import {cards, firestore} from "../firebase";
+import {PromptCard, ResponseCard} from "../../models/cards";
+import {CardPool} from "../../models/pool";
+import {draw, drawN} from "../../util/deal";
 import * as admin from "firebase-admin";
 import FieldValue = admin.firestore.FieldValue;
-import { TurnWinner } from "../../models/turn";
+import {TurnWinner} from "../../models/turn";
 import Timestamp = admin.firestore.Timestamp;
 
 /**
@@ -105,7 +105,7 @@ export function leaveGame(
 
   // Remove yourself from the judging rotation and responses
   transaction.update(gameDoc, {
-    judgeRotation: FieldValue.arrayRemove(uid),
+    "judgeRotation": FieldValue.arrayRemove(uid),
     "turn.responses": game.turn?.responses || {},
   });
 }

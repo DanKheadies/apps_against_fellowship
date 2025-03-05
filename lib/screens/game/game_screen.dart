@@ -35,6 +35,7 @@ class _GameScreenState extends State<GameScreen> {
     return BlocListener<GameBloc, GameState>(
       listener: (context, state) {
         _handleError(context, state);
+        _handleKicked(context, state);
       },
       child: BlocBuilder<GameBloc, GameState>(
         builder: (context, state) {
@@ -85,8 +86,9 @@ class _GameScreenState extends State<GameScreen> {
   ) {
     if (state.error != '') {
       // print('game screen error: ${state.error}');
-      String errMsg =
-          state.error.split(']')[1].split('\n')[0].replaceFirst(' ', '');
+      String errMsg = state.error.contains(']')
+          ? state.error.split(']')[1].split('\n')[0].replaceFirst(' ', '')
+          : state.error;
 
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
@@ -118,6 +120,58 @@ class _GameScreenState extends State<GameScreen> {
                   ? context.read<GameBloc>().add(
                         ClearError(),
                       )
+                  : null,
+            );
+    }
+  }
+
+  void _handleKicked(
+    BuildContext context,
+    GameState state,
+  ) {
+    if (state.kickingPlayerId == context.read<UserBloc>().state.user.id) {
+      print('handling being kicked..');
+      context.read<GameBloc>().add(
+            ClearKicking(),
+          );
+      context.read<HomeBloc>().add(
+            RefreshHome(),
+          );
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              'You have been kicked from the game.',
+              style: TextStyle(
+                color: state.game.gameStatus == GameStatus.inProgress
+                    ? Theme.of(context).colorScheme.surfaceTint
+                    : Theme.of(context).snackBarTheme.contentTextStyle!.color,
+              ),
+            ),
+            duration: const Duration(seconds: 5),
+            backgroundColor: state.game.gameStatus == GameStatus.inProgress
+                ? Theme.of(context).colorScheme.surfaceDim
+                : Theme.of(context).snackBarTheme.backgroundColor,
+            // action: SnackBarAction(
+            //   label: 'RIP',
+            //   onPressed: () {
+            //     // context.read<GameBloc>().add(
+            //     //       ClearKicking(),
+            //     //     );
+            //     // context.read<HomeBloc>().add(
+            //     //       RefreshHome(),
+            //     //     );
+            //     context.goNamed('home');
+            //   },
+            // ),
+          ),
+        ).closed.then(
+              (value) => context.mounted
+                  ? {
+                      context.goNamed('home'),
+                    }
                   : null,
             );
     }

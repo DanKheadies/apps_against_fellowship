@@ -1,5 +1,4 @@
 /* eslint-disable max-len */
-// import { CallableContext } from "firebase-functions/lib/common/providers/https";
 import { error } from "../util/error";
 import * as firestore from "../firebase/firebase";
 import { gameOver } from "../util/gameover";
@@ -12,7 +11,6 @@ import { gameOver } from "../util/gameover";
  * @param {any} data
  */
 export async function handleReDealHand(data: any) {
-  // const uid = context.auth?.uid;
   const uid = data.data["uid"];
   const gameId = data.data["game_id"];
 
@@ -28,28 +26,15 @@ export async function handleReDealHand(data: any) {
               `Player(${uid}) has enough prizes to re-deal their hand`
             );
             const prize = player.prizes.pop()!;
-            // const newHand = await firestore.games.drawResponseCards(gameId, 10);
             let newHand;
             try {
-              await firestore.games.drawResponseCards(gameId, 10);
+              newHand = await firestore.games.drawResponseCards(gameId, 10);
             } catch (err) {
               const players = await firestore.games.getPlayers(gameId);
               if (!players || players.length === 0) {
                 error("not-found", " No players found for this game");
               }
               await gameOver(game.gameId, gameId, "response", players);
-              // await firestore.games.updateStateWithData(
-              //   gameId,
-              //   {
-              //     gameStatus: "gameOver",
-              //     gameId: `${game.gameId}-game-over`,
-              //   },
-              //   players
-              // );
-              // error(
-              //   "resource-exhausted",
-              //   "Game Over. There are no more prompt cards to draw. Select more sets or less prizes."
-              // );
             }
 
             await firestore.players.reDealHand(gameId, uid, prize, newHand!);

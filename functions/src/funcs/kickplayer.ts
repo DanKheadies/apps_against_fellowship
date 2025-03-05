@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
-// import { CallableContext } from "firebase-functions/lib/common/providers/https";
-import {error} from "../util/error";
+import { error } from "../util/error";
 import * as firebase from "../firebase/firebase";
-import {nextJudge} from "../models/game";
+import { nextJudge } from "../models/game";
+import { gameOver } from "../util/gameover";
 
 /**
  * Kick Player - [Callable Function]
@@ -13,7 +13,6 @@ import {nextJudge} from "../models/game";
  * @param {any} data
  */
 export async function handleKickPlayer(data: any) {
-  // const uid = context.auth?.uid;
   const uid = data.data["uid"];
   const gameId = data.data["game_id"];
   const playerId = data.data["player_id"];
@@ -41,12 +40,19 @@ export async function handleKickPlayer(data: any) {
           console.log(`New Judge(${newJudge}) Picked!`);
         }
         firebase.games.leaveGame(transaction, playerId, game);
-        firebase.players.deleteUserGame(transaction, uid, gameId);
+        firebase.players.deleteUserGame(transaction, playerId, gameId);
       });
 
       console.log(
         `Player(${playerId}) was kicked from the Game(${game.gameId})`
       );
+
+      // If there's not enough players to continue, game over
+      // TODO: avoid perm game over; allow other users to join and revive
+      const players = await firebase.games.getPlayers(gameId);
+      if (players && players?.length <= 2) {
+        gameOver(game.gameId, gameId, "players", players);
+      }
 
       return {
         success: true,

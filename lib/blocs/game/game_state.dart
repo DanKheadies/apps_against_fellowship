@@ -2,44 +2,18 @@ part of 'game_bloc.dart';
 
 enum GameStateStatus {
   downvoting,
-  // true: downvote prompt
   error,
-  // true: any catch
   goodToGo,
-  // true: clear submitting (never called)
-  // true: done w/ downvoting prompt
-  // true: downvotes updated
-  // true: game updated (mostly from sub/stream or functions (?))
-  // true: done kicking player
-  // true: done picking winner
-  // true: players updated (mostly from sub/stream or functions (?))
-  // true: successfully submitted response(s)
-  // true: done waving at player
   initial,
-  // true: empty game state
   loading,
-  // true: game (full page loader) [this one is the axe > scapel]
-  // true: waiting room (spinner vs player list)
-  // true: kicking a player from the game
-  // UPDATE: use while functions run (i.e. the catch-all); won't affect
-  // GameScreen--just the components w/in them.
-  // Use in WaitingRoom to give more immediate "the game is starting" UI notice
-  // than waiting to hear back from the function.
+  redealing,
   submitting,
-  // true: Judge (pick winner stuff)
-  // true: player response cards (hide if submitting)
-  // true: picking winner
-  // true: start game
-  // true: submit response
-  // true: wave at player
-  // UPDATE: use submitting to indicate players are / have submitted responses
-  // Judge Dredd & player response stuff visiblity changes when submitting is true.
+  waving,
 }
 
 class GameState extends Equatable {
   final Game game;
   final GameStateStatus gameStateStatus;
-  // final GameStatus gameStatus; // Note: never called; removing
   final List<Player> players;
   final List<ResponseCard> selectedCards;
   final List<String> downvotes;
@@ -54,7 +28,6 @@ class GameState extends Equatable {
     this.error = '',
     this.game = Game.emptyGame,
     this.gameStateStatus = GameStateStatus.initial,
-    // this.gameStatus = GameStatus.waitingRoom,
     this.kickingPlayerId = '',
     this.players = const [],
     this.selectedCards = const [],
@@ -68,7 +41,6 @@ class GameState extends Equatable {
         error,
         game,
         gameStateStatus,
-        // gameStatus,
         kickingPlayerId,
         players,
         selectedCards,
@@ -79,7 +51,6 @@ class GameState extends Equatable {
     bool? canPickWinner,
     Game? game,
     GameStateStatus? gameStateStatus,
-    GameStatus? gameStatus,
     List<Player>? players,
     List<ResponseCard>? selectedCards,
     List<String>? downvotes,
@@ -93,7 +64,6 @@ class GameState extends Equatable {
       error: error ?? this.error,
       game: game ?? this.game,
       gameStateStatus: gameStateStatus ?? this.gameStateStatus,
-      // gameStatus: gameStatus ?? this.gameStatus,
       kickingPlayerId: kickingPlayerId ?? this.kickingPlayerId,
       players: players ?? this.players,
       selectedCards: selectedCards ?? this.selectedCards,
@@ -121,9 +91,6 @@ class GameState extends Equatable {
       gameStateStatus: GameStateStatus.values.firstWhere(
         (status) => status.name.toString() == json['gameStateStatus'],
       ),
-      // gameStatus: GameStatus.values.firstWhere(
-      //   (status) => status.name.toString() == json['gameStatus'],
-      // ),
       kickingPlayerId: json['kickingPlayerId'],
       players: playersList,
       selectedCards: selectedCardsList,
@@ -148,7 +115,6 @@ class GameState extends Equatable {
       'error': error,
       'game': game.toJson(),
       'gameStateStatus': gameStateStatus.name,
-      // 'gameStatus': gameStatus.name,
       'kickingPlayerId': kickingPlayerId,
       'players': playersList,
       'selectedCards': selectedCardsList,
@@ -162,7 +128,6 @@ class GameState extends Equatable {
     error: '',
     game: Game.emptyGame,
     gameStateStatus: GameStateStatus.initial,
-    // gameStatus: GameStatus.waitingRoom,
     kickingPlayerId: '',
     players: [],
     selectedCards: [],

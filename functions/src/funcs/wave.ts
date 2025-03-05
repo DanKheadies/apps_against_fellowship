@@ -16,7 +16,6 @@ import * as firebase from "../firebase/firebase.js";
  * @param {any} data
  */
 export async function handleWave(data: any) {
-  // const uid = context.auth?.uid;
   const uid = data.data["uid"];
   const gameId = data.data["game_id"];
   const playerId = data.data["player_id"];

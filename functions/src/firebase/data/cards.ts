@@ -4,10 +4,10 @@ import {
   COLLECTION_PROMPTS,
   COLLECTION_RESPONSES,
 } from "../constants";
-import { PromptCard, ResponseCard, CardSet } from "../../models/cards";
-import { chunkArray } from "../../util/chunk";
-import { error } from "../../util/error";
-import { firestore } from "../firebase";
+import {PromptCard, ResponseCard, CardSet} from "../../models/cards";
+import {chunkArray} from "../../util/chunk";
+import {error} from "../../util/error";
+import {firestore} from "../firebase";
 import * as admin from "firebase-admin";
 import FieldPath = admin.firestore.FieldPath;
 

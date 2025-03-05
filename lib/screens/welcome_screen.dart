@@ -103,9 +103,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         } else {
           Size size = MediaQuery.of(context).size;
 
-          if (state.errorMessage != '' && state.errorMessage != null) {
-            _handleError(state, context);
-          }
+          // if (state.errorMessage != '' && state.errorMessage != null) {
+          //   _handleError(state, context);
+          // }
+          _handleError(state, context);
 
           return ScreenWrapper(
             screen: method == AuthMethod.login
@@ -377,26 +378,32 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     AuthState state,
     BuildContext context,
   ) {
-    // String errorMsg = state.errorMessage!
-    //     .replaceAll('Exception: ', '')
-    //     .replaceAll(RegExp('\\[.*?\\]'), '');
+    if (state.errorMessage != '' && state.errorMessage != null) {
+      // String errorMsg = state.errorMessage!
+      //     .replaceAll('Exception: ', '')
+      //     .replaceAll(RegExp('\\[.*?\\]'), '');
 
-    String errMsg =
-        state.errorMessage!.split(']')[1].split('\n')[0].replaceFirst(' ', '');
+      String errMsg = state.errorMessage!.contains(']')
+          ? state.errorMessage!
+              .split(']')[1]
+              .split('\n')[0]
+              .replaceFirst(' ', '')
+          : state.errorMessage!;
 
-    ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(errMsg),
-          duration: const Duration(milliseconds: 4200),
-        ),
-      ).closed.then(
-            (value) => context.mounted
-                ? context.read<AuthBloc>().add(
-                      ResetError(),
-                    )
-                : null,
-          );
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(errMsg),
+            duration: const Duration(milliseconds: 4200),
+          ),
+        ).closed.then(
+              (value) => context.mounted
+                  ? context.read<AuthBloc>().add(
+                        ResetError(),
+                      )
+                  : null,
+            );
+    }
   }
 }

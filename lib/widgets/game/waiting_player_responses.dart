@@ -39,7 +39,7 @@ class WaitingPlayerResponses extends StatelessWidget {
                 ),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: columnCount,
-                  childAspectRatio: 88 / 130,
+                  childAspectRatio: 85 / 130,
                 ),
                 itemCount: players.length,
                 itemBuilder: (context, index) {

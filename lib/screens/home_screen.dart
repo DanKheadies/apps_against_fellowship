@@ -192,18 +192,15 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Future<void> _handleError(
   void _handleError(
     BuildContext context,
     HomeState state,
-  )
-  // async
-  {
+  ) {
     if (state.error != '') {
-      String errMsg =
-          state.error.split(']')[1].split('\n')[0].replaceFirst(' ', '');
+      String errMsg = state.error.contains(']')
+          ? state.error.split(']')[1].split('\n')[0].replaceFirst(' ', '')
+          : state.error;
 
-      // await Future.delayed(const Duration(milliseconds: 300));
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
         ..showSnackBar(

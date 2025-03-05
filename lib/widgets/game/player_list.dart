@@ -48,6 +48,7 @@ class PlayerList extends StatelessWidget {
                 isOwner: state.isOurGame,
                 isSelf: state.userId == player.id,
                 hasDownvoted: hasDownvoted,
+                // isKicking: state.kickingPlayerId == player.id,
               );
             },
           );

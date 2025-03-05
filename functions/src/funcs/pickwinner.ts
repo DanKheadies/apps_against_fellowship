@@ -1,14 +1,14 @@
 /* eslint-disable max-len */
 // import { CallableContext } from "firebase-functions/lib/v1/providers/https";
-import { error } from "../util/error";
+import {error} from "../util/error";
 import * as firebase from "../firebase/firebase";
-import { Turn, TurnWinner } from "../models/turn";
-import { getSpecial, PromptCard } from "../models/cards";
-import { Player, RANDO_CARDRISSIAN } from "../models/player";
-import { Game, nextJudge } from "../models/game";
-import { drawN } from "../util/deal";
-import { asyncMapValues } from "../util/map";
-import { gameOver } from "../util/gameover";
+import {Turn, TurnWinner} from "../models/turn";
+import {getSpecial, PromptCard} from "../models/cards";
+import {Player, RANDO_CARDRISSIAN} from "../models/player";
+import {Game, nextJudge} from "../models/game";
+import {drawN} from "../util/deal";
+import {asyncMapValues} from "../util/map";
+import {gameOver} from "../util/gameover";
 import * as admin from "firebase-admin";
 import FieldValue = admin.firestore.FieldValue;
 
@@ -193,7 +193,7 @@ export async function handlePickWinner(data: any) {
     } else {
       error(
         "invalid-argument",
-        'The function must be called with a valid "game_id".'
+        "The function must be called with a valid \"game_id\"."
       );
     }
   } else {

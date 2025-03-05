@@ -18,49 +18,6 @@ class GameRepository {
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
         _userRepository = userRepository;
 
-  // /// To test
-  // Future<void> testQuery({
-  //   required String id,
-  //   // required List<String> ids,
-  //   // required String userId,
-  //   // required dynamic user,
-  // }) async {
-  //   // var snapshot = await _firestore
-  //   //     .collectionGroup('players')
-  //   //     .where('id', isEqualTo: userId)
-  //   //     .get()
-  //   //     .then(
-  //   //   (res) {
-  //   //     print('res:');
-  //   //     print(res);
-  //   //   },
-  //   //   onError: (err) => print(err),
-  //   // );
-  //   // var snapshot = await _firestore
-  //   //     .collectionGroup('responses')
-  //   //     .where('cid', whereIn: ids)
-  //   //     .get()
-  //   //     .then(
-  //   //   (res) {
-  //   //     print('res:');
-  //   //     print(res);
-  //   //   },
-  //   //   onError: (err) => print(err),
-  //   // );
-  //   var snapshot = await _firestore
-  //       .collectionGroup('prompts')
-  //       .where('cid', isEqualTo: id)
-  //       .get()
-  //       .then(
-  //     (res) {
-  //       print('res:');
-  //       print(res);
-  //     },
-  //     onError: (err) => print(err),
-  //   );
-  //   print(snapshot);
-  // }
-
   /// Create a new game with the provided list of card sets
   Future<Game> createGame(
     User user,
@@ -291,8 +248,7 @@ class GameRepository {
             value.cardId,
           ),
         );
-    print('map');
-    print(map);
+
     HttpsCallableResult response =
         await FirebaseFunctions.instance.httpsCallable('submitResponses').call({
       'game_id': gameDocumentId,
@@ -335,14 +291,14 @@ class GameRepository {
     String uid, [
     String? message,
   ]) async {
-    HttpsCallableResult response =
-        await FirebaseFunctions.instance.httpsCallable('wave').call({
+    // HttpsCallableResult response =
+    await FirebaseFunctions.instance.httpsCallable('wave').call({
       'game_id': gameDocumentId,
       'player_id': playerId,
       'uid': uid,
       if (message != null) 'message': message,
     });
-    print("Wave sent to player successfully! ${response.data}");
+    print("Wave sent to player successfully!"); // ${response.data}");
   }
 
   /// Re-deal your hand in exchange for one prize card, if you have one
@@ -368,10 +324,6 @@ class GameRepository {
     String playerId,
     String uid,
   ) async {
-    print('pick winner');
-    // print(gameDocumentId);
-    // print(playerId);
-    // print(uid);
     HttpsCallableResult response =
         await FirebaseFunctions.instance.httpsCallable('pickWinner').call({
       'game_id': gameDocumentId,

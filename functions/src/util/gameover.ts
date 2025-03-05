@@ -18,7 +18,8 @@ export async function gameOver(
   reason: string,
   players: Player[]
 ) {
-  console.log("game over for: " + gameId);
+  console.log("Game Over for: " + gameId);
+
   await firebase.games.updateStateWithData(
     gameId,
     {
@@ -27,11 +28,17 @@ export async function gameOver(
     },
     players
   );
-  console.log("now throwing error and bailing");
-  error(
-    "resource-exhausted",
-    "Game Over. There are no more " +
+
+  let fullReason;
+  if (reason == "players") {
+    fullReason =
+      "Game Over. There are not enough players. Make more friends or something.";
+  } else {
+    fullReason =
+      "Game Over. There are no more " +
       reason +
-      " cards to draw. Select more sets or less prizes."
-  );
+      " cards to draw. Select more sets or less prizes.";
+  }
+
+  error("resource-exhausted", fullReason);
 }

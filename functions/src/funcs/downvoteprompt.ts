@@ -1,22 +1,15 @@
 /* eslint-disable max-len */
-// import {
-//   Change,
-//   EventContext,
-// } from "firebase-functions/lib/v1/cloud-functions";
 import {
   Change,
-  // DocumentSnapshot,
   FirestoreEvent,
   QueryDocumentSnapshot,
 } from "firebase-functions/v2/firestore";
-// import { DocumentSnapshot } from "firebase-functions/lib/v1/providers/firestore";
 import * as firestore from "../firebase/firebase";
-import {Player, RANDO_CARDRISSIAN} from "../models/player";
-import {getSpecial} from "../models/cards";
-import {Turn} from "../models/turn";
-import {Tally} from "../models/tally";
-import {gameOver} from "../util/gameover";
-// import { DocumentSnapshot } from "firebase-admin/firestore";
+import { Player, RANDO_CARDRISSIAN } from "../models/player";
+import { getSpecial } from "../models/cards";
+import { Turn } from "../models/turn";
+import { Tally } from "../models/tally";
+import { gameOver } from "../util/gameover";
 
 const downVoteThreshold = 2 / 3;
 
@@ -36,21 +29,16 @@ const downVoteThreshold = 2 / 3;
  * @param {FirestoreEvent<Change<QueryDocumentSnapshot>>} event
  */
 export async function handleDownVote(
-  // change: Change<DocumentSnapshot>,
   event: FirestoreEvent<
     Change<QueryDocumentSnapshot> | undefined,
     {
       gameId: string;
     }
   >
-  // context: EventContext
 ) {
-  // const gameId = context.params.gameId;
   const gameId = event.params.gameId;
 
-  // const previousTally = change.before.data() as Tally;
   const previousTally = event.data?.before.data() as Tally;
-  // const newTally = change.after.data() as Tally;
   const newTally = event.data?.after.data() as Tally;
 
   console.log(`Previous Game(${JSON.stringify(previousTally)})`);
@@ -67,6 +55,15 @@ export async function handleDownVote(
     if (players) {
       const numPlayers = players.length;
       if (newDownVotes.length >= Math.floor(downVoteThreshold * numPlayers)) {
+        // TODO: emit status change (loading) to drive user feedback
+        // await firebase.games.updateState(gameId, "inProgress", players);
+        // await firestore.games.update(gameId, {
+        //   turn: turn,
+        // });
+        // Update: issue is that we want to update the GameState status to "downvoting"
+        // But we only have access to the Game's status, e.g. inProgress, from here.
+        // TBC
+
         console.log("Threshold Met, resetting turn");
         await resetTurn(gameId, players);
       }
@@ -89,24 +86,11 @@ async function resetTurn(gameId: string, players: Player[]): Promise<void> {
     await firestore.games.returnResponseCards(gameId, game);
 
     // Re-draw a new prompt card
-    // const newPromptCard = await firestore.games.drawPromptCard(gameId);
     let newPromptCard;
     try {
       newPromptCard = await firestore.games.drawPromptCard(gameId);
     } catch (err) {
       await gameOver(game.gameId, gameId, "prompt", players);
-      // await firebase.games.updateStateWithData(
-      //   gameId,
-      //   {
-      //     gameStatus: "gameOver",
-      //     gameId: `${game.gameId}-game-over`,
-      //   },
-      //   players
-      // );
-      // error(
-      //   "resource-exhausted",
-      //   "Game Over. There are no more prompt cards to draw. Select more sets or less prizes."
-      // );
     }
 
     const turn: Turn = {
@@ -128,25 +112,12 @@ async function resetTurn(gameId: string, players: Player[]): Promise<void> {
       } else if (getSpecial(newPromptCard!.special) === "DRAW 2, PICK 3") {
         drawCount = 3;
       }
-      // turn.responses[RANDO_CARDRISSIAN] =
-      //   await firestore.games.drawResponseCards(gameId, drawCount);
+
       try {
         turn.responses[RANDO_CARDRISSIAN] =
           await firestore.games.drawResponseCards(gameId, drawCount);
       } catch (err) {
         await gameOver(game.gameId, gameId, "response", players);
-        // await firebase.games.updateStateWithData(
-        //   gameId,
-        //   {
-        //     gameStatus: "gameOver",
-        //     gameId: `${game.gameId}-game-over`,
-        //   },
-        //   players
-        // );
-        // error(
-        //   "resource-exhausted",
-        //   "Game Over. There are no more prompt cards to draw. Select more sets or less prizes."
-        // );
       }
 
       console.log("Rando Cardrissian has been dealt into the next turn");
@@ -161,7 +132,8 @@ async function resetTurn(gameId: string, players: Player[]): Promise<void> {
     await firestore.games.clearDownvotes(gameId);
 
     // Send Push
-    await firestore.push.sendTurnResetMessage(game, players, turn);
+    // TODO
+    // await firestore.push.sendTurnResetMessage(game, players, turn);
 
     console.log(`The current turn has been reset for Game(${game.id})!`);
   }

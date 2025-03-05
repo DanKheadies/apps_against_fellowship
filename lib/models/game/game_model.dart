@@ -19,6 +19,8 @@ extension GameStatusExt on GameStatus {
         return 'Game Starting';
       case GameStatus.inProgress:
         return 'In Progress';
+      case GameStatus.gameOver:
+        return 'Game Over';
       default:
         return 'Completed';
     }
