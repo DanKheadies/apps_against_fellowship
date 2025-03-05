@@ -39,17 +39,24 @@ class WaitingRoomScreen extends StatelessWidget {
           flactionLocation: FloatingActionButtonLocation.centerFloat,
           child: BlocListener<GameBloc, GameState>(
             listener: (context, state) {
+              _handleError(context, state);
               // TODO: see if this can be handled differently or is ideal
-              if (state.error != '') {
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      content: Text(state.error),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                    ),
-                  );
-              }
+              // if (state.error != '') {
+              //   ScaffoldMessenger.of(context)
+              //     ..hideCurrentSnackBar()
+              //     ..showSnackBar(
+              //       SnackBar(
+              //         content: Text(state.error),
+              //         backgroundColor: Theme.of(context).colorScheme.primary,
+              //       ),
+              //     ).closed.then(
+              //           (value) => context.mounted
+              //               ? context.read<GameBloc>().add(
+              //                     ClearError(),
+              //                   )
+              //               : null,
+              //         );
+              // }
             },
             child: isStarting
                 ? Center(
@@ -149,6 +156,9 @@ class WaitingRoomScreen extends StatelessWidget {
                                 // var link = await DynamicLinks.createLink(
                                 //     state.game.id);
                                 // await Share.share(link.toString());
+                                context.read<GameBloc>().add(
+                                      DownvotePrompt(),
+                                    );
                               },
                               child: const Text("INVITE"),
                             ),
@@ -242,5 +252,32 @@ class WaitingRoomScreen extends StatelessWidget {
             .addRandoCardrissian(gameDocumentId);
       },
     );
+  }
+
+  void _handleError(
+    BuildContext context,
+    GameState state,
+  ) {
+    if (state.error != '') {
+      // print('waiting room screen error: ${state.error}');
+      String errMsg =
+          state.error.split(']')[1].split('\n')[0].replaceFirst(' ', '');
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(errMsg),
+            duration: const Duration(milliseconds: 4200),
+            // backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+        ).closed.then(
+              (value) => context.mounted
+                  ? context.read<GameBloc>().add(
+                        ClearError(),
+                      )
+                  : null,
+            );
+    }
   }
 }

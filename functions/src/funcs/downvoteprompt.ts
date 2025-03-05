@@ -15,6 +15,7 @@ import {Player, RANDO_CARDRISSIAN} from "../models/player";
 import {getSpecial} from "../models/cards";
 import {Turn} from "../models/turn";
 import {Tally} from "../models/tally";
+import {gameOver} from "../util/gameover";
 // import { DocumentSnapshot } from "firebase-admin/firestore";
 
 const downVoteThreshold = 2 / 3;
@@ -88,11 +89,29 @@ async function resetTurn(gameId: string, players: Player[]): Promise<void> {
     await firestore.games.returnResponseCards(gameId, game);
 
     // Re-draw a new prompt card
-    const newPromptCard = await firestore.games.drawPromptCard(gameId);
+    // const newPromptCard = await firestore.games.drawPromptCard(gameId);
+    let newPromptCard;
+    try {
+      newPromptCard = await firestore.games.drawPromptCard(gameId);
+    } catch (err) {
+      await gameOver(game.gameId, gameId, "prompt", players);
+      // await firebase.games.updateStateWithData(
+      //   gameId,
+      //   {
+      //     gameStatus: "gameOver",
+      //     gameId: `${game.gameId}-game-over`,
+      //   },
+      //   players
+      // );
+      // error(
+      //   "resource-exhausted",
+      //   "Game Over. There are no more prompt cards to draw. Select more sets or less prizes."
+      // );
+    }
 
     const turn: Turn = {
       judgeId: game.turn.judgeId,
-      promptCard: newPromptCard,
+      promptCard: newPromptCard!,
       responses: {},
       winner: game.turn.winner,
     };
@@ -104,13 +123,32 @@ async function resetTurn(gameId: string, players: Player[]): Promise<void> {
     // Go ahead and set Rando Cardrissian's response if he is a part of this game
     if (players.find((p) => p.isRandoCardrissian)) {
       let drawCount = 1;
-      if (getSpecial(newPromptCard.special) === "PICK 2") {
+      if (getSpecial(newPromptCard!.special) === "PICK 2") {
         drawCount = 2;
-      } else if (getSpecial(newPromptCard.special) === "DRAW 2, PICK 3") {
+      } else if (getSpecial(newPromptCard!.special) === "DRAW 2, PICK 3") {
         drawCount = 3;
       }
-      turn.responses[RANDO_CARDRISSIAN] =
-        await firestore.games.drawResponseCards(gameId, drawCount);
+      // turn.responses[RANDO_CARDRISSIAN] =
+      //   await firestore.games.drawResponseCards(gameId, drawCount);
+      try {
+        turn.responses[RANDO_CARDRISSIAN] =
+          await firestore.games.drawResponseCards(gameId, drawCount);
+      } catch (err) {
+        await gameOver(game.gameId, gameId, "response", players);
+        // await firebase.games.updateStateWithData(
+        //   gameId,
+        //   {
+        //     gameStatus: "gameOver",
+        //     gameId: `${game.gameId}-game-over`,
+        //   },
+        //   players
+        // );
+        // error(
+        //   "resource-exhausted",
+        //   "Game Over. There are no more prompt cards to draw. Select more sets or less prizes."
+        // );
+      }
+
       console.log("Rando Cardrissian has been dealt into the next turn");
     }
 

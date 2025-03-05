@@ -91,7 +91,10 @@ class JudgeDreddState extends State<JudgeDredd> {
   Widget _buildPickWinnerButton(BuildContext context) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(
+          vertical: 16, // 12,
+          horizontal: 16,
+        ),
         shape: const StadiumBorder(),
         backgroundColor: Theme.of(context).colorScheme.primary,
       ),
@@ -128,7 +131,10 @@ class JudgeDreddState extends State<JudgeDredd> {
   Widget _buildPickingWinnerIndicator(BuildContext context) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(
+          vertical: 16, // 12,
+          horizontal: 16,
+        ),
         shape: const StadiumBorder(),
         backgroundColor: Theme.of(context).colorScheme.surfaceDim,
         disabledBackgroundColor: Theme.of(context).colorScheme.surfaceDim,

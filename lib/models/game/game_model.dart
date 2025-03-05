@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 
 enum GameStatus {
   completed,
+  gameOver,
   inProgress,
   starting,
   waitingRoom,

@@ -58,7 +58,7 @@ class TurnWinnerSheet extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 32),
                   child: buildResponseCardStack(
-                    turnWinner!.response,
+                    turnWinner!.response, // TODO: check
                     lastChild: Column(
                       children: [
                         const Divider(),
@@ -71,7 +71,6 @@ class TurnWinnerSheet extends StatelessWidget {
                                 .textTheme
                                 .titleSmall!
                                 .copyWith(
-                                  // color: AppColors.primaryVariant,
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
                           ),

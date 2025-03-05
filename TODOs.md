@@ -11,3 +11,4 @@
 10. Clean up and optimizations, e.g. BlocStates
 11. Analytics
 12. README steps to rebuild (?)
+13. Admin panel (CRUD cards, maintain on new import)

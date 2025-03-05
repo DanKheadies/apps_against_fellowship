@@ -77,6 +77,9 @@ class PromptContainer extends StatelessWidget {
               state: state,
             );
           } else {
+            // Note: user selects their prompts; the list contains the correct
+            // order, i.e. Pick 2 - 1st one on top, 2nd below it.
+            // print(state.selectedCards);
             var responseCardStack = buildResponseCardStack(
               state.selectedCards,
               lastChild: const SizedBox(),
@@ -130,12 +133,8 @@ class PromptContainer extends StatelessWidget {
   }
 
   Widget _buildPromptSpecial(BuildContext context, PromptCard promptCard) {
-    // if (promptCard != null &&
     if (promptCard != PromptCard.emptyPromptCard &&
-            // promptCard.special != null &&
-            promptCard.special != PromptSpecial.notSpecial.name
-        // && promptCard.special.isNotEmpty
-        ) {
+        promptCard.special != PromptSpecial.notSpecial.name) {
       return Container(
         height: 36,
         alignment: Alignment.centerRight,
@@ -143,7 +142,7 @@ class PromptContainer extends StatelessWidget {
         child: Text(
           promptCard.special.toUpperCase(),
           style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                color: Theme.of(context).canvasColor,
+                color: Theme.of(context).colorScheme.surface,
               ),
         ),
       );

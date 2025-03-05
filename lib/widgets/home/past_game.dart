@@ -1,6 +1,5 @@
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
-// import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -82,66 +81,6 @@ class PastGame extends StatelessWidget {
     );
   }
 
-  // Future<void> openGame(BuildContext context) async {
-  //   // TODO: move this into bloc, but which one?
-  //   // Note: I believe if I visually show the home screen is loading the game
-  //   // and hide this / these Past Game(s), I don't think they'll be able to
-  //   // execute navigation. Perhaps a listener.
-  //   // Update: just gonna have GameBloc handle trying to get the game
-  //   // context.read<GameBloc>().add(
-  //   //       OpenGame(
-  //   //         gameId: game.id,
-  //   //         user: context.read<UserBloc>().state.user,
-  //   //       ),
-  //   //     );
-  //   // context.goNamed('game');
-
-  //   // // Analytics > past game open
-  //   // try {
-  //   //   // print('trying to open game..');
-  //   //   // print(game.id);
-  //   //   // print(context.read<UserBloc>().state.user.id);
-  //   //   var existingGame = await context.read<GameRepository>().getGame(
-  //   //         game.id,
-  //   //         context.read<UserBloc>().state.user,
-  //   //       );
-
-  //   //   if (context.mounted) {
-  //   //     // print('going to..');
-  //   //     // print(existingGame);
-  //   //     // context.goNamed(
-  //   //     //   'game',
-  //   //     //   extra: existingGame,
-  //   //     // );
-  //   //     context.read<GameBloc>().add(
-  //   //           GameUpdated(
-  //   //             game: existingGame,
-  //   //           ),
-  //   //         );
-  //   //     context.read<GameBloc>().add(
-  //   //           Subscribe(
-  //   //             gameId: existingGame.id,
-  //   //           ),
-  //   //         );
-  //   //     context.goNamed('game');
-  //   //   } else {
-  //   //     print('context mounting error - go to Game screen');
-  //   //   }
-  //   // } catch (err) {
-  //   //   if (context.mounted) {
-  //   //     ScaffoldMessenger.of(context)
-  //   //       ..clearSnackBars()
-  //   //       ..showSnackBar(
-  //   //         SnackBar(
-  //   //           content: Text('$err'),
-  //   //         ),
-  //   //       );
-  //   //   } else {
-  //   //     print('context mounting error - error message messenger');
-  //   //   }
-  //   // }
-  // }
-
   Widget buildBackground(BuildContext context) {
     return Container(
       color: Colors.redAccent[200],
@@ -200,7 +139,6 @@ class PastGame extends StatelessWidget {
             ),
       onTap: game.gameStatus == GameStatus.inProgress ||
               game.gameStatus == GameStatus.waitingRoom
-          // ? () => openGame(context)
           ? () {
               context.read<GameBloc>().add(
                     OpenGame(

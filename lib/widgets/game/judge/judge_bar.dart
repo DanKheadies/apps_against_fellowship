@@ -92,10 +92,13 @@ class JudgeBar extends StatelessWidget {
   }
 
   Widget _buildJudgeAvatar(BuildContext context, Player player) {
-    return Container(
-      width: 52,
-      padding: const EdgeInsets.only(left: 12),
-      child: PlayerCircleAvatar(player: player),
+    return InkWell(
+      onDoubleTap: () => HelpDialog.openHelpDialog(context),
+      child: Container(
+        width: 52,
+        padding: const EdgeInsets.only(left: 12),
+        child: PlayerCircleAvatar(player: player),
+      ),
     );
   }
 }

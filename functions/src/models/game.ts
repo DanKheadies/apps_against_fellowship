@@ -25,6 +25,7 @@ export declare type GameStatus =
   | "waitingRoom"
   | "starting"
   | "inProgress"
+  | "gameOver"
   | "completed";
 
 /**

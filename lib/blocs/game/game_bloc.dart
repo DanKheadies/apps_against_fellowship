@@ -52,7 +52,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   ) {
     emit(
       state.copyWith(
-        error: null,
+        error: '',
+        gameStateStatus: GameStateStatus.goodToGo,
       ),
     );
   }
@@ -87,31 +88,36 @@ class GameBloc extends Bloc<GameEvent, GameState> {
   ) async {
     emit(
       state.copyWith(
-        gameStateStatus: GameStateStatus.downvoting, // TODO: loading (?)
+        error: '[firebase_derpions/resource-derped] Test error.',
       ),
     );
+    // emit(
+    //   state.copyWith(
+    //     gameStateStatus: GameStateStatus.downvoting, // TODO: loading (?)
+    //   ),
+    // );
 
-    try {
-      await _gameRepository.downVoteCurrentPrompt(
-        state.game.id,
-        _userBloc.state.user,
-      );
+    // try {
+    //   await _gameRepository.downVoteCurrentPrompt(
+    //     state.game.id,
+    //     _userBloc.state.user,
+    //   );
 
-      print('g2g2');
-      emit(
-        state.copyWith(
-          gameStateStatus: GameStateStatus.goodToGo,
-        ),
-      );
-    } catch (err) {
-      print('error downvoting prompt');
-      emit(
-        state.copyWith(
-          error: '$err',
-          gameStateStatus: GameStateStatus.error,
-        ),
-      );
-    }
+    //   print('g2g2');
+    //   emit(
+    //     state.copyWith(
+    //       gameStateStatus: GameStateStatus.goodToGo,
+    //     ),
+    //   );
+    // } catch (err) {
+    //   print('error downvoting prompt');
+    //   emit(
+    //     state.copyWith(
+    //       error: '$err',
+    //       gameStateStatus: GameStateStatus.error,
+    //     ),
+    //   );
+    // }
   }
 
   void _onDownvotesUpdated(
@@ -199,9 +205,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     PickResponseCard event,
     Emitter<GameState> emit,
   ) {
-    // TODO: emit a status (?)
-    print('pick response card; TODO emit?');
-
     // Check prompt special to determine if we allow the user to pick two
     var special = promptSpecial(state.game.turn!.promptCard.special);
     if (special != PromptSpecial.notSpecial) {
@@ -209,7 +212,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
       // If the user attempts to select more than the allotted amount for a give
       // prompt special, it will clear the selected and set the picked card as
       // the only one effectively starting the selection over.
-      var currentSelection = state.selectedCards;
+      var currentSelection = state.selectedCards.toList();
       switch (special) {
         case PromptSpecial.pick2:
           // Selected size limit is 2 here.
@@ -262,7 +265,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     PickWinner event,
     Emitter<GameState> emit,
   ) async {
-    // Note: was submitting; now loading
     if (state.gameStateStatus == GameStateStatus.loading) return;
 
     emit(
@@ -278,19 +280,18 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         _userBloc.state.user.id,
       );
 
-      print('g2g5');
       emit(
         state.copyWith(
           gameStateStatus: GameStateStatus.goodToGo,
         ),
       );
     } catch (err) {
-      print('error picking a winner: $err');
+      // print('error picking a winner: $err');
       emit(
         state.copyWith(
           error: '$err',
           gameStateStatus: GameStateStatus.error,
-          kickingPlayerId: null,
+          kickingPlayerId: '',
         ),
       );
     }
@@ -300,14 +301,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     PlayersUpdated event,
     Emitter<GameState> emit,
   ) {
-    print('players updated');
-    // print('g2g6');
     emit(
       state.copyWith(
-        // gameStateStatus: GameStateStatus.goodToGo, // TODO
-        // Note: have this be the g2g might simplify the "we don't have players"
-        // issue, but honestly might not be needed / helpful here anyways, i.e.
-        // we aren't looking for g2g anywhere in the code yet...
         players: event.players,
       ),
     );

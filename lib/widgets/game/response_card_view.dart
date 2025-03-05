@@ -62,7 +62,15 @@ Widget buildResponseCardStack(
   List<ResponseCard> cards, {
   required Widget lastChild,
 }) {
+  // print('BUILD');
   if (cards.isNotEmpty) {
+    // var flipCards = cards.reversed.toList();
+    // Note: reversing the cards provides the correct order on Pick 2, i.e.
+    // you select the 1st then 2nd, and it shows them as 1st on top, 2nd next
+    // for the judge.
+    // But for Pick 3, the order is 3rd, 1st, 2nd on reverse.
+    // Update: I think CID matters more, and their being index / organized by
+    // ID.
     var nextCard = cards.first;
     var remaining = cards.sublist(1);
 

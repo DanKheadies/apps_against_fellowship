@@ -82,7 +82,10 @@ class PlayerResponsePickerState extends State<PlayerResponsePicker> {
   Widget _buildSubmittingWidget(BuildContext context) {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        padding: const EdgeInsets.symmetric(
+          vertical: 16, // 12,
+          horizontal: 16,
+        ),
         shape: const StadiumBorder(),
         backgroundColor: Theme.of(context).colorScheme.surfaceDim,
         disabledBackgroundColor: Theme.of(context).colorScheme.surfaceDim,
@@ -102,7 +105,6 @@ class PlayerResponsePickerState extends State<PlayerResponsePicker> {
         child: Text(
           'SUBMITTING...',
           style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                // color: AppColors.colorOnPrimary,
                 color: Theme.of(context).colorScheme.surfaceTint,
                 letterSpacing: 1,
               ),
@@ -115,7 +117,7 @@ class PlayerResponsePickerState extends State<PlayerResponsePicker> {
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(
-          vertical: 12,
+          vertical: 16, // 12,
           horizontal: 16,
         ),
         shape: const StadiumBorder(),

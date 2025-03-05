@@ -1,13 +1,14 @@
 /* eslint-disable max-len */
 // import { CallableContext } from "firebase-functions/lib/v1/providers/https";
-import {error} from "../util/error";
+import { error } from "../util/error";
 import * as firebase from "../firebase/firebase";
-import {Turn, TurnWinner} from "../models/turn";
-import {getSpecial, PromptCard} from "../models/cards";
-import {Player, RANDO_CARDRISSIAN} from "../models/player";
-import {Game, nextJudge} from "../models/game";
-import {drawN} from "../util/deal";
-import {asyncMapValues} from "../util/map";
+import { Turn, TurnWinner } from "../models/turn";
+import { getSpecial, PromptCard } from "../models/cards";
+import { Player, RANDO_CARDRISSIAN } from "../models/player";
+import { Game, nextJudge } from "../models/game";
+import { drawN } from "../util/deal";
+import { asyncMapValues } from "../util/map";
+import { gameOver } from "../util/gameover";
 import * as admin from "firebase-admin";
 import FieldValue = admin.firestore.FieldValue;
 
@@ -28,7 +29,6 @@ import FieldValue = admin.firestore.FieldValue;
  * @param {any} data
  */
 export async function handlePickWinner(data: any) {
-  // const uid = context.auth?.uid;
   const uid = data.data["uid"];
   const gameId = data.data["game_id"];
   const winningPlayerId = data.data["player_id"];
@@ -96,26 +96,34 @@ export async function handlePickWinner(data: any) {
         const newJudge = nextJudge(game, gameTurn.judgeId!);
 
         // Draw next prompt card
-        const newPromptCard = await firebase.games.drawPromptCard(gameId);
+        let newPromptCard;
+        try {
+          newPromptCard = await firebase.games.drawPromptCard(gameId);
+        } catch (err) {
+          await gameOver(game.gameId, gameId, "prompt", players);
+        }
 
         const turn: Turn = {
           judgeId: newJudge,
           responses: {},
-          promptCard: newPromptCard,
+          promptCard: newPromptCard!,
           winner: turnWinner,
         };
 
         // Go ahead and set Rando Cardrissian's response if he is a part of this game
         if (players.find((p) => p.isRandoCardrissian)) {
           let drawCount = 1;
-          if (getSpecial(newPromptCard.special) === "PICK 2") {
+          if (getSpecial(newPromptCard!.special) === "PICK 2") {
             drawCount = 2;
-          } else if (getSpecial(newPromptCard.special) === "DRAW 2, PICK 3") {
+          } else if (getSpecial(newPromptCard!.special) === "DRAW 2, PICK 3") {
             drawCount = 3;
           }
-          turn.responses[RANDO_CARDRISSIAN] =
-            await firebase.games.drawResponseCards(gameId, drawCount);
-          console.log("Rando Cardrissian has been dealt into the next turn");
+          try {
+            turn.responses[RANDO_CARDRISSIAN] =
+              await firebase.games.drawResponseCards(gameId, drawCount);
+          } catch (err) {
+            await gameOver(game.gameId, gameId, "response", players);
+          }
         }
 
         // Set the next turn and increment the round
@@ -123,7 +131,6 @@ export async function handlePickWinner(data: any) {
           turn: turn,
           round: FieldValue.increment(1),
         });
-        console.log("Next turn has now been set!");
 
         // Clear downvotes
         await firebase.games.clearDownvotes(gameId);
@@ -136,7 +143,11 @@ export async function handlePickWinner(data: any) {
         );
 
         // Now Re-deal cards to the player based on the new prompt's special
-        await dealNewCardsToPlayers(game, newPromptCard, players);
+        try {
+          await dealNewCardsToPlayers(game, newPromptCard!, players);
+        } catch (err) {
+          await gameOver(game.gameId, gameId, "response", players);
+        }
 
         // Check win condition, and set the game to completed
         const getPrizeLength = (player: Player) => {
@@ -182,7 +193,7 @@ export async function handlePickWinner(data: any) {
     } else {
       error(
         "invalid-argument",
-        "The function must be called with a valid \"game_id\"."
+        'The function must be called with a valid "game_id".'
       );
     }
   } else {
@@ -229,7 +240,11 @@ async function dealNewCardsToPlayers(
     });
 
   // Update the game seed with now draw cards removed
-  await firebase.games.seedCardPool(game.id, [], cardPool.cards);
+  try {
+    await firebase.games.seedCardPool(game.id, [], cardPool.cards);
+  } catch (err) {
+    await gameOver(game.gameId, game.id, "response", players);
+  }
 
   // Get the actual cards from the DB
   const playerCards = await asyncMapValues(playerIndexes, async (indexes) => {

@@ -373,29 +373,30 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  Future<void> _handleError(
+  void _handleError(
     AuthState state,
     BuildContext context,
-  ) async {
-    String errorMsg = state.errorMessage!
-        .replaceAll('Exception: ', '')
-        .replaceAll(RegExp('\\[.*?\\]'), '');
+  ) {
+    // String errorMsg = state.errorMessage!
+    //     .replaceAll('Exception: ', '')
+    //     .replaceAll(RegExp('\\[.*?\\]'), '');
 
-    await Future.delayed(const Duration(milliseconds: 300));
+    String errMsg =
+        state.errorMessage!.split(']')[1].split('\n')[0].replaceFirst(' ', '');
 
-    if (context.mounted) {
-      ScaffoldMessenger.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(errorMsg),
-            duration: const Duration(milliseconds: 4200),
-          ),
-        );
-
-      context.read<AuthBloc>().add(
-            ResetError(),
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(errMsg),
+          duration: const Duration(milliseconds: 4200),
+        ),
+      ).closed.then(
+            (value) => context.mounted
+                ? context.read<AuthBloc>().add(
+                      ResetError(),
+                    )
+                : null,
           );
-    }
   }
 }

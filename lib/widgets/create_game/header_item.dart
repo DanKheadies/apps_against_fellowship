@@ -32,7 +32,6 @@ class HeaderItem extends StatelessWidget {
           Divider(
             height: 1,
             color: Theme.of(context).colorScheme.onSurface,
-            // color: Theme.of(context).cardColor,
           ),
           Container(
             height: 48,

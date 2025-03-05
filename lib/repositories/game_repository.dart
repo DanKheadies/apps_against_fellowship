@@ -285,16 +285,19 @@ class GameRepository {
     String uid,
     List<ResponseCard> cards,
   ) async {
+    dynamic map = cards.asMap().map(
+          (key, value) => MapEntry(
+            key.toString(),
+            value.cardId,
+          ),
+        );
+    print('map');
+    print(map);
     HttpsCallableResult response =
         await FirebaseFunctions.instance.httpsCallable('submitResponses').call({
       'game_id': gameDocumentId,
       'uid': uid,
-      'indexed_responses': cards.asMap().map(
-            (key, value) => MapEntry(
-              key.toString(),
-              value.cardId,
-            ),
-          )
+      'indexed_responses': map,
     });
     print("Responses Submitted! ${response.data}");
   }
@@ -365,6 +368,10 @@ class GameRepository {
     String playerId,
     String uid,
   ) async {
+    print('pick winner');
+    // print(gameDocumentId);
+    // print(playerId);
+    // print(uid);
     HttpsCallableResult response =
         await FirebaseFunctions.instance.httpsCallable('pickWinner').call({
       'game_id': gameDocumentId,

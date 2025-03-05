@@ -4,9 +4,10 @@ import {
   COLLECTION_PROMPTS,
   COLLECTION_RESPONSES,
 } from "../constants";
-import {PromptCard, ResponseCard, CardSet} from "../../models/cards";
-import {chunkArray} from "../../util/chunk";
-import {firestore} from "../firebase";
+import { PromptCard, ResponseCard, CardSet } from "../../models/cards";
+import { chunkArray } from "../../util/chunk";
+import { error } from "../../util/error";
+import { firestore } from "../firebase";
 import * as admin from "firebase-admin";
 import FieldPath = admin.firestore.FieldPath;
 
@@ -56,13 +57,20 @@ export async function getResponseCards(ids: string[]): Promise<ResponseCard[]> {
  * @param {string} id the id of the prompt card you wish to fetch
  */
 export async function getPromptCard(id: string): Promise<PromptCard> {
-  const querySnap = await firestore
-    .collectionGroup(COLLECTION_PROMPTS)
-    .where("cid", "==", id)
-    .limit(1)
-    .get();
+  try {
+    const querySnap = await firestore
+      .collectionGroup(COLLECTION_PROMPTS)
+      .where("cid", "==", id)
+      .limit(1)
+      .get();
 
-  return querySnap.docs.map((snapshot) => snapshot.data() as PromptCard)[0];
+    return querySnap.docs.map((snapshot) => snapshot.data() as PromptCard)[0];
+  } catch (err) {
+    error(
+      "resource-exhausted",
+      "Game Over. There are no more prompt cards to draw. Select more sets or less prizes."
+    );
+  }
 }
 
 /**

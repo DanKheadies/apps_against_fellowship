@@ -44,7 +44,6 @@ ThemeData lightTheme() {
     bottomAppBarTheme: const BottomAppBarTheme(
       color: white,
     ),
-    // dividerColor: Colors.red,
     canvasColor: white,
     cardColor: whiteBright,
     colorScheme: const ColorScheme.light().copyWith(

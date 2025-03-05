@@ -192,34 +192,32 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> _handleError(
+  // Future<void> _handleError(
+  void _handleError(
     BuildContext context,
     HomeState state,
-  ) async {
+  )
+  // async
+  {
     if (state.error != '') {
       String errMsg =
           state.error.split(']')[1].split('\n')[0].replaceFirst(' ', '');
-      await Future.delayed(const Duration(milliseconds: 300));
-      if (context.mounted) {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              duration: const Duration(seconds: 3),
-              content: Text(
-                errMsg,
-              ),
-            ),
-          );
-        errorTimer = Timer(
-          const Duration(seconds: 3),
-          () {
-            context.read<HomeBloc>().add(
-                  RefreshHome(),
-                );
-          },
-        );
-      }
+
+      // await Future.delayed(const Duration(milliseconds: 300));
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 3),
+            content: Text(errMsg),
+          ),
+        ).closed.then(
+              (value) => context.mounted
+                  ? context.read<HomeBloc>().add(
+                        RefreshHome(),
+                      )
+                  : null,
+            );
     }
   }
 }

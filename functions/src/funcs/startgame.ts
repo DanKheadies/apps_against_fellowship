@@ -22,26 +22,18 @@ import {Game} from "../models/game";
  * @param {any} data
  */
 export async function handleStartGame(data: any) {
-  console.log("start game");
-  // const uid = context.auth?.uid;
-  // const uid = data.uid;
   const uid = data.data["uid"];
-  // const gameId = data.game_id;
   const gameId = data.data["game_id"];
-  console.log("uid: " + uid);
-  console.log("gameId: " + gameId);
 
   if (uid) {
     if (gameId) {
       // Load the game for this gameId and verify that it is in the correct state
       const game = await firebase.games.getGame(gameId);
       if (game?.gameStatus === "waitingRoom") {
-        console.log("waiting room");
         game.id = gameId;
         // Game exists and is in the appropriate state. Now we will seed the card pull
         const players = await firebase.games.getPlayers(gameId);
         if (players && players.length > 2) {
-          console.log("more than 2 players");
           // Okay, enough players are in this game, now seed it
           const cardSets = await firebase.cards.getCardSet(...game.cardSets);
           if (cardSets.length > 0) {
@@ -74,18 +66,12 @@ export async function handleStartGame(data: any) {
               responses: responseCards,
             };
 
-            console.log("deal players in");
-            console.log(gameId);
-            console.log(players);
-            console.log(cardPool);
             // Deal 10 cards to every player, except Rando Cardrissian
             await dealPlayersIn(gameId, players, cardPool);
 
             /*
              * Generate the turn
              */
-            // TODO
-            // const firstTurn = await generateFirstTurn(game, players, cardPool);
             await generateFirstTurn(game, players, cardPool);
 
             /*

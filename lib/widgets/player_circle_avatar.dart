@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:apps_against_fellowship/models/models.dart';
+import 'package:flutter/material.dart';
 
 class PlayerCircleAvatar extends StatelessWidget {
   final Player player;
@@ -40,14 +39,12 @@ class PlayerCircleAvatar extends StatelessWidget {
             backgroundImage: player.avatarUrl != null && player.avatarUrl != ''
                 ? NetworkImage(player.avatarUrl!)
                 : null,
-            // backgroundColor: AppColors.primary,
             backgroundColor: Theme.of(context).colorScheme.primary,
             child: (player.avatarUrl == null || player.avatarUrl == '') &&
                     player.name != ''
                 ? Text(
                     playerInitials,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          // color: Colors.white,
                           color: Theme.of(context).scaffoldBackgroundColor,
                         ),
                   )

@@ -28,7 +28,7 @@ class WaitingPlayerResponses extends StatelessWidget {
         children: <Widget>[
           Divider(
             height: 1,
-            color: Theme.of(context).colorScheme.surface,
+            color: Theme.of(context).colorScheme.surfaceDim,
           ),
           Expanded(
             child: GridView.builder(
