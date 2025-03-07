@@ -33,6 +33,7 @@ class JudgeBar extends StatelessWidget {
     Player player, {
     bool hasDownvoted = false,
   }) {
+    bool isJudge = player.id == context.read<UserBloc>().state.user.id;
     var playerName = player.name;
     if (playerName.trim().isEmpty) {
       playerName = Player.defaultName;
@@ -52,25 +53,27 @@ class JudgeBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          context.read<GameBloc>().state.gameStateStatus ==
-                  GameStateStatus.waving
-              ? CircularProgressIndicator()
-              : IconButton(
-                  icon: Icon(
-                    MdiIcons.humanGreeting,
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
-                  onPressed: () {
-                    // Analytics()
-                    //     .logSelectContent(contentType: 'action', itemId: 'wave');
-                    context.read<GameBloc>().add(
-                          WaveAtPlayer(
-                            message: '',
-                            playerId: player.id,
-                          ),
-                        );
-                  },
-                ),
+          isJudge
+              ? const SizedBox()
+              : context.read<GameBloc>().state.gameStateStatus ==
+                      GameStateStatus.waving
+                  ? CircularProgressIndicator()
+                  : IconButton(
+                      icon: Icon(
+                        MdiIcons.humanGreeting,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                      onPressed: () {
+                        // Analytics()
+                        //     .logSelectContent(contentType: 'action', itemId: 'wave');
+                        context.read<GameBloc>().add(
+                              WaveAtPlayer(
+                                message: '',
+                                playerId: player.id,
+                              ),
+                            );
+                      },
+                    ),
           Container(
             width: 8,
           ),

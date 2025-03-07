@@ -4,7 +4,7 @@ abstract class GameEvent extends Equatable {
   const GameEvent();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class ClearError extends GameEvent {}
@@ -55,17 +55,20 @@ class KickPlayer extends GameEvent {
 }
 
 class OpenGame extends GameEvent {
+  final bool? fromNav;
   final String gameId;
   final User user;
 
   const OpenGame({
     required this.gameId,
     required this.user,
+    this.fromNav = false,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         gameId,
+        fromNav,
         user,
       ];
 }

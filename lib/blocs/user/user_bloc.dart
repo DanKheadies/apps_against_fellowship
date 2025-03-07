@@ -1,6 +1,8 @@
 // import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/cubits/cubits.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:equatable/equatable.dart';
@@ -11,13 +13,23 @@ part 'user_event.dart';
 part 'user_state.dart';
 
 class UserBloc extends HydratedBloc<UserEvent, UserState> {
+  // final AudioCubit _audioCubit;
+  final DeviceCubit _deviceCubit;
+  final SettingsBloc _settingsBloc;
   final StorageRepository _storageRepository;
   final UserRepository _userRepository;
 
   UserBloc({
+    // required AudioCubit audioCubit,
+    required DeviceCubit deviceCubit,
+    required SettingsBloc settingsBloc,
     required StorageRepository storageRepository,
     required UserRepository userRepository,
-  })  : _storageRepository = storageRepository,
+  })  :
+        // _audioCubit = audioCubit,
+        _deviceCubit = deviceCubit,
+        _settingsBloc = settingsBloc,
+        _storageRepository = storageRepository,
         _userRepository = userRepository,
         super(const UserState()) {
     on<ClearUser>(_onClearUser);
@@ -26,6 +38,23 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     on<UpdateTheme>(_onUpdateTheme);
     on<UpdateUser>(_onUpdateUser);
     on<UpdateUserImage>(_onUpdateUserImage);
+
+    print('INIT USER BLOC');
+    // Note: this kicked off b/c MaterialApp.router uses UserBloc's context &
+    // state to inform the theme of each screen, i.e. it's wrapped in a
+    // BlocBuilder<UserBloc>.
+    // I could make a call to DeviceCubit & AudioCubit and kick them off here.
+    // Worth a try...
+    // Update: yea, this works; however, I should bring in SettingsBloc rather
+    // than audioCubit
+    // _audioCubit.initializeAudio();
+    _deviceCubit.setup();
+    // _settingsBloc;
+    // Is this enough to initialize the settingsBloc and audioCubit?
+    // Yup, this works.
+    // UX: should we play audio when the user doesn't have the tools to edit /
+    // quiet it? Would be smarter to initialize this once they get to Home.
+    // Will it continue from there, i.e. in Game?
   }
 
   void _onClearUser(

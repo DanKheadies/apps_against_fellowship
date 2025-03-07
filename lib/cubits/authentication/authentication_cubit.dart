@@ -4,7 +4,9 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 part 'authentication_state.dart';
 
 class AuthenticationCubit extends Cubit<AuthenticationState> {
-  AuthenticationCubit() : super(AuthenticationState.initial());
+  AuthenticationCubit() : super(AuthenticationState.initial()) {
+    print('auth cubit!');
+  }
 
   void emailChanged(String value) {
     emit(

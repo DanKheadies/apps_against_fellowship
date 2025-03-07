@@ -114,6 +114,11 @@ class GameRepository {
 
       return Game.fromSnapshot(snapshot);
     } catch (e) {
+      // Note: disabling for notifications
+      // Not sure if this was to force our way into a game to test or what, but
+      // the user requirement is... isn't impossible to get (?)
+      // We'll see how far we can stretch context...
+      // Update: not that far by itself; but through Widget parameters...
       if (e is PlatformException && andJoin) {
         try {
           return await _addSelfToGame(

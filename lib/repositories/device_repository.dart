@@ -5,12 +5,12 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 
-class DevicesRepository {
+class DeviceRepository {
   final auth.FirebaseAuth _firebaseAuth;
   final DeviceInfoPlugin _deviceInfoPlugin;
   final FirebaseFirestore _firestore;
 
-  DevicesRepository({
+  DeviceRepository({
     DeviceInfoPlugin? deviceInfoPlugin,
     auth.FirebaseAuth? firebaseAuth,
     FirebaseFirestore? firestore,
@@ -23,9 +23,7 @@ class DevicesRepository {
     required String deviceId,
     required String token,
   }) async {
-    // TODO: see where deviceId and token come from
-    // Update state too
-
+    print('dev repo - update push token');
     var currentUser = _firebaseAuth.currentUser;
     if (currentUser != null) {
       // If current token is not null, attempt to pull existing device info and copy it to new push token

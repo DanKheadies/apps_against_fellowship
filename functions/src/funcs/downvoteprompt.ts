@@ -5,11 +5,11 @@ import {
   QueryDocumentSnapshot,
 } from "firebase-functions/v2/firestore";
 import * as firestore from "../firebase/firebase";
-import { Player, RANDO_CARDRISSIAN } from "../models/player";
-import { getSpecial } from "../models/cards";
-import { Turn } from "../models/turn";
-import { Tally } from "../models/tally";
-import { gameOver } from "../util/gameover";
+import {Player, RANDO_CARDRISSIAN} from "../models/player";
+import {getSpecial} from "../models/cards";
+import {Turn} from "../models/turn";
+import {Tally} from "../models/tally";
+import {gameOver} from "../util/gameover";
 
 const downVoteThreshold = 2 / 3;
 

@@ -1,4 +1,5 @@
 import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,8 +81,12 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
           return current.game.turn?.winner != previous.game.turn?.winner;
         },
         listener: (context, state) {
+          print('game state update');
           var turnWinner = state.game.turn?.winner;
-          if (turnWinner != null) {
+          print('turnWinner id: ${turnWinner?.playerId}');
+          if (turnWinner != null && turnWinner != TurnWinner.emptyTurnWinner) {
+            print('gonna show, but prob don\'t have players loaded yet');
+            print(state.players.length);
             _showWinnerBottomSheet(context, state);
           }
         },

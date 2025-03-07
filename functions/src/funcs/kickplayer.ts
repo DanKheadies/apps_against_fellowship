@@ -1,8 +1,8 @@
 /* eslint-disable max-len */
-import { error } from "../util/error";
+import {error} from "../util/error";
 import * as firebase from "../firebase/firebase";
-import { nextJudge } from "../models/game";
-import { gameOver } from "../util/gameover";
+import {nextJudge} from "../models/game";
+import {gameOver} from "../util/gameover";
 
 /**
  * Kick Player - [Callable Function]

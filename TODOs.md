@@ -4,11 +4,13 @@
 3. New responses (DONE)
 4. Downvoting (DONE)
 5. Waving (DONE)
-6. Notifications
-7. Sign in w/ Apple id
-8. TOS & Privacy Policy
-9. Delete account
-10. Clean up and optimizations, e.g. BlocStates
-11. Analytics
-12. README steps to rebuild (?)
-13. Admin panel (CRUD cards, maintain on new import)
+6. Kicking (DONE; might still have some UX TODO)
+7. Notifications
+8. Sign in w/ Apple id
+9. TOS & Privacy Policy
+10. Delete account
+11. Clean up and optimizations, e.g. BlocStates
+12. Analytics
+13. README steps to rebuild (?)
+14. Admin panel (CRUD cards, maintain on new import)
+15. Tunes

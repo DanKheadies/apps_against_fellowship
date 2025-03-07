@@ -42,6 +42,9 @@ class _GameScreenState extends State<GameScreen> {
           // TODO: would be good to Hydrate GameState so web could refresh page
           // and have data. Would need to check if the wheels churn and Subscribe,
           // et al.
+          // Update: not sure how valuable Hydration is for this app. Going to
+          // keep as is and consider.
+          // Might help for notifications navigation (?)
           if (state.game.id == '') {
             // print('no game id; spin');
             return screenWrapper(context);

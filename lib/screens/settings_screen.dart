@@ -1,4 +1,5 @@
 import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/cubits/cubits.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 // import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
@@ -149,6 +150,91 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () => deleteAccount(context),
               ),
             ],
+          ),
+          BlocBuilder<SettingsBloc, SettingsState>(
+            builder: (context, state) {
+              return PreferenceCategory(
+                title: 'Audio',
+                children: [
+                  // Preference(
+                  //   title: 'Theme',
+                  //   subtitle: context.read<UserBloc>().state.user.isDarkTheme
+                  //       ? 'Dark'
+                  //       : 'Light',
+                  //   icon: Icon(
+                  //     context.read<UserBloc>().state.user.isDarkTheme
+                  //         ? Icons.dark_mode
+                  //         : Icons.light_mode,
+                  //     color: Theme.of(context).colorScheme.primary,
+                  //   ),
+                  //   onTap: () => context.read<UserBloc>().add(
+                  //         const UpdateTheme(
+                  //           updateFirebase: true,
+                  //         ),
+                  //       ),
+                  // ),
+                  const SizedBox(height: 10),
+                  SettingsToggle(
+                    'All Audio',
+                    Icon(
+                      state.hasAudioOn ? Icons.volume_up : Icons.volume_off,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    onSelected: () => context.read<SettingsBloc>().add(
+                          ToggleAudio(),
+                        ),
+                  ),
+                  const SizedBox(height: 25),
+                  SettingsToggle(
+                    'Sound FX',
+                    Icon(
+                      state.hasSoundsOn ? Icons.graphic_eq : Icons.volume_off,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    onSelected: () => context.read<SettingsBloc>().add(
+                          ToggleSound(),
+                        ),
+                  ),
+                  const SizedBox(height: 25),
+                  SettingsToggle(
+                    'Music',
+                    Icon(
+                      state.hasMusicOn ? Icons.music_note : Icons.music_off,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    onSelected: () => context.read<SettingsBloc>().add(
+                          ToggleMusic(),
+                        ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Slider(
+                      value: state.musicVolume,
+                      activeColor: Theme.of(context).colorScheme.primary,
+                      inactiveColor: Theme.of(context).colorScheme.surface,
+                      onChanged: (value) => context.read<SettingsBloc>().add(
+                            SetMusicVolume(level: value),
+                          ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // TODO: add next & prev buttons to change the song
+                  BlocBuilder<AudioCubit, AudioState>(
+                    builder: (context, state) {
+                      return Text(
+                        // context.read<AudioCubit>().state.playlist.first.name,
+                        state.playlist.first.name,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.surface,
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                ],
+              );
+            },
           ),
           PreferenceCategory(
             title: 'Legal',

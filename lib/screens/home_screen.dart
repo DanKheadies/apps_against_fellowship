@@ -20,8 +20,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    errorTimer = Timer(Duration.zero, () {});
     super.initState();
+
+    errorTimer = Timer(Duration.zero, () {});
+
+    // Note: is this enough to initialize Settings & Audio (?)
+    print('settings');
+    context.read<SettingsBloc>().add(InitializeAudio());
+    // Update: need to activate some piece of the Bloc, e.g. add() or function
+    // call to kick off the initial code.
+    // This DOES start the music, but the songs won't continue to loop until
+    // I come back here, e.g. the song finishes while I'm on the game screen
+    // but it won't loop / go to the next song... Also, still seems to hit the
+    // SONG_MAX and times out. I believe I continue to initialize audio when
+    // I come back to home, which isn't ideal...
+    // Gonna need to consider some UX. I prob could / should initialize in
+    // userBloc, which "should" only initialize once being were it is in the
+    // widget tree (above MaterialApp.router). The music plays well with the
+    // splash screen, but I'll need to provide some kind of UI so users can
+    // manage the audio before logging in. I could consider keeping it muted
+    // until I get here to home, and then do a check to "play or keep quiet."
+    // Either way, there's still the issue of it falling over after playing
+    // each song once.
+    // TODO
   }
 
   @override

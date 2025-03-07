@@ -1,15 +1,16 @@
+import 'package:apps_against_fellowship/models/models.dart';
 // import 'package:bloc/bloc.dart';
 // import 'package:equatable/equatable.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-
-import 'package:apps_against_fellowship/models/models.dart';
 
 // part 'card_cache_state.dart';
 
 // class CardCacheCubit extends Cubit<CardCacheState> {
 class CardCacheCubit extends HydratedCubit<List<CardSet>> {
   // CardCacheCubit() : super(const CardCacheState());
-  CardCacheCubit() : super(const []);
+  CardCacheCubit() : super(const []) {
+    print('card cache cubit');
+  }
 
   // void getCardSets() async {
   //   emit(

@@ -121,7 +121,8 @@ class PlayerItem extends StatelessWidget {
               height: kMinInteractiveDimension,
               margin: const EdgeInsets.only(right: 8),
               child: context.read<GameBloc>().state.gameStateStatus ==
-                      GameStateStatus.loading
+                          GameStateStatus.loading &&
+                      !isSelf
                   // isKicking
                   ? Container(
                       padding: const EdgeInsets.all(12),

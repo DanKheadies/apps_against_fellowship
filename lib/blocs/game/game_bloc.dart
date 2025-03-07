@@ -153,7 +153,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
 
       emit(
         state.copyWith(
-          gameStateStatus: GameStateStatus.loading,
+          gameStateStatus: GameStateStatus.goodToGo,
           kickingPlayerId: '',
         ),
       );
@@ -181,6 +181,20 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         event.gameId,
         event.user,
       );
+
+      // if (event.fromNav != null) {
+      //   print('fromNav, so sanitize winner');
+      //   // TODO: I think this is causing issues & prompting a null winner (?)
+      //   // Gonna hide until I bring notifications online
+      //   existingGame = existingGame.copyWith(
+      //     turn: Turn(
+      //       judgeId: existingGame.turn!.judgeId,
+      //       responses: existingGame.turn!.responses,
+      //       promptCard: existingGame.turn!.promptCard,
+      //       winner: null,
+      //     ),
+      //   );
+      // }
 
       add(
         GameUpdated(game: existingGame),
@@ -300,14 +314,14 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     PlayersUpdated event,
     Emitter<GameState> emit,
   ) {
-    for (var player in event.players) {
-      print(player.id);
-      print(player.isInactive);
-    }
+    // for (var player in event.players) {
+    //   print(player.id);
+    //   print(player.isInactive);
+    // }
     print(_userBloc.state.user.id);
     if (event.players.any((player) =>
         player.id == _userBloc.state.user.id && player.isInactive)) {
-      print('we were kicked; leave game');
+      // print('we were kicked; leave game');
       emit(
         state.copyWith(
           kickingPlayerId: _userBloc.state.user.id,

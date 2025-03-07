@@ -407,7 +407,7 @@ async function invalidatePushToken(token: string) {
  */
 async function getPlayerPushTokens(players: Player[]): Promise<string[]> {
   const devices = await Promise.all(
-    players.map((value) => {
+    players.map(async (value) => {
       return firebase.firestore
         .collection(COLLECTION_USERS)
         .doc(value.id)

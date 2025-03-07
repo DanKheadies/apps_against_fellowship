@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
-import { error } from "../util/error";
+import {error} from "../util/error";
 import * as firestore from "../firebase/firebase";
-import { gameOver } from "../util/gameover";
+import {gameOver} from "../util/gameover";
 
 /**
  * Re-Deal Hand - [Callable Function]

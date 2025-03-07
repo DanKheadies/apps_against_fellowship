@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import * as firebase from "../firebase/firebase";
-import { error } from "../util/error";
+import {error} from "../util/error";
 
 /**
  * Leave Game - [Callable Function]

@@ -38,6 +38,12 @@ All [CAH or "Cards Against Humanity"](https://cardsagainsthumanity.com/) questio
 
 ## Additional Notes:
 
+The following Firebase collections need indexes to work with the server:
+
+- players : id
+- prompts : cid
+- responses: cid
+
 ---
 
 Compliments of DTFun LLC 2025
