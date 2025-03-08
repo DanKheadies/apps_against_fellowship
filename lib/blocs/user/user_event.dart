@@ -13,18 +13,18 @@ class CreateDeviceId extends UserEvent {}
 
 class DeleteProfilePhoto extends UserEvent {}
 
-class UpdateTheme extends UserEvent {
-  final bool updateFirebase;
+// class UpdateTheme extends UserEvent {
+//   final bool updateFirebase;
 
-  const UpdateTheme({
-    required this.updateFirebase,
-  });
+//   const UpdateTheme({
+//     required this.updateFirebase,
+//   });
 
-  @override
-  List<Object?> get props => [
-        updateFirebase,
-      ];
-}
+//   @override
+//   List<Object?> get props => [
+//         updateFirebase,
+//       ];
+// }
 
 class UpdateUser extends UserEvent {
   final bool? accountCreation;

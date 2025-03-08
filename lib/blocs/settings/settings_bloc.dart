@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:apps_against_fellowship/cubits/cubits.dart';
+// import 'package:apps_against_fellowship/models/models.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 // import 'package:logging/logging.dart';
@@ -18,6 +19,7 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
   final ValueNotifier<AppLifecycleState> _appLifecycleNotifier;
 
   /// Creates a new instance of [SettingsState] backed by [hydration].
+  /// Initializes all audio while tracking the state of the app.
   ///
   /// By default, settings are persisted using [HydratedBloc]
   /// (i.e. see hive [https://pub.dev/packages/hive] for more).
@@ -27,6 +29,7 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
   })  : _appLifecycleNotifier = appLifecycleNotifier,
         _audioCubit = audioCubit,
         super(const SettingsState()) {
+    on<CheckForUser>(_onCheckForUser);
     on<InitializeAudio>(_onInitializeAudio);
     on<InitializeAudioForWeb>(_onInitializeAudioForWeb);
     on<SetMusicVolume>(_onSetMusicVolume);
@@ -36,29 +39,61 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
     on<ToggleSound>(_onToggleSound);
 
     _appLifecycleNotifier.addListener(handleAppLifecycle);
+
+    add(
+      InitializeAudio(),
+    );
+
+    // TODO: turn everything off on instantiation
+    // Once the user logs in, we turn everything on. If they turn them off in
+    // settings, we cache that, and on subsequent loads, we hydrate from those
+    // settings.
   }
 
-  /// Makes sure the audio cubit is listening to changes
-  /// of both the app lifecycle (e.g. suspended app) and to changes
-  /// of settings (e.g. muted sound).
-  // Update: seems to always go inactive > hidden > paused; then hidden > inactive > resumed
+  /// Makes sure the settings bloc is listening to changes of both the app
+  /// lifecycle (e.g. suspend app) and to settings changes (e.g. mute sound).
+  // Note: seems to always go (leaving app) inactive > hidden > paused;
+  // then (returning to app) hidden > inactive > resumed
   void handleAppLifecycle() {
     switch (_appLifecycleNotifier.value) {
       case AppLifecycleState.paused:
-        print('app paused');
+      // print('app paused');
       case AppLifecycleState.detached:
-        print('app detached');
+      // print('app detached');
       case AppLifecycleState.hidden:
-        print('app hidden');
+        // print('app hidden');
         _audioCubit.stopAllSound();
       case AppLifecycleState.resumed:
-        print('app resumed');
-        if (state.hasAudioOn && state.hasMusicOn) {
+        // print('app resumed');
+        if (state.hasUser && state.hasAudioOn && state.hasMusicOn) {
           _audioCubit.startOrResumeMusic();
         }
       case AppLifecycleState.inactive:
-        print('app inactive');
+        // print('app inactive');
         break;
+    }
+  }
+
+  void _onCheckForUser(
+    CheckForUser event,
+    Emitter<SettingsState> emit,
+  ) {
+    print('we have a user');
+    emit(
+      state.copyWith(
+        hasUser: event.haveUser,
+      ),
+    );
+
+    print('event.haveUser: ${event.haveUser}');
+    print('state.hasAudioOn: ${state.hasAudioOn}');
+    print('state.hasMusicOn: ${state.hasMusicOn}');
+    if (event.haveUser && state.hasAudioOn && state.hasMusicOn) {
+      _audioCubit.startOrResumeMusic();
+    }
+    if (!event.haveUser) {
+      // _audioCubit.releaseMusicPlayer(state.previousMusicPlayerId);
+      _audioCubit.stopAllSound();
     }
   }
 
@@ -66,25 +101,41 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
     InitializeAudio event,
     Emitter<SettingsState> emit,
   ) {
-    print('settings bloc');
-    if (state.hasAudioOn && state.hasMusicOn) {
-      // On the web, sound can only start after user interaction, so
-      // we start muted there on every game start.
-      if (kIsWeb) {
-        // Logger('SettingsBloc').info(
-        //   'On the web, music can only start after user interaction.',
-        // );
-        print('On the web, music can only start after user interaction.');
-        add(
-          InitializeAudio(),
-        );
-      } else {
-        // _audioCubit.playCurrentSongInPlaylist();
-        _audioCubit.initializeAudio();
-      }
-    }
+    // Update: the goal here should be to initialize audioCubit's music player
+    // stream. We also load the SFX in that step, which could be avoided / waited
+    // for until there's a user. But in this case, it's a small load w/ minimal
+    // impact.
+    // print('settings bloc');
+    // if (state.hasAudioOn && state.hasMusicOn) {
+    //   // On the web, sound can only start after user interaction, so
+    //   // we start muted there on every game start.
+    //   if (kIsWeb) {
+    //     // Logger('SettingsBloc').info(
+    //     //   'On the web, music can only start after user interaction.',
+    //     // );
+    //     print('On the web, music can only start after user interaction.');
+    //     add(
+    //       InitializeAudioForWeb(),
+    //     );
+    //   } else {
+    //     // _audioCubit.playCurrentSongInPlaylist();
+    //     _audioCubit.initializeAudio();
+    //   }
+    // }
+    // print('set music vol: ${state.musicVolume}');
+    // _audioCubit.setMusicVolume(state.musicVolume);
+    print('settings bloc - init audio');
+    String currentMusicPlayerId =
+        _audioCubit.initializeAudio(state.previousMusicPlayerId);
     print('set music vol: ${state.musicVolume}');
     _audioCubit.setMusicVolume(state.musicVolume);
+
+    print('new previousMusicPlayerId: $currentMusicPlayerId');
+    emit(
+      state.copyWith(
+        previousMusicPlayerId: currentMusicPlayerId,
+      ),
+    );
   }
 
   void _onInitializeAudioForWeb(

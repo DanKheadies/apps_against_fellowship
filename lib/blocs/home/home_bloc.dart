@@ -27,6 +27,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<RefreshHome>(_onRefreshHome);
     on<UserUpdatedViaHome>(_onUserUpdatedViaHome);
 
+    // TODO: need to kick this to the curb when I sign out
     _joinedGamesSubscription = _gameRepository
         .observeJoinedGames(_userBloc.state.user)
         .listen((event) {

@@ -9,6 +9,9 @@ void authenticationNavigator(
   // Need to keep to facilitate ScreenWrapper's Listener
 ) {
   print('trigger auth nav');
+  print(
+    'have authUser: ${stateHolder.authUser != null ? 'true' : 'false'}',
+  );
   String currentScreen =
       GoRouter.of(context).routeInformationProvider.value.uri.toString();
   // print(currentScreen);

@@ -13,12 +13,14 @@ class AudioState extends Equatable {
   final double musicVolume;
   final int currentSfxPlayer;
   final List<AudioPlayer> sfxPlayers;
+  final String musicPlayerId;
   final Queue<Song> playlist;
 
   const AudioState({
     required this.audioStatus,
     this.currentSfxPlayer = 0,
     required this.musicPlayer,
+    required this.musicPlayerId,
     required this.musicVolume,
     required this.playlist,
     required this.sfxPlayers,
@@ -29,17 +31,21 @@ class AudioState extends Equatable {
         audioStatus,
         currentSfxPlayer,
         musicPlayer,
+        musicPlayerId,
         musicVolume,
         playlist,
         sfxPlayers,
       ];
 
   factory AudioState.initial() {
+    String musicPlayerId = UuidV4().generate();
     return AudioState(
       audioStatus: AudioStatus.intial,
       musicPlayer: AudioPlayer(
-        playerId: 'musicPlayer',
+        // playerId: 'musicPlayer', // TODO: need a randomized id for Hot Restart
+        playerId: musicPlayerId,
       ),
+      musicPlayerId: musicPlayerId,
       musicVolume: 0.5,
       playlist: Queue.of(List<Song>.of(songs)..shuffle),
       sfxPlayers: Iterable.generate(
@@ -57,12 +63,14 @@ class AudioState extends Equatable {
     double? musicVolume,
     int? currentSfxPlayer,
     List<AudioPlayer>? sfxPlayers,
+    String? musicPlayerId,
     Queue<Song>? playlist,
   }) {
     return AudioState(
       audioStatus: audioStatus ?? this.audioStatus,
       currentSfxPlayer: currentSfxPlayer ?? this.currentSfxPlayer,
       musicPlayer: musicPlayer ?? this.musicPlayer,
+      musicPlayerId: musicPlayerId ?? this.musicPlayerId,
       musicVolume: musicVolume ?? this.musicVolume,
       playlist: playlist ?? this.playlist,
       sfxPlayers: sfxPlayers ?? this.sfxPlayers,

@@ -9,7 +9,10 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 class CardCacheCubit extends HydratedCubit<List<CardSet>> {
   // CardCacheCubit() : super(const CardCacheState());
   CardCacheCubit() : super(const []) {
-    print('card cache cubit');
+    // Note: this does trigger when the cubit is instantiated, i.e. when we
+    // go to the CreateGameScreen for the first time. Does not repeat on
+    // subsequent visits.
+    // print('card cache cubit');
   }
 
   // void getCardSets() async {

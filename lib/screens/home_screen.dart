@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // Note: is this enough to initialize Settings & Audio (?)
     print('settings');
-    context.read<SettingsBloc>().add(InitializeAudio());
+    // context.read<SettingsBloc>().add(InitializeAudio());
     // Update: need to activate some piece of the Bloc, e.g. add() or function
     // call to kick off the initial code.
     // This DOES start the music, but the songs won't continue to loop until
@@ -43,6 +43,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // Either way, there's still the issue of it falling over after playing
     // each song once.
     // TODO
+    // Going to avoid initializing here...
+    // Going to try initializing with successful AuthSub
   }
 
   @override

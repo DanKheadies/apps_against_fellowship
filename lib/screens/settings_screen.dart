@@ -77,6 +77,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         // TODO
         // await authRepository.deleteAccount();
 
+        if (context.mounted) {
+          context.read<HomeBloc>().close();
+        } else {
+          print('derp');
+        }
         authBloc.add(
           SignOut(),
         );
@@ -86,7 +91,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           print('is platform exception, so probably google');
           if (err.code == 'ERROR_REQUIRES_RECENT_LOGIN') {}
           // await authRepository.deleteAccount();
-
+          if (context.mounted) {
+            context.read<HomeBloc>().close();
+          } else {
+            print('derp');
+          }
           authBloc.add(
             SignOut(),
           );
@@ -113,20 +122,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               Preference(
                 title: 'Theme',
-                subtitle: context.read<UserBloc>().state.user.isDarkTheme
+                subtitle: context.read<DeviceCubit>().state.isDarkTheme
                     ? 'Dark'
                     : 'Light',
                 icon: Icon(
-                  context.read<UserBloc>().state.user.isDarkTheme
+                  context.read<DeviceCubit>().state.isDarkTheme
                       ? Icons.dark_mode
                       : Icons.light_mode,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                onTap: () => context.read<UserBloc>().add(
-                      const UpdateTheme(
-                        updateFirebase: true,
-                      ),
-                    ),
+                onTap: () => context.read<DeviceCubit>().toggleTheme(),
               ),
               Preference(
                 title: 'Sign Out',
@@ -135,9 +140,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 // onTap: () => signOut(context),
-                onTap: () => context.read<AuthBloc>().add(
-                      SignOut(),
-                    ),
+                onTap: () {
+                  print('sign out');
+                  context.read<HomeBloc>().close();
+                  context.read<AuthBloc>().add(
+                        SignOut(),
+                      );
+                },
               ),
               Preference(
                 title: 'Delete Account',

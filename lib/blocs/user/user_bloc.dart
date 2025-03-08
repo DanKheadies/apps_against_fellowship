@@ -1,8 +1,8 @@
 // import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:apps_against_fellowship/blocs/blocs.dart';
-import 'package:apps_against_fellowship/cubits/cubits.dart';
+// import 'package:apps_against_fellowship/blocs/blocs.dart';
+// import 'package:apps_against_fellowship/cubits/cubits.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:equatable/equatable.dart';
@@ -14,28 +14,28 @@ part 'user_state.dart';
 
 class UserBloc extends HydratedBloc<UserEvent, UserState> {
   // final AudioCubit _audioCubit;
-  final DeviceCubit _deviceCubit;
-  final SettingsBloc _settingsBloc;
+  // final DeviceCubit _deviceCubit;
+  // final SettingsBloc _settingsBloc;
   final StorageRepository _storageRepository;
   final UserRepository _userRepository;
 
   UserBloc({
     // required AudioCubit audioCubit,
-    required DeviceCubit deviceCubit,
-    required SettingsBloc settingsBloc,
+    // required DeviceCubit deviceCubit,
+    // required SettingsBloc settingsBloc,
     required StorageRepository storageRepository,
     required UserRepository userRepository,
   })  :
         // _audioCubit = audioCubit,
-        _deviceCubit = deviceCubit,
-        _settingsBloc = settingsBloc,
+        // _deviceCubit = deviceCubit,
+        // _settingsBloc = settingsBloc,
         _storageRepository = storageRepository,
         _userRepository = userRepository,
         super(const UserState()) {
     on<ClearUser>(_onClearUser);
     on<CreateDeviceId>(_onCreateDeviceId);
     on<DeleteProfilePhoto>(_onDeleteProfilePhoto);
-    on<UpdateTheme>(_onUpdateTheme);
+    // on<UpdateTheme>(_onUpdateTheme);
     on<UpdateUser>(_onUpdateUser);
     on<UpdateUserImage>(_onUpdateUserImage);
 
@@ -48,13 +48,19 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     // Update: yea, this works; however, I should bring in SettingsBloc rather
     // than audioCubit
     // _audioCubit.initializeAudio();
-    _deviceCubit.setup();
+    // _deviceCubit.setup();
     // _settingsBloc;
     // Is this enough to initialize the settingsBloc and audioCubit?
     // Yup, this works.
     // UX: should we play audio when the user doesn't have the tools to edit /
     // quiet it? Would be smarter to initialize this once they get to Home.
     // Will it continue from there, i.e. in Game?
+    // Update: with our current UserBloc wrapper around MaterialApp.router, this
+    // builds on app build / load up, which is OK.
+    // We could use that to seed the "emptyUser" with and locally cached cubit
+    // info, e.g. Brightness and Device. Then either the Subscription fed User
+    // loads in and updates the local state, which should be reflect back to the
+    // cubits, OR there's no state change to those data elements.
   }
 
   void _onClearUser(
@@ -126,34 +132,34 @@ class UserBloc extends HydratedBloc<UserEvent, UserState> {
     }
   }
 
-  void _onUpdateTheme(
-    UpdateTheme event,
-    Emitter<UserState> emit,
-  ) {
-    emit(
-      state.copyWith(
-        userStatus: UserStatus.loading,
-      ),
-    );
+  // void _onUpdateTheme(
+  //   UpdateTheme event,
+  //   Emitter<UserState> emit,
+  // ) {
+  //   emit(
+  //     state.copyWith(
+  //       userStatus: UserStatus.loading,
+  //     ),
+  //   );
 
-    if (event.updateFirebase) {
-      _userRepository.updateUser(
-        user: state.user.copyWith(
-          isDarkTheme: !state.user.isDarkTheme,
-        ),
-      );
-    }
+  //   if (event.updateFirebase) {
+  //     _userRepository.updateUser(
+  //       user: state.user.copyWith(
+  //         isDarkTheme: !state.user.isDarkTheme,
+  //       ),
+  //     );
+  //   }
 
-    emit(
-      state.copyWith(
-        user: state.user.copyWith(
-          isDarkTheme: !state.user.isDarkTheme,
-          updatedAt: DateTime.now(),
-        ),
-        userStatus: UserStatus.loaded,
-      ),
-    );
-  }
+  //   emit(
+  //     state.copyWith(
+  //       user: state.user.copyWith(
+  //         isDarkTheme: !state.user.isDarkTheme,
+  //         updatedAt: DateTime.now(),
+  //       ),
+  //       userStatus: UserStatus.loaded,
+  //     ),
+  //   );
+  // }
 
   void _onUpdateUser(
     UpdateUser event,

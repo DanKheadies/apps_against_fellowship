@@ -15,6 +15,7 @@ part 'auth_state.dart';
 // class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
+  final SettingsBloc _settingsBloc;
   final UserBloc _userBloc;
   final UserRepository _userRepository;
   StreamSubscription<GoogleSignInAccount?>? _authUserGoogleSubscription;
@@ -23,9 +24,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   AuthBloc({
     required AuthRepository authRepository,
+    required SettingsBloc settingsBloc,
     required UserRepository userRepository,
     required UserBloc userBloc,
   })  : _authRepository = authRepository,
+        _settingsBloc = settingsBloc,
         _userBloc = userBloc,
         _userRepository = userRepository,
         super(const AuthState()) {
@@ -54,6 +57,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             _userRepository.getUserStream(userId: authUser.uid).listen((user) {
           // Wait for an id from the stream before carrying on.
           if (user != null) {
+            print('we have user!');
+            print(
+              'have authUser: ${state.authUser != null ? 'true' : 'false'}',
+            );
             _userBloc.add(
               UpdateUser(
                 updateFirebase: false,
@@ -62,12 +69,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             );
 
             if (state.authUser == null) {
+              print('update state & CheckForUser');
               add(
                 AuthUserChanged(
                   authUser: authUser,
                 ),
               );
+
+              _settingsBloc.add(
+                CheckForUser(
+                  haveUser: true,
+                ),
+              );
             }
+
+            // TODO: call settings and intialize audio
+            // _userBloc.
+            // _settingsBloc.
+            // Note: don't want to have to add settingsBloc as a requirement here
+            // but can.
+            // Only want to do this once, i.e. stick up with auth check above.
           }
         });
       } else if (authUser == null && state.status == AuthStatus.authenticated) {
@@ -435,6 +456,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // Note: on Hot Reload, Google auth takes a double tap on Sign Out to
       // fully sign out. Not sure if this will reel it's head in other cases.
 
+      // TODO: might need to switch the order her and sign out of user stuff
+      // first; hmm... order may not matter here (?)
+
       print('trying to sign out');
       await _authRepository.signOut();
       print('done awaiting sign out');
@@ -446,13 +470,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       _userSubscription = null;
       print('user should be signed out via auth');
 
+      _settingsBloc.add(
+        CheckForUser(
+          haveUser: false,
+        ),
+      );
+
+      // TODO: close out the HomeBloc's stream
+      // Might be able to do it via the Sign Out button
+      // Yup, that did it. Should make sure all sign out options include closing
+      // the Home Sub/Stream, but I could bake it into this SignOut handler.
+      // _homeBloc.close();
+
+      // TODO: authUser isn't being nulled out on SignOut. The status is updating
+      // correctly, but 
+      print('authUser should be null');
       emit(
         state.copyWith(
-          authUser: null,
+          authUser: null, // TODO: this isn't nulling out the authUser (?)
           errorMessage: '',
           status: AuthStatus.unauthenticated,
         ),
       );
+      print(state.authUser);
     } catch (err) {
       print('sign out error: $err');
       emit(

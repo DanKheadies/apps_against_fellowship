@@ -82,6 +82,16 @@ class DeviceCubit extends HydratedCubit<DeviceState> {
     checkAndUpdateToken();
   }
 
+  void toggleTheme() {
+    print('devCub - update theme');
+
+    emit(
+      state.copyWith(
+        isDarkTheme: !state.isDarkTheme,
+      ),
+    );
+  }
+
   @override
   Future<void> close() {
     _tokenSubscription?.cancel();

@@ -12,15 +12,19 @@ class SettingsState extends Equatable {
   final bool hasAudioOn;
   final bool hasMusicOn;
   final bool hasSoundsOn;
+  final bool hasUser; // TODO: kill all audio until user logs in
   final bool isPaused; // TODO: causing issues for background on Hot Reload
   final double musicVolume;
+  final String previousMusicPlayerId;
 
   const SettingsState({
     this.hasAudioOn = true,
     this.hasMusicOn = true,
     this.hasSoundsOn = true,
+    this.hasUser = false,
     this.isPaused = false,
     this.musicVolume = 0.5,
+    this.previousMusicPlayerId = '',
   });
 
   @override
@@ -28,34 +32,43 @@ class SettingsState extends Equatable {
         hasAudioOn,
         hasMusicOn,
         hasSoundsOn,
+        hasUser,
         isPaused,
         musicVolume,
+        previousMusicPlayerId,
       ];
 
   SettingsState copyWith({
     bool? hasAudioOn,
     bool? hasMusicOn,
     bool? hasSoundsOn,
+    bool? hasUser,
     bool? isPaused,
     double? musicVolume,
+    String? previousMusicPlayerId,
   }) {
     return SettingsState(
       hasAudioOn: hasAudioOn ?? this.hasAudioOn,
       hasMusicOn: hasMusicOn ?? this.hasMusicOn,
       hasSoundsOn: hasSoundsOn ?? this.hasSoundsOn,
+      hasUser: hasUser ?? this.hasUser,
       isPaused: isPaused ?? this.isPaused,
       musicVolume: musicVolume ?? this.musicVolume,
+      previousMusicPlayerId:
+          previousMusicPlayerId ?? this.previousMusicPlayerId,
     );
   }
 
   factory SettingsState.fromJson(Map<String, dynamic> json) {
     // TODO: isPaused is causing issues for background on Hot Reload + App Pause
     return SettingsState(
-      hasAudioOn: json['hasAudioOn'] as bool,
-      hasMusicOn: json['hasMusicOn'] as bool,
-      hasSoundsOn: json['hasSoundsOn'] as bool,
+      hasAudioOn: json['hasAudioOn'], // as bool,
+      hasMusicOn: json['hasMusicOn'], // as bool,
+      hasSoundsOn: json['hasSoundsOn'], // as bool,
+      // hasUser: json['hasUser'] as bool,
       // isPaused: json['isPaused'] as bool,
-      musicVolume: json['musicVolume'] as double,
+      musicVolume: json['musicVolume'], // as double,
+      previousMusicPlayerId: json['previousMusicPlayerId'],
     );
   }
 
@@ -64,8 +77,10 @@ class SettingsState extends Equatable {
       'hasAudioOn': hasAudioOn,
       'hasMusicOn': hasMusicOn,
       'hasSoundsOn': hasSoundsOn,
-      'isPaused': isPaused,
+      // 'hasUser': hasUser,
+      // 'isPaused': isPaused,
       'musicVolume': musicVolume,
+      'previousMusicPlayerId': previousMusicPlayerId,
     };
   }
 }

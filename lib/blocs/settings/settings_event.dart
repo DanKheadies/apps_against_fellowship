@@ -7,6 +7,19 @@ abstract class SettingsEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class CheckForUser extends SettingsEvent {
+  final bool haveUser;
+
+  const CheckForUser({
+    required this.haveUser,
+  });
+
+  @override
+  List<Object> get props => [
+        haveUser,
+      ];
+}
+
 class InitializeAudio extends SettingsEvent {}
 
 class InitializeAudioForWeb extends SettingsEvent {}

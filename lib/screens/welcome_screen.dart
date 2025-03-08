@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/cubits/cubits.dart';
 // import 'package:apps_against_fellowship/cubits/cubits.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
@@ -72,62 +73,61 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     print('build welcome screen');
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        if (state.status == AuthStatus.submitting) {
-          return ScreenWrapper(
-            screen: 'AAF Welcome',
-            hideAppBar: true,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        } else if (state.status == AuthStatus.authenticated) {
-          return ScreenWrapper(
-            screen: 'AAF Welcome',
-            hideAppBar: true,
-            child: Center(
-              child: GestureDetector(
-                onLongPress: () {
-                  context.read<AuthBloc>().add(
-                        SignOut(),
-                      );
-                },
-                child: Icon(
-                  Icons.thumb_up_alt_outlined,
-                  color: Theme.of(context).colorScheme.surface,
-                  size: 50,
+    return BlocListener<AuthBloc, AuthState>(
+      // listener: (context, state) => _handleError(state, context),
+      listener: _handleError,
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          if (state.status == AuthStatus.submitting) {
+            return ScreenWrapper(
+              screen: 'AAF Welcome',
+              hideAppBar: true,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          } else if (state.status == AuthStatus.authenticated) {
+            return ScreenWrapper(
+              screen: 'AAF Welcome',
+              hideAppBar: true,
+              child: Center(
+                child: GestureDetector(
+                  onLongPress: () {
+                    context.read<AuthBloc>().add(
+                          SignOut(),
+                        );
+                  },
+                  child: Icon(
+                    Icons.thumb_up_alt_outlined,
+                    color: Theme.of(context).colorScheme.surface,
+                    size: 50,
+                  ),
                 ),
               ),
-            ),
-          );
-        } else {
-          Size size = MediaQuery.of(context).size;
+            );
+          } else {
+            Size size = MediaQuery.of(context).size;
 
-          // if (state.errorMessage != '' && state.errorMessage != null) {
-          //   _handleError(state, context);
-          // }
-          _handleError(state, context);
-
-          return ScreenWrapper(
-            screen: method == AuthMethod.login
-                ? 'Login'
-                : method == AuthMethod.register
-                    ? 'Register'
-                    : 'AAF Welcome',
-            hideAppBar: method == AuthMethod.tbd,
-            goBackTo: 'welcome',
-            specialBack: () => setState(() {
-              method = AuthMethod.tbd;
-            }),
-            actions: _buildWelcomeActions(),
-            flaction: _buildWelcomeFlaction(),
-            child: method == AuthMethod.tbd
-                ? _buildWelcomeLanding(size)
-                : _buildWelcomeAuthentication(size),
-          );
-        }
-      },
+            return ScreenWrapper(
+              screen: method == AuthMethod.login
+                  ? 'Login'
+                  : method == AuthMethod.register
+                      ? 'Register'
+                      : 'AAF Welcome',
+              hideAppBar: method == AuthMethod.tbd,
+              goBackTo: 'welcome',
+              specialBack: () => setState(() {
+                method = AuthMethod.tbd;
+              }),
+              actions: _buildWelcomeActions(),
+              flaction: _buildWelcomeFlaction(),
+              child: method == AuthMethod.tbd
+                  ? _buildWelcomeLanding(size)
+                  : _buildWelcomeAuthentication(size),
+            );
+          }
+        },
+      ),
     );
   }
 
@@ -159,14 +159,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
       IconButton(
         icon: Icon(
-          context.read<UserBloc>().state.user.isDarkTheme
+          // context.read<UserBloc>().state.user.isDarkTheme
+          context.read<DeviceCubit>().state.isDarkTheme
               ? Icons.dark_mode
               : Icons.light_mode,
         ),
         onPressed: () {
-          context.read<UserBloc>().add(
-                UpdateTheme(updateFirebase: true),
-              );
+          // context.read<UserBloc>().add(
+          //       UpdateTheme(updateFirebase: false),
+          //     );
+          context.read<DeviceCubit>().toggleTheme();
         },
       ),
     ];
@@ -243,9 +245,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           text: 'Sign Out',
                           onTap: buttOpacTimer.isActive
                               ? null
-                              : () => context.read<AuthBloc>().add(
-                                    SignOut(),
-                                  ),
+                              // : () => context.read<AuthBloc>().add(
+                              //       SignOut(),
+                              //     ),
+                              // : () => print(
+                              //       'have authUser: ${context.read<AuthBloc>().state.authUser != null ? 'true' : 'false'}',
+                              //     ),
+                              : () => print(context
+                                  .read<AuthBloc>()
+                                  .state), // TODO: revert
                         ),
                       ),
                     ),
@@ -376,8 +384,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   void _handleError(
-    AuthState state,
     BuildContext context,
+    AuthState state,
   ) {
     if (state.errorMessage != '' && state.errorMessage != null) {
       // String errorMsg = state.errorMessage!

@@ -5,7 +5,10 @@ part 'authentication_state.dart';
 
 class AuthenticationCubit extends Cubit<AuthenticationState> {
   AuthenticationCubit() : super(AuthenticationState.initial()) {
-    print('auth cubit!');
+    // Note: this does trigger when the cubit is instantiated, i.e. when we
+    // open the AuthenticationWidget via Login or Register. Does not repeat on
+    // subsequent visits.
+    // print('auth cubit!');
   }
 
   void emailChanged(String value) {
