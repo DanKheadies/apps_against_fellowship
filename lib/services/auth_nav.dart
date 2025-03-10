@@ -5,8 +5,7 @@ import 'package:go_router/go_router.dart';
 
 void authenticationNavigator(
   BuildContext context,
-  AuthState stateHolder, // Not giving up-to-date info; use context instead
-  // Need to keep to facilitate ScreenWrapper's Listener
+  AuthState stateHolder,
 ) {
   print('trigger auth nav');
   print(

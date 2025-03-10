@@ -9,22 +9,9 @@ abstract class UserEvent extends Equatable {
 
 class ClearUser extends UserEvent {}
 
-class CreateDeviceId extends UserEvent {}
+// class CreateDeviceId extends UserEvent {}
 
 class DeleteProfilePhoto extends UserEvent {}
-
-// class UpdateTheme extends UserEvent {
-//   final bool updateFirebase;
-
-//   const UpdateTheme({
-//     required this.updateFirebase,
-//   });
-
-//   @override
-//   List<Object?> get props => [
-//         updateFirebase,
-//       ];
-// }
 
 class UpdateUser extends UserEvent {
   final bool? accountCreation;

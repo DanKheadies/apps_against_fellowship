@@ -78,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         // await authRepository.deleteAccount();
 
         if (context.mounted) {
-          context.read<HomeBloc>().close();
+          context.read<HomeBloc>().close(); // TODO: move to authBloc
         } else {
           print('derp');
         }
@@ -92,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (err.code == 'ERROR_REQUIRES_RECENT_LOGIN') {}
           // await authRepository.deleteAccount();
           if (context.mounted) {
-            context.read<HomeBloc>().close();
+            context.read<HomeBloc>().close(); // TODO: move to authBloc
           } else {
             print('derp');
           }
@@ -142,7 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // onTap: () => signOut(context),
                 onTap: () {
                   print('sign out');
-                  context.read<HomeBloc>().close();
+                  context.read<HomeBloc>().close(); // TODO: move to authBloc
                   context.read<AuthBloc>().add(
                         SignOut(),
                       );
@@ -165,23 +165,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               return PreferenceCategory(
                 title: 'Audio',
                 children: [
-                  // Preference(
-                  //   title: 'Theme',
-                  //   subtitle: context.read<UserBloc>().state.user.isDarkTheme
-                  //       ? 'Dark'
-                  //       : 'Light',
-                  //   icon: Icon(
-                  //     context.read<UserBloc>().state.user.isDarkTheme
-                  //         ? Icons.dark_mode
-                  //         : Icons.light_mode,
-                  //     color: Theme.of(context).colorScheme.primary,
-                  //   ),
-                  //   onTap: () => context.read<UserBloc>().add(
-                  //         const UpdateTheme(
-                  //           updateFirebase: true,
-                  //         ),
-                  //       ),
-                  // ),
                   const SizedBox(height: 10),
                   SettingsToggle(
                     'All Audio',
@@ -228,17 +211,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // TODO: add next & prev buttons to change the song
-                  BlocBuilder<AudioCubit, AudioState>(
-                    builder: (context, state) {
-                      return Text(
-                        // context.read<AudioCubit>().state.playlist.first.name,
-                        state.playlist.first.name,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.surface,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.chevron_left),
+                          onPressed: () =>
+                              context.read<AudioCubit>().prevSong(),
                         ),
-                      );
-                    },
+                        BlocBuilder<AudioCubit, AudioState>(
+                          builder: (context, state) {
+                            // print('audio state update');
+                            // print(state.playlist.first.name);
+                            return Text(
+                              state.currentSongTitle,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.surface,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.chevron_right),
+                          onPressed: () =>
+                              context.read<AudioCubit>().nextSong(),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 15),
                 ],

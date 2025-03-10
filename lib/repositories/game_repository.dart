@@ -218,7 +218,7 @@ class GameRepository {
     var rando = const Player(
       id: 'rando-cardrissian',
       name: "Rando Cardrissian",
-      avatarUrl: null,
+      // avatarUrl: null,
       isRandoCardrissian: true,
     );
 

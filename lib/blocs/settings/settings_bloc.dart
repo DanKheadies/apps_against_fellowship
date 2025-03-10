@@ -54,22 +54,24 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
   /// lifecycle (e.g. suspend app) and to settings changes (e.g. mute sound).
   // Note: seems to always go (leaving app) inactive > hidden > paused;
   // then (returning to app) hidden > inactive > resumed
+  // Update: for web it's just inactive, then resumed
   void handleAppLifecycle() {
     switch (_appLifecycleNotifier.value) {
       case AppLifecycleState.paused:
-      // print('app paused');
+        print('app paused');
       case AppLifecycleState.detached:
-      // print('app detached');
+        print('app detached');
       case AppLifecycleState.hidden:
-        // print('app hidden');
+        print('app hidden');
         _audioCubit.stopAllSound();
       case AppLifecycleState.resumed:
-        // print('app resumed');
+        print('app resumed');
         if (state.hasUser && state.hasAudioOn && state.hasMusicOn) {
           _audioCubit.startOrResumeMusic();
         }
       case AppLifecycleState.inactive:
-        // print('app inactive');
+        print('app inactive');
+        _audioCubit.stopAllSound();
         break;
     }
   }

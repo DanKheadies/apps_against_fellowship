@@ -81,12 +81,12 @@ class _GamePlayScreenState extends State<GamePlayScreen> {
           return current.game.turn?.winner != previous.game.turn?.winner;
         },
         listener: (context, state) {
-          print('game state update');
+          // print('game state update');
           var turnWinner = state.game.turn?.winner;
-          print('turnWinner id: ${turnWinner?.playerId}');
+          // print('turnWinner id: ${turnWinner?.playerId}');
           if (turnWinner != null && turnWinner != TurnWinner.emptyTurnWinner) {
-            print('gonna show, but prob don\'t have players loaded yet');
-            print(state.players.length);
+            // print('gonna show, but prob don\'t have players loaded yet');
+            // print(state.players.length);
             _showWinnerBottomSheet(context, state);
           }
         },

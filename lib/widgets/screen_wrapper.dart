@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-/// Controls
+/// Controls the overall UX / UI for consistency across screens as well as
+/// handling authentication access and navigation.
 class ScreenWrapper extends StatelessWidget {
   final AppBar? customAppBar;
   final bool? avoidLongPressThemeChange;
@@ -38,22 +39,9 @@ class ScreenWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('build wrapper for $screen');
-    // TODO: upgrade to multibloc listener and combine into AppsAF (?).
-    // Let this be "purely" a way to deliver consistent UI / widget look n feel.
-    // Let AppsAF handle all logic actions, e.g. authentication, app state, etc.
-    // Update: nope we need info on GoRouter context to make the nav work.
-    // We supply it at the time of MaterialApp.router instantiation, not before.
-    // In other words, can't work on AppsAF b/c there's no info when we call it.
-    // Can keep here...
+    // print('build wrapper for $screen');
     return BlocListener<AuthBloc, AuthState>(
-      // TODO: listenWhen status changes or authUser (?)
-      // Updating a profile pic triggers this atm; not the goal.
       listener: (context, state) => authenticationNavigator(context, state),
-      // listener: (context, state) => print('derp'),
-      // Note: passing this state is stale in AuthHav, but context.read<>
-      // is up-to-date. Keeping for listener, but odd...
-      // TOOD: see ii-CC about hasSubscription for notifications
       child: Title(
         title: screen,
         color: Colors.purpleAccent,
@@ -87,11 +75,6 @@ class ScreenWrapper extends StatelessWidget {
               ? child
               : InkWell(
                   onLongPress: () {
-                    // context.read<UserBloc>().add(
-                    //       const UpdateTheme(
-                    //         updateFirebase: false,
-                    //       ),
-                    //     );
                     context.read<DeviceCubit>().toggleTheme();
                   },
                   child: child,

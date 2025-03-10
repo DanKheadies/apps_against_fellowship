@@ -32,6 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _userBloc = userBloc,
         _userRepository = userRepository,
         super(const AuthState()) {
+    // on<Derp>(_onDerp);
     on<AuthUserChanged>(_onAuthUserChanged);
     on<AuthGoogleUserChanged>(_onAuthGoogleUserChanged);
     // on<LoginWithApple>(_onLoginWithApple); // TODO: https://pub.dev/packages/sign_in_with_apple
@@ -46,6 +47,39 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     _setupAuthSubscriptions();
   }
+
+  // Note: it appears you can't "devert" an optional paramter to null with
+  // copyWith(). It defaults to the "other" value (derp..).
+  // Once it's been assigned, the only way to rever to "null" is to initialize
+  // aka create a null state.
+  // TODO: initialize the state back to starting on a sign-out
+  // TODO: verify this "fixes" the subscription issue and handles the settings /
+  // audio issue
+  // TODO: find all instances of copyWith that try to set a null value and remove
+  // or at least "fix" for the appropriate response
+
+  // void _onDerp(
+  //   Derp event,
+  //   Emitter<AuthState> emit,
+  // ) {
+  //   print('derp');
+  //   // print('has authUser: ${state.authUser == null ? "false" : "true"}');
+  //   print('derp: ${state.derp}');
+  //   emit(
+  //     // state.copyWith(
+  //     //   // authUser: null,
+  //     //   derp: null,
+  //     // ),
+  //     state.initialize(),
+  //   );
+  //   // print('has authUser: ${state.authUser == null ? "false" : "true"}');
+  //   print('derp: ${state.derp}');
+  //   // print('but the sub (?)');
+  //   // if (state.authUser != null) {
+  //   //   print('here she is..');
+  //   //   print(state.authUser);
+  //   // }
+  // }
 
   void _setupAuthSubscriptions() {
     _authUserSubscription = _authRepository.user.listen((authUser) {
@@ -68,6 +102,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               ),
             );
 
+            // Issue: authUser isn't nulling out on a SignOut, so this doesn't
+            // run again
+            // Update: seems like this will derp..
             if (state.authUser == null) {
               print('update state & CheckForUser');
               add(
@@ -136,6 +173,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         errorMessage: '',
         // lastUpdate: DateTime.now(),
         status: AuthStatus.authenticated,
+        derp: "hasUser",
       ),
     );
   }
@@ -171,22 +209,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } else {
         print('nope');
         emit(
-          state.copyWith(
-            authUser: null,
-            errorMessage: 'Google validation failed. Please try again.',
-            // errorMessage: '',
-            status: AuthStatus.unauthenticated,
-          ),
+          // state.copyWith(
+          //   authUser: null,
+          //   errorMessage: 'Google validation failed. Please try again.',
+          //   // errorMessage: '',
+          //   status: AuthStatus.unauthenticated,
+          // ),
+          state.initialize().copyWith(
+                errorMessage: 'Google validation failed. Please try again.',
+                status: AuthStatus.unauthenticated,
+              ),
         );
       }
     } catch (err) {
       print('login (google) error: $err');
       emit(
-        state.copyWith(
-          authUser: null,
-          errorMessage: err.toString(),
-          status: AuthStatus.unauthenticated,
-        ),
+        // state.copyWith(
+        //   authUser: null,
+        //   errorMessage: err.toString(),
+        //   status: AuthStatus.unauthenticated,
+        // ),
+        state.initialize().copyWith(
+              errorMessage: err.toString(),
+              status: AuthStatus.unauthenticated,
+            ),
       );
     }
   }
@@ -237,11 +283,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           ? 'The email and password combination are invalid. Please double check and try again.'
           : err.toString();
       emit(
-        state.copyWith(
-          authUser: null,
-          errorMessage: errorMessage,
-          status: AuthStatus.unauthenticated,
-        ),
+        // state.copyWith(
+        //   authUser: null,
+        //   errorMessage: errorMessage,
+        //   status: AuthStatus.unauthenticated,
+        // ),
+        state.initialize().copyWith(
+              errorMessage: errorMessage,
+              status: AuthStatus.unauthenticated,
+            ),
       );
     }
   }
@@ -282,11 +332,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (err) {
       print('login (google) error: $err');
       emit(
-        state.copyWith(
-          authUser: null,
-          errorMessage: err.toString(),
-          status: AuthStatus.unauthenticated,
-        ),
+        // state.copyWith(
+        //   authUser: null,
+        //   errorMessage: err.toString(),
+        //   status: AuthStatus.unauthenticated,
+        // ),
+        state.initialize().copyWith(
+              errorMessage: err.toString(),
+              status: AuthStatus.unauthenticated,
+            ),
       );
     }
   }
@@ -352,11 +406,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (err) {
       print('register anon error: $err');
       emit(
-        state.copyWith(
-          authUser: null,
-          errorMessage: err.toString(),
-          status: AuthStatus.unauthenticated,
-        ),
+        // state.copyWith(
+        //   authUser: null,
+        //   errorMessage: err.toString(),
+        //   status: AuthStatus.unauthenticated,
+        // ),
+        state.initialize().copyWith(
+              errorMessage: err.toString(),
+              status: AuthStatus.unauthenticated,
+            ),
       );
     }
   }
@@ -401,11 +459,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (err) {
       print('register error: $err');
       emit(
-        state.copyWith(
-          authUser: null,
-          errorMessage: err.toString(),
-          status: AuthStatus.unauthenticated,
-        ),
+        // state.copyWith(
+        //   authUser: null,
+        //   errorMessage: err.toString(),
+        //   status: AuthStatus.unauthenticated,
+        // ),
+        state.initialize().copyWith(
+              errorMessage: err.toString(),
+              status: AuthStatus.unauthenticated,
+            ),
       );
     }
   }
@@ -483,24 +545,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // _homeBloc.close();
 
       // TODO: authUser isn't being nulled out on SignOut. The status is updating
-      // correctly, but 
-      print('authUser should be null');
+      // correctly, but the parameter doesn't reset. Currently checking authUser
+      // in the Subscription (User) to udpate authUser and reset / start music.
+      print('authUser should be null..');
       emit(
-        state.copyWith(
-          authUser: null, // TODO: this isn't nulling out the authUser (?)
-          errorMessage: '',
-          status: AuthStatus.unauthenticated,
-        ),
+        state.initialize().copyWith(
+              errorMessage: '',
+              status: AuthStatus.unauthenticated,
+            ),
       );
-      print(state.authUser);
     } catch (err) {
       print('sign out error: $err');
       emit(
-        state.copyWith(
-          authUser: null,
-          errorMessage: err.toString(),
-          status: AuthStatus.unauthenticated,
-        ),
+        state.initialize().copyWith(
+              errorMessage: err.toString(),
+              status: AuthStatus.unauthenticated,
+            ),
       );
     }
   }
@@ -515,14 +575,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _userSubscription = null;
     return super.close();
   }
-
-  // @override
-  // AuthState? fromJson(Map<String, dynamic> json) {
-  //   return AuthState.fromJson(json);
-  // }
-
-  // @override
-  // Map<String, dynamic>? toJson(AuthState state) {
-  //   return state.toJson();
-  // }
 }

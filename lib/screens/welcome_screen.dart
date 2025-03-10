@@ -72,9 +72,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    print('build welcome screen');
+    // print('build welcome screen');
     return BlocListener<AuthBloc, AuthState>(
-      // listener: (context, state) => _handleError(state, context),
       listener: _handleError,
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
@@ -251,9 +250,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               // : () => print(
                               //       'have authUser: ${context.read<AuthBloc>().state.authUser != null ? 'true' : 'false'}',
                               //     ),
-                              : () => print(context
-                                  .read<AuthBloc>()
-                                  .state), // TODO: revert
+                              : () => print(
+                                    context.read<AuthBloc>().state,
+                                  ), // TODO: revert
                         ),
                       ),
                     ),

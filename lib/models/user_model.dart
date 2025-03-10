@@ -4,7 +4,6 @@ import 'package:equatable/equatable.dart';
 class User extends Equatable {
   final bool acceptedTerms;
   final bool developerPackEnabled;
-  // final bool isDarkTheme;
   final DateTime? updatedAt;
   final int? playerLimit;
   final int? prizesToWin;
@@ -22,7 +21,6 @@ class User extends Equatable {
     required this.deviceId,
     required this.email,
     required this.id,
-    // required this.isDarkTheme,
     required this.name,
     this.playerLimit,
     this.prizesToWin,
@@ -38,7 +36,6 @@ class User extends Equatable {
         deviceId,
         email,
         id,
-        // isDarkTheme,
         name,
         playerLimit,
         prizesToWin,
@@ -67,7 +64,6 @@ class User extends Equatable {
       deviceId: deviceId ?? this.deviceId,
       email: email ?? this.email,
       id: id ?? this.id,
-      // isDarkTheme: isDarkTheme ?? this.isDarkTheme,
       name: name ?? this.name,
       playerLimit: playerLimit ?? this.playerLimit,
       prizesToWin: prizesToWin ?? this.prizesToWin,
@@ -88,7 +84,6 @@ class User extends Equatable {
       deviceId: json['deviceId'] ?? '',
       email: json['email'] ?? '',
       id: json['id'] ?? '',
-      // isDarkTheme: json['isDarkTheme'] ?? false,
       name: json['name'] ?? '',
       playerLimit: json['playerLimit'],
       prizesToWin: json['prizesToWin'],
@@ -103,11 +98,6 @@ class User extends Equatable {
         ? (data['updatedAt'] as Timestamp).toDate()
         : DateTime.now();
 
-    // return User.fromJson(data).copyWith(
-    //   id: snap.id,
-    //   updatedAt: updatedTime,
-    // );
-
     return User(
       acceptedTerms: data['acceptedTerms'] ?? false,
       avatarUrl: data['avatarUrl'] ?? '',
@@ -115,7 +105,6 @@ class User extends Equatable {
       deviceId: data['deviceId'] ?? '',
       email: data['email'] ?? '',
       id: snap.id,
-      // isDarkTheme: data['isDarkTheme'] ?? false,
       name: data['name'] ?? '',
       playerLimit: data['playerLimit'],
       prizesToWin: data['prizesToWin'],
@@ -136,7 +125,6 @@ class User extends Equatable {
       'deviceId': deviceId,
       'email': email,
       'id': id,
-      // 'isDarkTheme': isDarkTheme,
       'name': name,
       'playerLimit': playerLimit,
       'prizesToWin': prizesToWin,
@@ -152,7 +140,6 @@ class User extends Equatable {
     deviceId: '',
     email: '',
     id: '',
-    // isDarkTheme: false,
     name: '',
   );
 }

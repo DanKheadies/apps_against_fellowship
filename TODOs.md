@@ -13,4 +13,5 @@
 12. Analytics
 13. README steps to rebuild (?)
 14. Admin panel (CRUD cards, maintain on new import)
-15. Tunes
+15. Tunes (DONE)
+16. Models refactor (see god)

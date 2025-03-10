@@ -25,25 +25,25 @@ class DeviceCubit extends HydratedCubit<DeviceState> {
     print('dev cubit check and update');
     // String? token = await _firebaseMessaging.getAPNSToken(); // TBD
     // TODO: need to configure Firebase, iOS, and Android first
-    // String? token = await _firebaseMessaging.getToken(); // TODO: web (?)
-    // print('token: $token');
-    // if ((token != null && token != state.token) || force) {
-    //   print('FCM Token is different from what is stored, updating device...');
-    //   try {
-    //     _deviceRepository.updatePushToken(
-    //       deviceId: state.deviceId,
-    //       token: token!,
-    //     );
+    String? token = await _firebaseMessaging.getToken(); // TODO: web (?)
+    print('token: $token');
+    if ((token != null && token != state.token) || force) {
+      print('FCM Token is different from what is stored, updating device...');
+      try {
+        _deviceRepository.updatePushToken(
+          deviceId: state.deviceId,
+          token: token!,
+        );
 
-    //     emit(
-    //       state.copyWith(
-    //         token: token,
-    //       ),
-    //     );
-    //   } catch (err) {
-    //     print('update token error: $err');
-    //   }
-    // }
+        emit(
+          state.copyWith(
+            token: token,
+          ),
+        );
+      } catch (err) {
+        print('update token error: $err');
+      }
+    }
   }
 
   // Note: moved to FirebaseNotifications file
@@ -58,6 +58,7 @@ class DeviceCubit extends HydratedCubit<DeviceState> {
   // }
 
   void setup() {
+    // Note: currently not being called; is main.dart the right place to init (?)
     print('dev cubit setup');
     // Setup firebase messaging
     _tokenSubscription = _firebaseMessaging.onTokenRefresh.listen((token) {
@@ -83,8 +84,6 @@ class DeviceCubit extends HydratedCubit<DeviceState> {
   }
 
   void toggleTheme() {
-    print('devCub - update theme');
-
     emit(
       state.copyWith(
         isDarkTheme: !state.isDarkTheme,

@@ -66,8 +66,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     emit(
       state.copyWith(
         selectedCards: [],
-        // error: 'Test error',
-        // gameStateStatus: GameStateStatus.error,
       ),
     );
   }
@@ -114,11 +112,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     DownvotesUpdated event,
     Emitter<GameState> emit,
   ) {
-    // print('g2g3');
     emit(
       state.copyWith(
         downvotes: event.downvotes,
-        // gameStateStatus: GameStateStatus.goodToGo, // TODO
       ),
     );
   }
@@ -130,10 +126,6 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     emit(
       state.copyWith(
         game: event.game,
-        // gameStateStatus: GameStateStatus.goodToGo, // TODO
-        // Note: if we don't g2g here, the sub can crunching and eventually
-        // get the players, which we can trigger as g2g. Not sure if that's
-        // ideal, but lets try it.
       ),
     );
   }
@@ -314,14 +306,8 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     PlayersUpdated event,
     Emitter<GameState> emit,
   ) {
-    // for (var player in event.players) {
-    //   print(player.id);
-    //   print(player.isInactive);
-    // }
-    print(_userBloc.state.user.id);
     if (event.players.any((player) =>
         player.id == _userBloc.state.user.id && player.isInactive)) {
-      // print('we were kicked; leave game');
       emit(
         state.copyWith(
           kickingPlayerId: _userBloc.state.user.id,
@@ -528,9 +514,9 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     Emitter<GameState> emit,
     GameStateStatus status,
   ) {
-    print('check for $status');
+    // print('check for $status');
     if (state.gameStateStatus == status) return;
-    print('emitting: $status');
+    // print('emitting: $status');
     emit(
       state.copyWith(
         gameStateStatus: status,

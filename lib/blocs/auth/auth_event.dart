@@ -7,6 +7,8 @@ abstract class AuthEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+// class Derp extends AuthEvent {}
+
 class AuthUserChanged extends AuthEvent {
   final auth.User? authUser;
 

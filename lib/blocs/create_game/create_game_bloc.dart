@@ -145,7 +145,7 @@ class CreateGameBloc extends Bloc<CreateGameEvent, CreateGameState> {
     emit(
       state.copyWith(
         createGameStatus: CreateGameStatus.loading,
-        error: null,
+        error: '',
       ),
     );
 

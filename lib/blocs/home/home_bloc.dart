@@ -28,6 +28,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<UserUpdatedViaHome>(_onUserUpdatedViaHome);
 
     // TODO: need to kick this to the curb when I sign out
+    // Update: we're calling out HomeBloc.close() where the SignOut call is
+    // made, but it would be smarter to call it in AuthBloc's SignOut.
     _joinedGamesSubscription = _gameRepository
         .observeJoinedGames(_userBloc.state.user)
         .listen((event) {
@@ -39,19 +41,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       );
     });
   }
-
-  // void _onHomeStarted(
-  //   HomeStarted event,
-  //   Emitter<HomeState> emit,
-  // ) async {
-  //   // TODO: see if a user sub and joinedGame sub are necessary
-  //   try {
-  //     _userSubscription?.cancel();
-  //     _userSubscription = _userRepository.
-  //   } catch (err) {
-  //     Logger().e('Error on home start: $err');
-  //   }
-  // }
 
   void _onJoinGame(
     JoinGame event,
@@ -80,13 +69,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         ),
       );
     } catch (err) {
-      // print('home bloc: err joining game: $err');
-      // TODO: Append the error message at all?
       emit(
         state.copyWith(
           error: '$err',
           isLoading: false,
-          // joinedGame: null,
           joiningGame: '',
         ),
       );
@@ -113,7 +99,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     try {
       emit(
         state.copyWith(
-          // isLoading: true,
           games: state.games..remove(event.game),
           leavingGame: event.game,
         ),
@@ -126,16 +111,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
       emit(
         state.copyWith(
-          // isLoading: false,
-          leavingGame: null,
+          // leavingGame: null,
+          leavingGame: UserGame.emptyUserGame,
         ),
       );
     } catch (err) {
       print('home bloc: leave game err: $err');
       emit(
         state.copyWith(
-          // isLoading: false,
-          leavingGame: null,
+          // leavingGame: null,
+          leavingGame: UserGame.emptyUserGame,
         ),
       );
     }

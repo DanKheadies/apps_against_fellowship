@@ -13,12 +13,14 @@ class AudioState extends Equatable {
   final double musicVolume;
   final int currentSfxPlayer;
   final List<AudioPlayer> sfxPlayers;
+  final String currentSongTitle;
   final String musicPlayerId;
   final Queue<Song> playlist;
 
   const AudioState({
     required this.audioStatus,
     this.currentSfxPlayer = 0,
+    required this.currentSongTitle,
     required this.musicPlayer,
     required this.musicPlayerId,
     required this.musicVolume,
@@ -30,6 +32,7 @@ class AudioState extends Equatable {
   List<Object> get props => [
         audioStatus,
         currentSfxPlayer,
+        currentSongTitle,
         musicPlayer,
         musicPlayerId,
         musicVolume,
@@ -39,15 +42,17 @@ class AudioState extends Equatable {
 
   factory AudioState.initial() {
     String musicPlayerId = UuidV4().generate();
+    List<Song> songList = List<Song>.of(songs)..shuffle();
+    Queue<Song> playlist = Queue.of(songList);
     return AudioState(
       audioStatus: AudioStatus.intial,
+      currentSongTitle: playlist.first.name,
       musicPlayer: AudioPlayer(
-        // playerId: 'musicPlayer', // TODO: need a randomized id for Hot Restart
-        playerId: musicPlayerId,
+        playerId: musicPlayerId, // Need a randomized id for Hot Restart
       ),
       musicPlayerId: musicPlayerId,
       musicVolume: 0.5,
-      playlist: Queue.of(List<Song>.of(songs)..shuffle),
+      playlist: playlist,
       sfxPlayers: Iterable.generate(
         2,
         (i) => AudioPlayer(
@@ -63,12 +68,14 @@ class AudioState extends Equatable {
     double? musicVolume,
     int? currentSfxPlayer,
     List<AudioPlayer>? sfxPlayers,
+    String? currentSongTitle,
     String? musicPlayerId,
     Queue<Song>? playlist,
   }) {
     return AudioState(
       audioStatus: audioStatus ?? this.audioStatus,
       currentSfxPlayer: currentSfxPlayer ?? this.currentSfxPlayer,
+      currentSongTitle: currentSongTitle ?? this.currentSongTitle,
       musicPlayer: musicPlayer ?? this.musicPlayer,
       musicPlayerId: musicPlayerId ?? this.musicPlayerId,
       musicVolume: musicVolume ?? this.musicVolume,

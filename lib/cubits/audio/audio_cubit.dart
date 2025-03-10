@@ -8,7 +8,6 @@ import 'package:apps_against_fellowship/models/models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/v4.dart';
-// import 'pakcage:just_audio/just_audio.dart';
 // import 'package:logging/logging.dart';
 
 part 'audio_state.dart';
@@ -21,11 +20,15 @@ class AudioCubit extends Cubit<AudioState> {
   Future<void> playCurrentSongInPlaylist() async {
     // log.info('Playing ${state.playlist.first} now.');
     print('Playing ${state.playlist.first} now.');
-    // print(state.playlist.first.filename);
     try {
       await state.musicPlayer.play(
         AssetSource(
           'music/${state.playlist.first.filename}',
+        ),
+      );
+      emit(
+        state.copyWith(
+          currentSongTitle: state.playlist.first.name,
         ),
       );
     } catch (err) {
@@ -36,6 +39,20 @@ class AudioCubit extends Cubit<AudioState> {
       print('Could not play song ${state.playlist.first}');
       print(err);
     }
+  }
+
+  void prevSong() {
+    print('play prev song');
+    state.musicPlayer.stop();
+    state.playlist.addFirst(state.playlist.removeLast());
+    playCurrentSongInPlaylist();
+  }
+
+  void nextSong() {
+    print('play next song');
+    state.musicPlayer.stop();
+    state.playlist.addLast(state.playlist.removeFirst());
+    playCurrentSongInPlaylist();
   }
 
   Future<void> preloadSfx() async {
@@ -49,49 +66,28 @@ class AudioCubit extends Cubit<AudioState> {
     );
   }
 
+  // Gets and returns musicPlayerIds to release current running audio players
+  // via Hot Restart/Load.
+  // Note: if on web and changing / restarting before music can pause,
+  // the music player will continue and a full restart is required.
   String initializeAudio(String previousMusicPlayerId) {
-    print('initializing audio');
-    print('releasing music player: $previousMusicPlayerId');
-    // TODO: Release any current running audio players for Hot Restart/Load
-    // AudioPlayer(playerId: previousMusicPlayerId).release();
+    // print('initializing audio');
+    // print('releasing music player: $previousMusicPlayerId');
     releaseMusicPlayer(previousMusicPlayerId);
 
     // log.info('Initialize music repeat.');
-    print('Initialize music repeat.');
+    // print('Initialize music repeat.');
     state.musicPlayer.onPlayerComplete.listen(handleSongFinished);
-    // state.musicPlayer.
-    // playCurrentSongInPlaylist();
     unawaited(preloadSfx());
 
-    print('returning music player: ${state.musicPlayerId}');
+    // print('returning music player: ${state.musicPlayerId}');
     return state.musicPlayerId;
   }
 
   void handleSongFinished(void _) {
     // log.info('Last song finished playing.');
-    print('Last song finished playing.');
-    // print(state.playlist.length);
-    // print(state.playlist);
-    // Note: issue w/ this logic, it's like the songs are getting deleted
-    // The playlist updates accordingly, but the music player can't play the
-    // asset...
-    // state.playlist.addLast(state.playlist.removeFirst());
-    // Update: interesting... it only runs twice, even with this gone.
-    // Gonna check and see what happens w/ DUC.
-    // Technically, it only has 1 song that repeats, so that might have
-    // something to do with it.. More to dig into. Hmmm... DUC stopped after
-    // the ~5th time playing. I could manually restart it, but didn't get the
-    // stream error. Second test ran for ~10 times before going quiet. Something
-    // is there...
-    // print(state.playlist.length);
-    // print(state.playlist);
+    // print('Last song finished playing.');
     state.playlist.addLast(state.playlist.removeFirst());
-    // print('Now first in the list: ${state.playlist.first.name}');
-    // Update: yup by initializing the audio cubit once, from the get-go, i.e.
-    // calling SettingsBloc in AppsAF rather than on a specific screen,
-    // the songs continue to cycle thru the playlist as expected.
-    // TODO: figure a way to NOT play music until there's a user, but still
-    // setup the stream.
     playCurrentSongInPlaylist();
   }
 
@@ -147,19 +143,21 @@ class AudioCubit extends Cubit<AudioState> {
     );
   }
 
+  // TODO: (on web at least) the song starts from the beginning when you nav
+  // away and come back; might need to track a duration /
   void startOrResumeMusic() async {
-    print('start or resume');
+    // print('start or resume');
     if (state.musicPlayer.source == null) {
       // log.info('No music source set. '
       //     'Start playing the current song in playlist.');
-      print('No music source set. '
-          'Start playing the current song in playlist.');
+      // print('No music source set. '
+      //     'Start playing the current song in playlist.');
       await playCurrentSongInPlaylist();
       return;
     }
 
     // log.info('Resuming paused music.');
-    print('Resuming paused music.');
+    // print('Resuming paused music.');
     try {
       state.musicPlayer.resume();
     } catch (err) {

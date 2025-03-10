@@ -40,13 +40,10 @@ class DeviceState extends Equatable {
   }
 
   factory DeviceState.fromJson(Map<String, dynamic> json) {
-    print('devState fromJson');
     String devId = json['deviceId'] == null || json['deviceId'] == ''
-        // || json['deviceId'] == "Instance of 'UuidV4'"
         ? UuidV4().generate()
         : json['deviceId'];
-    // print(json);
-    print('devId: $devId');
+    // print('devId: $devId');
 
     return DeviceState(
       deviceId: devId,

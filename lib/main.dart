@@ -46,29 +46,9 @@ Future<void> main() async {
 
   SystemChannels.textInput.invokeMethod('TextInput.hide');
 
-  // TODO (?)
   // Setup Push Notifications
-  // Note: should initizlie when the cubit does. We'll see if that's a problem..
-  // Can't seem to wire up the cubit as a "start-up" call. Going to implment
-  // the "current" way to handle Firebase Messaging
   // TODO
   // FirebaseMessaging.onBackgroundMessage(backgroundHandler);
-  // Note: need to activate the Notifictions TODOs via ii-CC
-  // Note: initializing a function here in the MultiBloc provider, i.e. ..init(),
-  // won't trigger until the bloc is called, i.e. BlocBuilder, etc.
-  // Once it's called, the function here and anything in the constructors workflow
-  // will trigger, i.e. { init(); }
-  // This is useful to run DeviceCubit and get token updates.
-  // Note: AudioCubit initializes (successfully?) when the subsequent cubit/bloc
-  // references it in the Multi hierarchy. Perhaps I should look to have
-  // UsersBloc make a call to it and get the device info for the user?
-  // Update: Yea DeviceCubit & AudioCubit don't kick off unless something calls
-  // for them to be used. The Hydration runs (?)
-  // Current guess: I'm serving up the flow of Blocs, Cubits, and Repos here.
-  // It's not until I call them in some way, e.g. BlocBuilder, Listener, etc.,
-  // that they come "online" and do stuff. So, how to best structure this so
-  // that things like Device & Audio start from the get-go, but don't overload
-  // or cause unnecessary rebuilds.
 
   // Bloc.observer = SimpleBlocObserver(); // Same as LoggingBlocDelegate
 
@@ -139,7 +119,7 @@ class AppsAgainstFellowship extends StatelessWidget {
             providers: [
               // Needed for Auth (TBC)
               BlocProvider(
-                create: (context) => AudioCubit(), //..initializeAudio(),
+                create: (context) => AudioCubit(),
               ),
               // Needed for Auth
               BlocProvider(
@@ -148,7 +128,7 @@ class AppsAgainstFellowship extends StatelessWidget {
               BlocProvider(
                 create: (context) => DeviceCubit(
                   deviceRepository: context.read<DeviceRepository>(),
-                  // )..setup(),
+                  // )..setup(), // TBD if this is the right spot
                 ),
               ),
               // Needed for Auth (TBC)
@@ -162,9 +142,6 @@ class AppsAgainstFellowship extends StatelessWidget {
               // Needed for Auth
               BlocProvider(
                 create: (context) => UserBloc(
-                  // audioCubit: context.read<AudioCubit>(),
-                  // deviceCubit: context.read<DeviceCubit>(),
-                  // settingsBloc: context.read<SettingsBloc>(),
                   storageRepository: context.read<StorageRepository>(),
                   userRepository: context.read<UserRepository>(),
                 ),
