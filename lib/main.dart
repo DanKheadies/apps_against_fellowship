@@ -52,6 +52,8 @@ Future<void> main() async {
 
   // Bloc.observer = SimpleBlocObserver(); // Same as LoggingBlocDelegate
 
+  // Google for Web
+
   runApp(const AppsAgainstFellowship());
 }
 
@@ -60,29 +62,10 @@ class AppsAgainstFellowship extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Setup ALO to track app state and initialize the provider tree.
-    // TODO: while setting up a ProviderTree does work, it might be more
-    // cumbersome than anything. The previous "smaller" bloc approach lets us
-    // call the necessary provides only where needed. In a hydrated approach,
-    // this should save on unnecessary setup, e.g. card cache cubit.
-    // At a minimum, initializing anything needed for authorization should
-    // remain here as a "core" wrapping. Then in the "MaterialApp.router"
-    // setup, we can handle any other small, app-wide state, e.g. device cubit
-    // and brightness (theme) cubit.
     return AppLifecycleObserver(
       // Initialize card cache
-      // TODO: not sure if I need to do this here. It needs to be initialized so
-      // Create Game Screen can check. I'm wondering if this is the "smaller
-      // blocs" pattern helps, i.e. the only time we use the cache is when we
-      // try to create a new game, so to avoid pulling a bunch of data from the
-      // local storage, wait until we need it.
-      // Update: fixed the Audio issue, and have insights on cloud-permission
-      // issue(s) -> need to close out of all Sub/Streams when I sign-out.
-      // Would be good to include in AuthBloc rather than as an additional call
-      // out in the UI. Including in AuthBloc will require it here and instantiate.
-      // Will basically have all Blocs w/ sub/streams initialized here, which
-      // puts us back to square one--sorta. Would still be smart to slim down
-      // where we can, e.g. CardCacheCubit, CardRepo, GameRepo & Bloc (?), etc.
+      // TODO: Move non-initial Blocs & Repos to their respective areas (?)
+      // Note: this will most likely cause issues that will need to be corrected
       child: BlocProvider(
         create: (context) => CardCacheCubit(),
         child: MultiRepositoryProvider(

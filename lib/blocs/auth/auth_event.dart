@@ -49,16 +49,32 @@ class LoginWithEmailAndPassword extends AuthEvent {
       ];
 }
 
+class LoginWithApple extends AuthEvent {
+  final bool isWeb;
+
+  const LoginWithApple({
+    required this.isWeb,
+  });
+
+  @override
+  List<Object?> get props => [
+        isWeb,
+      ];
+}
+
 class LoginWithGoogle extends AuthEvent {
   final bool isSilent;
+  final bool isWeb;
 
   const LoginWithGoogle({
     this.isSilent = false,
+    this.isWeb = false,
   });
 
   @override
   List<Object?> get props => [
         isSilent,
+        isWeb,
       ];
 }
 

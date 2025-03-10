@@ -18,6 +18,8 @@ class AuthRepository {
   })  : _firebaseAuth = firebaseAuth ?? auth.FirebaseAuth.instance,
         _googleSignIn = googleSignIn ??
             GoogleSignIn(
+              clientId:
+                  '69402188680-uv677skjffo54b39tmsnsmgcn4ed2pcs.apps.googleusercontent.com',
               scopes: ['email'],
             ),
         _userRepository = userRepository;
@@ -55,6 +57,7 @@ class AuthRepository {
   /// Authenticate with Google's service.
   Future<void> loginWithGoogle({
     required bool isSilently,
+    required bool isWeb,
   }) async {
     try {
       // UPDATE: Google on Web is a bit of an issue; we're not even getting to
@@ -82,6 +85,12 @@ class AuthRepository {
       if (isSilently) {
         // account = await _googleSignIn.signInSilently();
         await _googleSignIn.signInSilently();
+      } else if (isWeb) {
+        print('isWeb: ${_googleSignIn.scopes}');
+        // await _googleSignIn.canAccessScopes(_googleSignIn.scopes);
+        final bool isAuthorized =
+            await _googleSignIn.requestScopes(_googleSignIn.scopes);
+        print(isAuthorized);
       } else {
         // account = await _googleSignIn.signIn();
         await _googleSignIn.signIn();

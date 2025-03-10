@@ -7,6 +7,7 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -32,7 +33,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         super(const AuthState()) {
     on<AuthUserChanged>(_onAuthUserChanged);
     on<AuthGoogleUserChanged>(_onAuthGoogleUserChanged);
-    // on<LoginWithApple>(_onLoginWithApple); // TODO: https://pub.dev/packages/sign_in_with_apple
+    on<LoginWithApple>(_onLoginWithApple);
     on<LoginWithLink>(_onLoginWithLink);
     on<LoginWithEmailAndPassword>(_onLoginWithEmailAndPassword);
     on<LoginWithGoogle>(_onLoginWithGoogle);
@@ -43,6 +44,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignOut>(_onSignOut);
 
     _setupAuthSubscriptions();
+  }
+
+  void _checkAndEmit(
+    Emitter<AuthState> emit,
+    AuthStatus status,
+  ) {
+    // print('check for $status');
+    if (state.status == status) return;
+    // print('emitting: $status');
+    emit(
+      state.copyWith(
+        status: status,
+      ),
+    );
   }
 
   void _setupAuthSubscriptions() {
@@ -134,14 +149,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthGoogleUserChanged event,
     Emitter<AuthState> emit,
   ) async {
-    if (state.status == AuthStatus.submitting) return;
-    print('auth google user changed: authenticating');
+    _checkAndEmit(emit, AuthStatus.submitting);
+    // if (state.status == AuthStatus.submitting) return;
+    // print('auth google user changed: authenticating');
 
-    emit(
-      state.copyWith(
-        status: AuthStatus.submitting,
-      ),
-    );
+    // emit(
+    //   state.copyWith(
+    //     status: AuthStatus.submitting,
+    //   ),
+    // );
 
     try {
       var googleUser = await _authRepository.getGoogleUser(
@@ -174,17 +190,46 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  void _onLoginWithApple(
+    LoginWithApple event,
+    Emitter<AuthState> emit,
+  ) async {
+    _checkAndEmit(emit, AuthStatus.submitting);
+
+    try {
+      // final credential = await SignInWithApple.getAppleIDCredential(
+      //   scopes: [
+      //     AppleIDAuthorizationScopes.email,
+      //     AppleIDAuthorizationScopes.fullName,
+      //   ],
+      //   webAuthenticationOptions: WebAuthenticationOptions(
+      //     clientId: clientId,
+      //     redirectUri: redirectUri,
+      //   ),
+      // );
+    } catch (err) {
+      print('login (apple) error: $err');
+      emit(
+        state.initialize().copyWith(
+              errorMessage: err.toString(),
+              status: AuthStatus.unauthenticated,
+            ),
+      );
+    }
+  }
+
   void _onLoginWithEmailAndPassword(
     LoginWithEmailAndPassword event,
     Emitter<AuthState> emit,
   ) async {
-    if (state.status == AuthStatus.submitting) return;
+    _checkAndEmit(emit, AuthStatus.submitting);
+    // if (state.status == AuthStatus.submitting) return;
 
-    emit(
-      state.copyWith(
-        status: AuthStatus.submitting,
-      ),
-    );
+    // emit(
+    //   state.copyWith(
+    //     status: AuthStatus.submitting,
+    //   ),
+    // );
 
     try {
       var authUser = await _authRepository.loginWithEmailAndPassword(
@@ -231,17 +276,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     LoginWithGoogle event,
     Emitter<AuthState> emit,
   ) async {
-    if (state.status == AuthStatus.submitting) return;
-    print('login w/ google');
-    if (event.isSilent) {
-      print('SILENTLY...');
-    }
+    _checkAndEmit(emit, AuthStatus.submitting);
+    // if (state.status == AuthStatus.submitting) return;
+    // print('login w/ google');
+    // if (event.isSilent) {
+    //   print('SILENTLY...');
+    // }
 
-    emit(
-      state.copyWith(
-        status: AuthStatus.submitting,
-      ),
-    );
+    // emit(
+    //   state.copyWith(
+    //     status: AuthStatus.submitting,
+    //   ),
+    // );
 
     // TODO: handle kIsWeb
     // if (!kIsWeb) {
@@ -253,6 +299,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       await _authRepository.loginWithGoogle(
         isSilently: event.isSilent,
+        isWeb: event.isWeb,
       );
 
       emit(
@@ -312,13 +359,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     RegisterAnonymously event,
     Emitter<AuthState> emit,
   ) async {
-    if (state.status == AuthStatus.submitting) return;
+    _checkAndEmit(emit, AuthStatus.submitting);
+    // if (state.status == AuthStatus.submitting) return;
 
-    emit(
-      state.copyWith(
-        status: AuthStatus.submitting,
-      ),
-    );
+    // emit(
+    //   state.copyWith(
+    //     status: AuthStatus.submitting,
+    //   ),
+    // );
 
     try {
       var anonUser = await _authRepository.registerAnonymous();
@@ -344,13 +392,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     RegisterWithEmailAndPassword event,
     Emitter<AuthState> emit,
   ) async {
-    if (state.status == AuthStatus.submitting) return;
+    _checkAndEmit(emit, AuthStatus.submitting);
+    // if (state.status == AuthStatus.submitting) return;
 
-    emit(
-      state.copyWith(
-        status: AuthStatus.submitting,
-      ),
-    );
+    // emit(
+    //   state.copyWith(
+    //     status: AuthStatus.submitting,
+    //   ),
+    // );
 
     try {
       var authUser = await _authRepository.registerUserWithFirebase(
@@ -414,13 +463,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     SignOut event,
     Emitter<AuthState> emit,
   ) async {
-    if (state.status == AuthStatus.submitting) return;
+    _checkAndEmit(emit, AuthStatus.submitting);
+    // if (state.status == AuthStatus.submitting) return;
 
-    emit(
-      state.copyWith(
-        status: AuthStatus.submitting,
-      ),
-    );
+    // emit(
+    //   state.copyWith(
+    //     status: AuthStatus.submitting,
+    //   ),
+    // );
 
     try {
       await _authRepository.signOut();

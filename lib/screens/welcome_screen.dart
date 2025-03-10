@@ -7,8 +7,9 @@ import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:google_sign_in_web/web_only.dart' as web;
+import 'package:google_sign_in_web/web_only.dart' as web;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 enum AuthMethod {
   login,
@@ -52,12 +53,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     buttOpacTimer;
     titleOpacTimer;
 
-    // TODO: is this the right place (?)
     if (!kIsWeb) {
       context.read<AuthBloc>().add(
             LoginWithGoogle(isSilent: true),
-            // LoginWithGoogleSilently(),
-            // SignOut(),
           );
     }
   }
@@ -79,7 +77,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         builder: (context, state) {
           if (state.status == AuthStatus.submitting) {
             return ScreenWrapper(
-              screen: 'AAF Welcome',
+              screen: 'Apps AF',
               hideAppBar: true,
               child: Center(
                 child: CircularProgressIndicator(),
@@ -87,7 +85,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             );
           } else if (state.status == AuthStatus.authenticated) {
             return ScreenWrapper(
-              screen: 'AAF Welcome',
+              screen: 'Apps AF',
               hideAppBar: true,
               child: Center(
                 child: GestureDetector(
@@ -112,7 +110,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                   ? 'Login'
                   : method == AuthMethod.register
                       ? 'Register'
-                      : 'AAF Welcome',
+                      : 'Apps AF',
               hideAppBar: method == AuthMethod.tbd,
               goBackTo: 'welcome',
               specialBack: () => setState(() {
@@ -238,51 +236,51 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       child: Center(
                         child: HomeOutlineButton(
                           icon: Icon(
-                            MdiIcons.logout,
+                            MdiIcons.apple,
                             color: Theme.of(context).colorScheme.primary,
                           ),
-                          text: 'Sign Out',
+                          text: 'Apple',
                           onTap: buttOpacTimer.isActive
                               ? null
                               : () => context.read<AuthBloc>().add(
-                                    SignOut(),
+                                    LoginWithApple(isWeb: kIsWeb),
                                   ),
                         ),
                       ),
                     ),
                   ),
                 ),
-                // TODO: add Apple auth (and then Apple auth for web)
-                kIsWeb
-                    ? const SizedBox()
-                    : Positioned(
-                        top: size.height / 2 + 25,
-                        left: 0,
-                        child: AnimatedOpacity(
-                          opacity: buttonOpacity,
-                          duration: const Duration(seconds: 1),
-                          child: SizedBox(
-                            width: size.width,
-                            child: Center(
-                              child:
-                                  // TODO: add Google sign-in for web
-                                  // kIsWeb ? web.renderButton() :
-                                  HomeOutlineButton(
-                                icon: Icon(
-                                  MdiIcons.google,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                text: 'Google',
-                                onTap: buttOpacTimer.isActive
-                                    ? null
-                                    : () => context.read<AuthBloc>().add(
-                                          LoginWithGoogle(),
-                                        ),
-                              ),
-                            ),
-                          ),
-                        ),
+                Positioned(
+                  top: size.height / 2 + 25,
+                  left: 0,
+                  child: AnimatedOpacity(
+                    opacity: buttonOpacity,
+                    duration: const Duration(seconds: 1),
+                    child: SizedBox(
+                      width: size.width,
+                      child: Center(
+                        child:
+                            // TODO: finish Google sign-in for web
+                            // Still having issues w/ authorization; TBContinued
+                            kIsWeb
+                                ? web.renderButton()
+                                : HomeOutlineButton(
+                                    icon: Icon(
+                                      MdiIcons.google,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    text: 'Google',
+                                    onTap: buttOpacTimer.isActive
+                                        ? null
+                                        : () => context.read<AuthBloc>().add(
+                                              LoginWithGoogle(isWeb: kIsWeb),
+                                            ),
+                                  ),
                       ),
+                    ),
+                  ),
+                ),
                 Positioned(
                   top: size.height / 2 + 100,
                   left: 0,
