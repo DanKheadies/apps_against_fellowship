@@ -5,14 +5,12 @@ import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
-// import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
-// class AuthBloc extends HydratedBloc<AuthEvent, AuthState> {
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
   final SettingsBloc _settingsBloc;
@@ -32,7 +30,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _userBloc = userBloc,
         _userRepository = userRepository,
         super(const AuthState()) {
-    // on<Derp>(_onDerp);
     on<AuthUserChanged>(_onAuthUserChanged);
     on<AuthGoogleUserChanged>(_onAuthGoogleUserChanged);
     // on<LoginWithApple>(_onLoginWithApple); // TODO: https://pub.dev/packages/sign_in_with_apple
@@ -48,53 +45,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _setupAuthSubscriptions();
   }
 
-  // Note: it appears you can't "devert" an optional paramter to null with
-  // copyWith(). It defaults to the "other" value (derp..).
-  // Once it's been assigned, the only way to rever to "null" is to initialize
-  // aka create a null state.
-  // TODO: initialize the state back to starting on a sign-out
-  // TODO: verify this "fixes" the subscription issue and handles the settings /
-  // audio issue
-  // TODO: find all instances of copyWith that try to set a null value and remove
-  // or at least "fix" for the appropriate response
-
-  // void _onDerp(
-  //   Derp event,
-  //   Emitter<AuthState> emit,
-  // ) {
-  //   print('derp');
-  //   // print('has authUser: ${state.authUser == null ? "false" : "true"}');
-  //   print('derp: ${state.derp}');
-  //   emit(
-  //     // state.copyWith(
-  //     //   // authUser: null,
-  //     //   derp: null,
-  //     // ),
-  //     state.initialize(),
-  //   );
-  //   // print('has authUser: ${state.authUser == null ? "false" : "true"}');
-  //   print('derp: ${state.derp}');
-  //   // print('but the sub (?)');
-  //   // if (state.authUser != null) {
-  //   //   print('here she is..');
-  //   //   print(state.authUser);
-  //   // }
-  // }
-
   void _setupAuthSubscriptions() {
     _authUserSubscription = _authRepository.user.listen((authUser) {
-      print('auth sub online');
+      // print('auth sub online');
       if (authUser != null) {
-        print('auth sub has user');
+        // print('auth sub has user');
 
         _userSubscription =
             _userRepository.getUserStream(userId: authUser.uid).listen((user) {
           // Wait for an id from the stream before carrying on.
           if (user != null) {
-            print('we have user!');
-            print(
-              'have authUser: ${state.authUser != null ? 'true' : 'false'}',
-            );
             _userBloc.add(
               UpdateUser(
                 updateFirebase: false,
@@ -102,11 +62,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
               ),
             );
 
-            // Issue: authUser isn't nulling out on a SignOut, so this doesn't
-            // run again
-            // Update: seems like this will derp..
             if (state.authUser == null) {
-              print('update state & CheckForUser');
               add(
                 AuthUserChanged(
                   authUser: authUser,
@@ -163,15 +119,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthUserChanged event,
     Emitter<AuthState> emit,
   ) {
-    // Note: this is triggering AuthNav, e.g. change apps and come back (?)
-    print('auth user changed: authenticating');
-    // print('prev lastUpdate: ${state.lastUpdate}');
-    // print('curr lastUpdate: ${DateTime.now()}');
+    // print('auth user changed: authenticating');
     emit(
       state.copyWith(
         authUser: event.authUser,
         errorMessage: '',
-        // lastUpdate: DateTime.now(),
         status: AuthStatus.authenticated,
         derp: "hasUser",
       ),
@@ -197,24 +149,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
 
       if (googleUser != null) {
-        // print('prev lastUpdate: ${state.lastUpdate}');
-        // print('curr lastUpdate: ${DateTime.now()}');
         emit(
           state.copyWith(
             authUser: googleUser,
-            // lastUpdate: DateTime.now(),
             status: AuthStatus.authenticated,
           ),
         );
       } else {
-        print('nope');
         emit(
-          // state.copyWith(
-          //   authUser: null,
-          //   errorMessage: 'Google validation failed. Please try again.',
-          //   // errorMessage: '',
-          //   status: AuthStatus.unauthenticated,
-          // ),
           state.initialize().copyWith(
                 errorMessage: 'Google validation failed. Please try again.',
                 status: AuthStatus.unauthenticated,
@@ -224,11 +166,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (err) {
       print('login (google) error: $err');
       emit(
-        // state.copyWith(
-        //   authUser: null,
-        //   errorMessage: err.toString(),
-        //   status: AuthStatus.unauthenticated,
-        // ),
         state.initialize().copyWith(
               errorMessage: err.toString(),
               status: AuthStatus.unauthenticated,
@@ -278,16 +215,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     } catch (err) {
       print('login (E&P) error: $err');
-      // TODO: provide a better errorMessage
       String errorMessage = err.toString().contains('malformed or has expired')
           ? 'The email and password combination are invalid. Please double check and try again.'
           : err.toString();
       emit(
-        // state.copyWith(
-        //   authUser: null,
-        //   errorMessage: errorMessage,
-        //   status: AuthStatus.unauthenticated,
-        // ),
         state.initialize().copyWith(
               errorMessage: errorMessage,
               status: AuthStatus.unauthenticated,
@@ -332,11 +263,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (err) {
       print('login (google) error: $err');
       emit(
-        // state.copyWith(
-        //   authUser: null,
-        //   errorMessage: err.toString(),
-        //   status: AuthStatus.unauthenticated,
-        // ),
         state.initialize().copyWith(
               errorMessage: err.toString(),
               status: AuthStatus.unauthenticated,
@@ -406,11 +332,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (err) {
       print('register anon error: $err');
       emit(
-        // state.copyWith(
-        //   authUser: null,
-        //   errorMessage: err.toString(),
-        //   status: AuthStatus.unauthenticated,
-        // ),
         state.initialize().copyWith(
               errorMessage: err.toString(),
               status: AuthStatus.unauthenticated,
@@ -459,11 +380,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (err) {
       print('register error: $err');
       emit(
-        // state.copyWith(
-        //   authUser: null,
-        //   errorMessage: err.toString(),
-        //   status: AuthStatus.unauthenticated,
-        // ),
         state.initialize().copyWith(
               errorMessage: err.toString(),
               status: AuthStatus.unauthenticated,
@@ -507,30 +423,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
 
     try {
-      // Note: I believe the exception about permission-denied is coming from
-      // the order of operations here. I think if I scrub the user first, it
-      // won't come up, but I'm concerned that if something fails the sign out
-      // process, I'll be in a weird state.
-      // Update: order of operations didn't make the difference here (might
-      // still be the right call), but there might be another sub/stream that
-      // is causing this issue, i.e. HomeBloc's joinedGames.
-      // TODO ...
-      // Note: on Hot Reload, Google auth takes a double tap on Sign Out to
-      // fully sign out. Not sure if this will reel it's head in other cases.
-
-      // TODO: might need to switch the order her and sign out of user stuff
-      // first; hmm... order may not matter here (?)
-
-      print('trying to sign out');
       await _authRepository.signOut();
-      print('done awaiting sign out');
 
       _userBloc.add(
         ClearUser(),
       );
       _userSubscription?.cancel();
       _userSubscription = null;
-      print('user should be signed out via auth');
 
       _settingsBloc.add(
         CheckForUser(
@@ -544,10 +443,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // the Home Sub/Stream, but I could bake it into this SignOut handler.
       // _homeBloc.close();
 
-      // TODO: authUser isn't being nulled out on SignOut. The status is updating
-      // correctly, but the parameter doesn't reset. Currently checking authUser
-      // in the Subscription (User) to udpate authUser and reset / start music.
-      print('authUser should be null..');
       emit(
         state.initialize().copyWith(
               errorMessage: '',

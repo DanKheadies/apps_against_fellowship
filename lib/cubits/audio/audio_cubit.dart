@@ -19,7 +19,7 @@ class AudioCubit extends Cubit<AudioState> {
 
   Future<void> playCurrentSongInPlaylist() async {
     // log.info('Playing ${state.playlist.first} now.');
-    print('Playing ${state.playlist.first} now.');
+    // print('Playing ${state.playlist.first} now.');
     try {
       await state.musicPlayer.play(
         AssetSource(
@@ -42,14 +42,14 @@ class AudioCubit extends Cubit<AudioState> {
   }
 
   void prevSong() {
-    print('play prev song');
+    // print('play prev song');
     state.musicPlayer.stop();
     state.playlist.addFirst(state.playlist.removeLast());
     playCurrentSongInPlaylist();
   }
 
   void nextSong() {
-    print('play next song');
+    // print('play next song');
     state.musicPlayer.stop();
     state.playlist.addLast(state.playlist.removeFirst());
     playCurrentSongInPlaylist();
@@ -143,10 +143,7 @@ class AudioCubit extends Cubit<AudioState> {
     );
   }
 
-  // TODO: (on web at least) the song starts from the beginning when you nav
-  // away and come back; might need to track a duration /
   void startOrResumeMusic() async {
-    // print('start or resume');
     if (state.musicPlayer.source == null) {
       // log.info('No music source set. '
       //     'Start playing the current song in playlist.');

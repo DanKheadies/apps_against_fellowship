@@ -111,16 +111,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
       emit(
         state.copyWith(
-          // leavingGame: null,
-          leavingGame: UserGame.emptyUserGame,
+          leavingGame: null,
+          // leavingGame: UserGame.emptyUserGame,
         ),
       );
     } catch (err) {
       print('home bloc: leave game err: $err');
       emit(
         state.copyWith(
-          // leavingGame: null,
-          leavingGame: UserGame.emptyUserGame,
+          leavingGame: null,
+          // leavingGame: UserGame.emptyUserGame,
         ),
       );
     }

@@ -61,12 +61,10 @@ class SettingsState extends Equatable {
 
   factory SettingsState.fromJson(Map<String, dynamic> json) {
     return SettingsState(
-      hasAudioOn: json['hasAudioOn'], // as bool,
-      hasMusicOn: json['hasMusicOn'], // as bool,
-      hasSoundsOn: json['hasSoundsOn'], // as bool,
-      // hasUser: json['hasUser'] as bool,
-      // isPaused: json['isPaused'] as bool,
-      musicVolume: json['musicVolume'], // as double,
+      hasAudioOn: json['hasAudioOn'],
+      hasMusicOn: json['hasMusicOn'],
+      hasSoundsOn: json['hasSoundsOn'],
+      musicVolume: json['musicVolume'],
       previousMusicPlayerId: json['previousMusicPlayerId'],
     );
   }
@@ -76,8 +74,6 @@ class SettingsState extends Equatable {
       'hasAudioOn': hasAudioOn,
       'hasMusicOn': hasMusicOn,
       'hasSoundsOn': hasSoundsOn,
-      // 'hasUser': hasUser,
-      // 'isPaused': isPaused,
       'musicVolume': musicVolume,
       'previousMusicPlayerId': previousMusicPlayerId,
     };

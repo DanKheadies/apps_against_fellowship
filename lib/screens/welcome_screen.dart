@@ -244,15 +244,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                           text: 'Sign Out',
                           onTap: buttOpacTimer.isActive
                               ? null
-                              // : () => context.read<AuthBloc>().add(
-                              //       SignOut(),
-                              //     ),
-                              // : () => print(
-                              //       'have authUser: ${context.read<AuthBloc>().state.authUser != null ? 'true' : 'false'}',
-                              //     ),
-                              : () => print(
-                                    context.read<AuthBloc>().state,
-                                  ), // TODO: revert
+                              : () => context.read<AuthBloc>().add(
+                                    SignOut(),
+                                  ),
                         ),
                       ),
                     ),

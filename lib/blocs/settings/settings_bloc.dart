@@ -43,11 +43,6 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
     add(
       InitializeAudio(),
     );
-
-    // TODO: turn everything off on instantiation
-    // Once the user logs in, we turn everything on. If they turn them off in
-    // settings, we cache that, and on subsequent loads, we hydrate from those
-    // settings.
   }
 
   /// Makes sure the settings bloc is listening to changes of both the app
@@ -58,19 +53,19 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
   void handleAppLifecycle() {
     switch (_appLifecycleNotifier.value) {
       case AppLifecycleState.paused:
-        print('app paused');
+      // print('app paused');
       case AppLifecycleState.detached:
-        print('app detached');
+      // print('app detached');
       case AppLifecycleState.hidden:
-        print('app hidden');
+        // print('app hidden');
         _audioCubit.stopAllSound();
       case AppLifecycleState.resumed:
-        print('app resumed');
+        // print('app resumed');
         if (state.hasUser && state.hasAudioOn && state.hasMusicOn) {
           _audioCubit.startOrResumeMusic();
         }
       case AppLifecycleState.inactive:
-        print('app inactive');
+        // print('app inactive');
         _audioCubit.stopAllSound();
         break;
     }
@@ -80,21 +75,16 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
     CheckForUser event,
     Emitter<SettingsState> emit,
   ) {
-    print('we have a user');
     emit(
       state.copyWith(
         hasUser: event.haveUser,
       ),
     );
 
-    print('event.haveUser: ${event.haveUser}');
-    print('state.hasAudioOn: ${state.hasAudioOn}');
-    print('state.hasMusicOn: ${state.hasMusicOn}');
     if (event.haveUser && state.hasAudioOn && state.hasMusicOn) {
       _audioCubit.startOrResumeMusic();
     }
     if (!event.haveUser) {
-      // _audioCubit.releaseMusicPlayer(state.previousMusicPlayerId);
       _audioCubit.stopAllSound();
     }
   }
@@ -103,36 +93,11 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
     InitializeAudio event,
     Emitter<SettingsState> emit,
   ) {
-    // Update: the goal here should be to initialize audioCubit's music player
-    // stream. We also load the SFX in that step, which could be avoided / waited
-    // for until there's a user. But in this case, it's a small load w/ minimal
-    // impact.
-    // print('settings bloc');
-    // if (state.hasAudioOn && state.hasMusicOn) {
-    //   // On the web, sound can only start after user interaction, so
-    //   // we start muted there on every game start.
-    //   if (kIsWeb) {
-    //     // Logger('SettingsBloc').info(
-    //     //   'On the web, music can only start after user interaction.',
-    //     // );
-    //     print('On the web, music can only start after user interaction.');
-    //     add(
-    //       InitializeAudioForWeb(),
-    //     );
-    //   } else {
-    //     // _audioCubit.playCurrentSongInPlaylist();
-    //     _audioCubit.initializeAudio();
-    //   }
-    // }
-    // print('set music vol: ${state.musicVolume}');
-    // _audioCubit.setMusicVolume(state.musicVolume);
-    print('settings bloc - init audio');
+    // print('settings bloc - init audio');
     String currentMusicPlayerId =
         _audioCubit.initializeAudio(state.previousMusicPlayerId);
-    print('set music vol: ${state.musicVolume}');
     _audioCubit.setMusicVolume(state.musicVolume);
 
-    print('new previousMusicPlayerId: $currentMusicPlayerId');
     emit(
       state.copyWith(
         previousMusicPlayerId: currentMusicPlayerId,
@@ -168,7 +133,7 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
     Emitter<SettingsState> emit,
   ) {
     // Logger('SettingsBloc').fine('hasAudioOn changed to ${state.hasAudioOn}');
-    print('hasAudioOn changed to ${state.hasAudioOn}');
+    // print('hasAudioOn changed to ${state.hasAudioOn}');
     if (state.hasAudioOn) {
       // All sound just got muted. Audio is off.
       _audioCubit.stopAllSound();
@@ -245,8 +210,6 @@ class SettingsBloc extends HydratedBloc<SettingsEvent, SettingsState> {
   /// Asynchronously loads values from the local storage.
   @override
   SettingsState? fromJson(Map<String, dynamic> json) {
-    // Logger('SettingsController').fine(() => 'Loaded settings: $json');
-    // print('Loaded settings: $json');
     return SettingsState.fromJson(json);
   }
 

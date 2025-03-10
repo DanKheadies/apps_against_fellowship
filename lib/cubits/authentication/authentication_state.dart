@@ -32,7 +32,6 @@ class AuthenticationState extends Equatable {
       name: '',
       password: '',
       status: AuthenticationStatus.initial,
-      // errorMessage: '',
     );
   }
 

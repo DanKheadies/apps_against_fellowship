@@ -9,9 +9,8 @@
 8. Sign in w/ Apple id
 9. TOS & Privacy Policy
 10. Delete account
-11. Clean up and optimizations, e.g. BlocStates
+11. Clean up / optimizations / model refactor, e.g. BlocStates
 12. Analytics
 13. README steps to rebuild (?)
 14. Admin panel (CRUD cards, maintain on new import)
 15. Tunes (DONE)
-16. Models refactor (see god)
