@@ -11,7 +11,6 @@ class AppsAF extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<DeviceCubit, DeviceState>(
       builder: (context, state) {
-        print('apps af - bloc builder device cubit');
         return MaterialApp.router(
           // TODO: Locales
           debugShowCheckedModeBanner: false,

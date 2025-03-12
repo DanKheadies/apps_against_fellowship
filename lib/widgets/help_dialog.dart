@@ -123,7 +123,7 @@ class _HelpDialogState extends State<HelpDialog> {
                   : TextButton(
                       onPressed: canSend
                           ? () async {
-                              print('submit');
+                              // print('submit');
                               await _submit(context);
                             }
                           : null,
@@ -132,7 +132,7 @@ class _HelpDialogState extends State<HelpDialog> {
                         style: TextStyle(
                           color: canSend
                               ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onTertiary,
+                              : Theme.of(context).colorScheme.surface,
                           fontSize: 18,
                         ),
                       ),

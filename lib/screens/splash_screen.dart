@@ -74,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Title(
       title: 'Apps Against Fellowship',
-      color: Colors.purple, // TODO: does what?
+      color: Colors.purple,
       child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: BlocBuilder<AuthBloc, AuthState>(

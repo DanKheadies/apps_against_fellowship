@@ -31,6 +31,7 @@ class GameBloc extends Bloc<GameEvent, GameState> {
     on<ClearError>(_onClearError);
     on<ClearPickedResponseCards>(_onClearPickedResponseCards);
     on<ClearKicking>(_onClearKicking);
+    on<CloseGameStreams>(_onCloseGameStreams);
     on<DownvotePrompt>(_onDownvotePrompt);
     on<DownvotesUpdated>(_onDownvotesUpdated);
     on<GameUpdated>(_onGameUpdated);
@@ -80,6 +81,15 @@ class GameBloc extends Bloc<GameEvent, GameState> {
         kickingPlayerId: '',
       ),
     );
+  }
+
+  void _onCloseGameStreams(
+    CloseGameStreams event,
+    Emitter<GameState> emit,
+  ) {
+    _downvoteSubscription?.cancel();
+    _gameSubcription?.cancel();
+    _playersSubscription?.cancel();
   }
 
   void _onDownvotePrompt(

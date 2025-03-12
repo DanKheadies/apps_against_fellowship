@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthRepository {
   final auth.FirebaseAuth _firebaseAuth;
@@ -18,8 +19,6 @@ class AuthRepository {
   })  : _firebaseAuth = firebaseAuth ?? auth.FirebaseAuth.instance,
         _googleSignIn = googleSignIn ??
             GoogleSignIn(
-              clientId:
-                  '69402188680-uv677skjffo54b39tmsnsmgcn4ed2pcs.apps.googleusercontent.com',
               scopes: ['email'],
             ),
         _userRepository = userRepository;
@@ -42,6 +41,46 @@ class AuthRepository {
   Stream<GoogleSignInAccount?> get userGoogle =>
       _googleSignIn.onCurrentUserChanged;
 
+  Future<void> deleteAccount() async {
+    try {
+      await _firebaseAuth.currentUser!.delete();
+      print('RIP');
+    } on auth.FirebaseAuthException catch (e) {
+      print(e);
+      // TODO: (?)
+      // if (e.code == 'requires-recent-login') {
+      //   try {
+      //     final providerData = _firebaseAuth.currentUser?.providerData.first;
+
+      //     // if (AppleAuthProvider().providerId == providerData!.providerId) {
+      //     //   await firebaseAuth.currentUser!
+      //     //       .reauthenticateWithProvider(AppleAuthProvider());
+      //     // } else
+      //     // if (GoogleAuthProvider().providerId ==
+      //     //     providerData.providerId) {
+      //     //   await firebaseAuth.currentUser!
+      //     //       .reauthenticateWithProvider(GoogleAuthProvider());
+      //     // }
+      //     // if (_googleSignIn.clientId ==
+      //     //     providerData?.providerId) {
+      //     //   await _firebaseAuth.currentUser!
+      //     //       .reauthenticateWithProvider(_googleSignIn.signIn());
+      //     // }
+
+      //     await _firebaseAuth.currentUser?.delete();
+      //   } catch (e) {
+      //     // Handle exceptions
+      //   }
+      // } else {
+      //   print('firebase auth exception - not recent login');
+      //   print(e);
+      // }
+    } catch (err) {
+      print('delete error: $err');
+      throw Exception(err);
+    }
+  }
+
   // /// Authenticate with Google's web access.
   // Future<bool> authorizeGoogleScopesForWeb({
   //   required GoogleSignInAccount account,
@@ -53,6 +92,39 @@ class AuthRepository {
   //     throw Exception(err);
   //   }
   // }
+
+  /// Authenticate with Apple credentials through an OAuth route.
+  // TODO: issue w/ adding the Sign In with Apple capability in Runner & Developer
+  Future<void> loginWithApple() async {
+    try {
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        // webAuthenticationOptions: WebAuthenticationOptions(
+        //   clientId: clientId,
+        //   redirectUri: redirectUri,
+        // ),
+      );
+
+      print(appleCredential);
+      // auth.UserCredential appleUser = await _firebaseAuth.
+      // _firebaseAuth.signInWithCredential(credential);
+      final oAuthCredential = auth.OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        accessToken: appleCredential.authorizationCode,
+      );
+
+      auth.UserCredential credentials =
+          await _firebaseAuth.signInWithCredential(oAuthCredential);
+      print('has creds');
+      print(credentials);
+    } catch (err) {
+      print('apple err: $err');
+      throw Exception(err);
+    }
+  }
 
   /// Authenticate with Google's service.
   Future<void> loginWithGoogle({
@@ -86,6 +158,9 @@ class AuthRepository {
         // account = await _googleSignIn.signInSilently();
         await _googleSignIn.signInSilently();
       } else if (isWeb) {
+        // TODO: finish; incorporating the Web button allows for the next step,
+        // but we're still missing some authorization stuffs.. Also, having the
+        // web package active causes iOS not to build correctly, so FML.
         print('isWeb: ${_googleSignIn.scopes}');
         // await _googleSignIn.canAccessScopes(_googleSignIn.scopes);
         final bool isAuthorized =

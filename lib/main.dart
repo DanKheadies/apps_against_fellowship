@@ -63,97 +63,78 @@ class AppsAgainstFellowship extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppLifecycleObserver(
-      // Initialize card cache
-      // TODO: Move non-initial Blocs & Repos to their respective areas (?)
-      // Note: this will most likely cause issues that will need to be corrected
-      child: BlocProvider(
-        create: (context) => CardCacheCubit(),
-        child: MultiRepositoryProvider(
+      child: MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider(
+            create: (context) => UserRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => StorageRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => GameRepository(
+              userRepository: context.read<UserRepository>(),
+            ),
+          ),
+          RepositoryProvider(
+            create: (context) => DeviceRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => AuthRepository(
+              userRepository: context.read<UserRepository>(),
+            ),
+          ),
+        ],
+        child: MultiBlocProvider(
           providers: [
-            // Needed for Auth
-            RepositoryProvider(
-              create: (context) => UserRepository(),
+            BlocProvider(
+              create: (context) => AudioCubit(),
             ),
-            // Needed for Auth
-            RepositoryProvider(
-              create: (context) => StorageRepository(),
+            BlocProvider(
+              create: (context) => AuthenticationCubit(),
             ),
-            RepositoryProvider(
-              create: (context) => GameRepository(
+            BlocProvider(
+              create: (context) => DeviceCubit(
+                deviceRepository: context.read<DeviceRepository>(),
+              ),
+            ),
+            BlocProvider(
+              create: (context) => SettingsBloc(
+                appLifecycleNotifier: context.read<AppLifecycleStateNotifier>(),
+                audioCubit: context.read<AudioCubit>(),
+              ),
+            ),
+            BlocProvider(
+              create: (context) => UserBloc(
+                storageRepository: context.read<StorageRepository>(),
                 userRepository: context.read<UserRepository>(),
               ),
             ),
-            RepositoryProvider(
-              create: (context) => DeviceRepository(),
-            ),
-            RepositoryProvider(
-              create: (context) => CardsRepository(
-                cardCache: context.read<CardCacheCubit>(),
+            BlocProvider(
+              create: (context) => AuthBloc(
+                authRepository: context.read<AuthRepository>(),
+                settingsBloc: context.read<SettingsBloc>(),
+                userBloc: context.read<UserBloc>(),
+                userRepository: context.read<UserRepository>(),
               ),
             ),
-            // Needed for Auth
-            RepositoryProvider(
-              create: (context) => AuthRepository(
-                userRepository: context.read<UserRepository>(),
+            // Note: need to not be linked to AuthBloc b/c of sub/stream using
+            // user.id
+            BlocProvider(
+              create: (context) => GameBloc(
+                authRepository: context.read<AuthRepository>(),
+                gameRepository: context.read<GameRepository>(),
+                userBloc: context.read<UserBloc>(),
+              ),
+            ),
+            BlocProvider(
+              create: (context) => HomeBloc(
+                gameRepository: context.read<GameRepository>(),
+                userBloc: context.read<UserBloc>(),
               ),
             ),
           ],
-          child: MultiBlocProvider(
-            providers: [
-              // Needed for Auth (TBC)
-              BlocProvider(
-                create: (context) => AudioCubit(),
-              ),
-              // Needed for Auth
-              BlocProvider(
-                create: (context) => AuthenticationCubit(),
-              ),
-              BlocProvider(
-                create: (context) => DeviceCubit(
-                  deviceRepository: context.read<DeviceRepository>(),
-                  // )..setup(), // TBD if this is the right spot
-                ),
-              ),
-              // Needed for Auth (TBC)
-              BlocProvider(
-                create: (context) => SettingsBloc(
-                  appLifecycleNotifier:
-                      context.read<AppLifecycleStateNotifier>(),
-                  audioCubit: context.read<AudioCubit>(),
-                ),
-              ),
-              // Needed for Auth
-              BlocProvider(
-                create: (context) => UserBloc(
-                  storageRepository: context.read<StorageRepository>(),
-                  userRepository: context.read<UserRepository>(),
-                ),
-              ),
-              // Needed for Auth
-              BlocProvider(
-                create: (context) => AuthBloc(
-                  authRepository: context.read<AuthRepository>(),
-                  settingsBloc: context.read<SettingsBloc>(),
-                  userBloc: context.read<UserBloc>(),
-                  userRepository: context.read<UserRepository>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => GameBloc(
-                  authRepository: context.read<AuthRepository>(),
-                  gameRepository: context.read<GameRepository>(),
-                  userBloc: context.read<UserBloc>(),
-                ),
-              ),
-              BlocProvider(
-                create: (context) => HomeBloc(
-                  gameRepository: context.read<GameRepository>(),
-                  userBloc: context.read<UserBloc>(),
-                ),
-              ),
-            ],
-            child: AppsAF(),
-          ),
+          child: AppsAF(),
         ),
       ),
     );

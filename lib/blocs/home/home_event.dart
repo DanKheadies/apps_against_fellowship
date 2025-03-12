@@ -35,6 +35,8 @@ class JoinedGamesUpdated extends HomeEvent {
       ];
 }
 
+class CloseHomeStreams extends HomeEvent {}
+
 class LeaveGame extends HomeEvent {
   final UserGame game;
 

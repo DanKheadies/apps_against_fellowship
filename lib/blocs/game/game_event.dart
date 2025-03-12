@@ -13,6 +13,8 @@ class ClearPickedResponseCards extends GameEvent {}
 
 class ClearKicking extends GameEvent {}
 
+class CloseGameStreams extends GameEvent {}
+
 class DownvotePrompt extends GameEvent {}
 
 class DownvotesUpdated extends GameEvent {

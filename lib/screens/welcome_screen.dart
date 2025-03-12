@@ -2,14 +2,12 @@ import 'dart:async';
 
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/cubits/cubits.dart';
-// import 'package:apps_against_fellowship/cubits/cubits.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_sign_in_web/web_only.dart' as web;
+// import 'package:google_sign_in_web/web_only.dart' as web;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 enum AuthMethod {
   login,
@@ -156,15 +154,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       ),
       IconButton(
         icon: Icon(
-          // context.read<UserBloc>().state.user.isDarkTheme
           context.read<DeviceCubit>().state.isDarkTheme
               ? Icons.dark_mode
               : Icons.light_mode,
         ),
         onPressed: () {
-          // context.read<UserBloc>().add(
-          //       UpdateTheme(updateFirebase: false),
-          //     );
           context.read<DeviceCubit>().toggleTheme();
         },
       ),
@@ -225,62 +219,67 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     ),
                   ),
                 ),
-                Positioned(
-                  top: size.height / 2 - 50,
-                  left: 0,
-                  child: AnimatedOpacity(
-                    opacity: buttonOpacity,
-                    duration: const Duration(seconds: 1),
-                    child: SizedBox(
-                      width: size.width,
-                      child: Center(
-                        child: HomeOutlineButton(
-                          icon: Icon(
-                            MdiIcons.apple,
-                            color: Theme.of(context).colorScheme.primary,
+                // TODO: apple sign in
+                // Positioned(
+                //   top: size.height / 2 - 50,
+                //   left: 0,
+                //   child: AnimatedOpacity(
+                //     opacity: buttonOpacity,
+                //     duration: const Duration(seconds: 1),
+                //     child: SizedBox(
+                //       width: size.width,
+                //       child: Center(
+                //         child: HomeOutlineButton(
+                //           icon: Icon(
+                //             MdiIcons.apple,
+                //             color: Theme.of(context).colorScheme.primary,
+                //           ),
+                //           text: 'Apple',
+                //           onTap: buttOpacTimer.isActive
+                //               ? null
+                //               : () => context.read<AuthBloc>().add(
+                //                     LoginWithApple(isWeb: kIsWeb),
+                //                   ),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
+                // ),
+                kIsWeb
+                    ? const SizedBox()
+                    : Positioned(
+                        top: size.height / 2 + 25,
+                        left: 0,
+                        child: AnimatedOpacity(
+                          opacity: buttonOpacity,
+                          duration: const Duration(seconds: 1),
+                          child: SizedBox(
+                            width: size.width,
+                            child: Center(
+                              child:
+                                  // TODO: finish Google sign-in for web
+                                  // Still having issues w/ authorization; TBContinued
+                                  // Note: incorporating the web package prevents
+                                  // iOS from building...
+                                  // kIsWeb
+                                  //     ? web.renderButton()
+                                  //     :
+                                  HomeOutlineButton(
+                                icon: Icon(
+                                  MdiIcons.google,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                text: 'Google',
+                                onTap: buttOpacTimer.isActive
+                                    ? null
+                                    : () => context.read<AuthBloc>().add(
+                                          LoginWithGoogle(isWeb: kIsWeb),
+                                        ),
+                              ),
+                            ),
                           ),
-                          text: 'Apple',
-                          onTap: buttOpacTimer.isActive
-                              ? null
-                              : () => context.read<AuthBloc>().add(
-                                    LoginWithApple(isWeb: kIsWeb),
-                                  ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: size.height / 2 + 25,
-                  left: 0,
-                  child: AnimatedOpacity(
-                    opacity: buttonOpacity,
-                    duration: const Duration(seconds: 1),
-                    child: SizedBox(
-                      width: size.width,
-                      child: Center(
-                        child:
-                            // TODO: finish Google sign-in for web
-                            // Still having issues w/ authorization; TBContinued
-                            kIsWeb
-                                ? web.renderButton()
-                                : HomeOutlineButton(
-                                    icon: Icon(
-                                      MdiIcons.google,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                    text: 'Google',
-                                    onTap: buttOpacTimer.isActive
-                                        ? null
-                                        : () => context.read<AuthBloc>().add(
-                                              LoginWithGoogle(isWeb: kIsWeb),
-                                            ),
-                                  ),
-                      ),
-                    ),
-                  ),
-                ),
                 Positioned(
                   top: size.height / 2 + 100,
                   left: 0,
@@ -379,10 +378,6 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     AuthState state,
   ) {
     if (state.errorMessage != '' && state.errorMessage != null) {
-      // String errorMsg = state.errorMessage!
-      //     .replaceAll('Exception: ', '')
-      //     .replaceAll(RegExp('\\[.*?\\]'), '');
-
       String errMsg = state.errorMessage!.contains(']')
           ? state.errorMessage!
               .split(']')[1]

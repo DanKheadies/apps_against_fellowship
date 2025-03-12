@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,13 +19,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool showToS = false;
   late Timer errorTimer;
+  late Timer webNavTimer;
+  late WebViewController webViewCont;
 
   @override
   void initState() {
     super.initState();
 
     errorTimer = Timer(Duration.zero, () {});
+    webNavTimer = Timer(Duration.zero, () {});
+
+    if (!kIsWeb) {
+      _initializeToS();
+    }
   }
 
   @override
@@ -38,18 +49,9 @@ class _HomeScreenState extends State<HomeScreen> {
       hideAppBar: true,
       child: BlocListener<HomeBloc, HomeState>(
         listener: (context, state) {
-          bool hasGame =
-              state.joinedGame != null && state.joinedGame != Game.emptyGame;
-          if (hasGame) {
-            context.read<GameBloc>().add(
-                  OpenGame(
-                    gameId: state.joinedGame!.id,
-                    user: context.read<UserBloc>().state.user,
-                  ),
-                );
-            context.goNamed('game');
-          }
           _handleError(context, state);
+          _handleGame(context, state);
+          _handleToS(context, context.read<UserBloc>().state);
         },
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
@@ -218,4 +220,175 @@ class _HomeScreenState extends State<HomeScreen> {
             );
     }
   }
+
+  void _handleGame(
+    BuildContext context,
+    HomeState state,
+  ) {
+    bool hasGame =
+        state.joinedGame != null && state.joinedGame != Game.emptyGame;
+    if (hasGame) {
+      context.read<GameBloc>().add(
+            OpenGame(
+              gameId: state.joinedGame!.id,
+              user: context.read<UserBloc>().state.user,
+            ),
+          );
+      context.goNamed('game');
+    }
+  }
+
+  Future<void> _handleToS(
+    BuildContext context,
+    UserState state,
+  ) async {
+    if (state.user != User.emptyUser && !state.user.acceptedTerms && !showToS) {
+      setState(() {
+        showToS = true;
+      });
+
+      bool acceptsToS = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          if (kIsWeb) {
+            // setState(() {
+            //   kWebNavToToS = true;
+            // });
+            webNavTimer = Timer(
+              Duration(milliseconds: 1500),
+              () async {
+                // setState(() {
+                //   kWebHasNavToToS = true;
+                // });
+                final Uri url = Uri.parse(
+                  'https://apps-against-fellowship.web.app/tos.html',
+                );
+                if (!await launchUrl(url)) {
+                  throw Exception('Could not launch $url');
+                }
+              },
+            );
+          }
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              'Terms of Service',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+            ),
+            content: kIsWeb
+                ? Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Do you agree to the following Terms of Service?',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.surface,
+                        ),
+                      ),
+                      const SizedBox(height: 15),
+                      const CircularProgressIndicator(),
+                    ],
+                  )
+                : WebViewWidget(
+                    controller: webViewCont,
+                  ),
+            actions: [
+              TextButton(
+                child: Text(
+                  'DECLINE',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              TextButton(
+                child: Text(
+                  'ACCEPT',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        },
+      );
+
+      if (acceptsToS) {
+        if (context.mounted) {
+          context.read<UserBloc>().add(
+                UpdateUser(
+                  updateFirebase: true,
+                  user: state.user.copyWith(
+                    acceptedTerms: true,
+                  ),
+                ),
+              );
+        } else {
+          print('TOS error; context not mounted');
+        }
+      }
+
+      setState(() {
+        showToS = false;
+      });
+    }
+  }
+
+  void _initializeToS() {
+    webViewCont = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {
+            // Update loading bar.
+          },
+          onPageStarted: (String url) {},
+          onPageFinished: (String url) {},
+          onHttpError: (HttpResponseError error) {},
+          onWebResourceError: (WebResourceError error) {},
+          onNavigationRequest: (NavigationRequest request) {
+            // if (request.url.startsWith('https://www.youtube.com/')) {
+            //   return NavigationDecision.prevent;
+            // }
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
+      ..loadRequest(
+        Uri.parse(
+          'https://apps-against-fellowship.web.app/tos.html',
+        ),
+      );
+  }
+
+  // void registerViewFactory() {
+  //   // Register a custom view factory for HtmlElementView
+  //   // This view factory creates an iframe element to display HTML content
+  //   web.platformViewRegistry.registerViewFactory(
+  //     'plotly-chart-html',
+  //     (int viewId) {
+  //       // Create an iframe element
+  //       var element = html.IFrameElement();
+  //       // Set the source of the iframe to your HTML file
+  //       element.src = 'path/to/your/html/file.html';
+  //       // Allow iframe to resize according to its content
+  //       element.style.border = 'none';
+  //       element.style.width = '100%';
+  //       element.style.height = '100%';
+  //       return element;
+  //     },
+  //   );
+  // }
 }

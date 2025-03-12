@@ -21,15 +21,16 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   })  : _gameRepository = gameRepository,
         _userBloc = userBloc,
         super(HomeState.loading()) {
+    on<CloseHomeStreams>(_onCloseHomeStreams);
     on<JoinGame>(_onJoinGame);
     on<JoinedGamesUpdated>(_onJoinedGamesUpdated);
     on<LeaveGame>(_onLeaveGame);
     on<RefreshHome>(_onRefreshHome);
     on<UserUpdatedViaHome>(_onUserUpdatedViaHome);
 
-    // TODO: need to kick this to the curb when I sign out
-    // Update: we're calling out HomeBloc.close() where the SignOut call is
-    // made, but it would be smarter to call it in AuthBloc's SignOut.
+    // TODO: Re-initialize this sub ike we do for GameBloc's subs. On SignOut of
+    // Account 1 -> SignIn Account 2 & Account Deletion, this acts wonky.
+    // print('setup home bloc');
     _joinedGamesSubscription = _gameRepository
         .observeJoinedGames(_userBloc.state.user)
         .listen((event) {
@@ -40,6 +41,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         JoinedGamesUpdated(games: event),
       );
     });
+  }
+
+  void _onCloseHomeStreams(
+    CloseHomeStreams event,
+    Emitter<HomeState> emit,
+  ) {
+    _joinedGamesSubscription?.cancel();
   }
 
   void _onJoinGame(
@@ -112,7 +120,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(
         state.copyWith(
           leavingGame: null,
-          // leavingGame: UserGame.emptyUserGame,
+          // leavingGame: UserGame.emptyUserGame, // Note: not this
         ),
       );
     } catch (err) {
@@ -120,7 +128,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       emit(
         state.copyWith(
           leavingGame: null,
-          // leavingGame: UserGame.emptyUserGame,
+          // leavingGame: UserGame.emptyUserGame, // Note: not this
         ),
       );
     }

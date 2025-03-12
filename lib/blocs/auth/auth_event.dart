@@ -33,6 +33,8 @@ class AuthGoogleUserChanged extends AuthEvent {
       ];
 }
 
+class DeleteAccount extends AuthEvent {}
+
 class LoginWithEmailAndPassword extends AuthEvent {
   final String email;
   final String password;
@@ -75,22 +77,6 @@ class LoginWithGoogle extends AuthEvent {
   List<Object?> get props => [
         isSilent,
         isWeb,
-      ];
-}
-
-class LoginWithLink extends AuthEvent {
-  final String email;
-  final String emailLink;
-
-  const LoginWithLink({
-    required this.email,
-    required this.emailLink,
-  });
-
-  @override
-  List<Object?> get props => [
-        email,
-        emailLink,
       ];
 }
 

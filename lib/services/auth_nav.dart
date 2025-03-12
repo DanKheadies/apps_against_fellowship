@@ -7,35 +7,30 @@ void authenticationNavigator(
   BuildContext context,
   AuthState stateHolder,
 ) {
-  print('trigger auth nav');
-  print(
-    'have authUser: ${stateHolder.authUser != null ? 'true' : 'false'}',
-  );
+  // print('trigger auth nav');
+  // print(
+  //   'have authUser: ${stateHolder.authUser != null ? 'true' : 'false'}',
+  // );
   String currentScreen =
       GoRouter.of(context).routeInformationProvider.value.uri.toString();
   // print(currentScreen);
   AuthState state = context.read<AuthBloc>().state;
 
+  // Keep unauthenticated users at Welcome (note: Splash has no authNav)
   if ((state.status == AuthStatus.unauthenticated ||
           state.status == AuthStatus.unknown ||
           state.authUser == null) &&
       currentScreen != '/welcome') {
-    print('not auth\'d, go to welcome from $currentScreen');
+    // print('not auth\'d, go to welcome from $currentScreen');
     context.goNamed('welcome');
-  } else if (state.status == AuthStatus.authenticated &&
-          state.authUser != null
-          // && currentScreen != '/home'
-          &&
-          (currentScreen == '/' || currentScreen == '/welcome')
-      // Note: helps avoid spamming on home, but will cause a nav back to home
-      // on other screens, e.g. uploading a new profile photo.
-      ) {
-    print('auth\'d, to home from $currentScreen');
-    context.goNamed('home');
-  } else {
-    print('don\'t nav just yet..');
   }
-  // TODO: TOS, et al
-  // Note: Splash is passing UserState down; ScreenWrapper only AuthState
-  // Can use context.read to get accurate info here
+  // Avoid landing on Welcome if user is authenticated (exception: Splash)
+  else if (state.status == AuthStatus.authenticated &&
+      state.authUser != null &&
+      (currentScreen == '/' || currentScreen == '/welcome')) {
+    // print('auth\'d, to home from $currentScreen');
+    context.goNamed('home');
+    // } else {
+    // print('don\'t nav just yet..');
+  }
 }

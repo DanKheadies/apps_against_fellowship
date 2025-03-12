@@ -1,4 +1,5 @@
 import 'package:apps_against_fellowship/blocs/blocs.dart';
+import 'package:apps_against_fellowship/cubits/card_cache_cubit.dart';
 import 'package:apps_against_fellowship/models/models.dart';
 import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
@@ -18,67 +19,69 @@ class CreateGameScreen extends StatefulWidget {
 class _CreateGameScreenState extends State<CreateGameScreen> {
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.light,
-      child: BlocProvider(
-        create: (context) => CreateGameBloc(
-          cardsRepository: context.read<CardsRepository>(),
-          gameRepository: context.read<GameRepository>(),
-          userBloc: context.read<UserBloc>(),
-        )..add(LoadCreateGame()),
-        child: MultiBlocListener(
-          listeners: [
-            // Error Listener
-            BlocListener<CreateGameBloc, CreateGameState>(
-              listenWhen: (previous, current) =>
-                  current.error != previous.error,
-              listener: (context, state) {
-                if (state.error != '') {
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Text(state.error),
-                        backgroundColor: Theme.of(context).colorScheme.error,
-                      ),
-                    );
-                }
-              },
-            ),
+    // Initialize card cache
+    return BlocProvider(
+      create: (context) => CardCacheCubit(),
+      child: RepositoryProvider(
+        create: (context) => CardsRepository(
+          cardCache: context.read<CardCacheCubit>(),
+        ),
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: SystemUiOverlayStyle.light,
+          child: BlocProvider(
+            create: (context) => CreateGameBloc(
+              cardsRepository: context.read<CardsRepository>(),
+              gameRepository: context.read<GameRepository>(),
+              userBloc: context.read<UserBloc>(),
+            )..add(LoadCreateGame()),
+            child: MultiBlocListener(
+              listeners: [
+                // Error Listener
+                BlocListener<CreateGameBloc, CreateGameState>(
+                  listenWhen: (previous, current) =>
+                      current.error != previous.error,
+                  listener: (context, state) {
+                    if (state.error != '') {
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(
+                          SnackBar(
+                            content: Text(state.error),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.error,
+                          ),
+                        );
+                    }
+                  },
+                ),
 
-            // New Game Listener
-            BlocListener<CreateGameBloc, CreateGameState>(
-              listenWhen: (previous, current) =>
-                  current.createdGame.id != previous.createdGame.id,
-              listener: (context, state) {
-                // TODO: the UX is slightly off, half second of seeing the lists
-                // again before navigating away; rather it keep showing 'loading'
-                if (state.createdGame != Game.emptyGame) {
-                  // Navigator.of(context)
-                  //     .pushReplacement(GamePageRoute(state.createdGame));
-                  // context.read<GameBloc>().add(
-                  //   OpenGame(
-                  //     gameId: game.id,
-                  //     user: context.read<UserBloc>().state.user,
-                  //   ),
-                  // );
-                  print('creating game; have created game');
-                  // I think this was all g2g.
-                  context.read<GameBloc>().add(
-                        GameUpdated(game: state.createdGame),
+                // New Game Listener
+                BlocListener<CreateGameBloc, CreateGameState>(
+                  listenWhen: (previous, current) =>
+                      current.createdGame.id != previous.createdGame.id,
+                  listener: (context, state) {
+                    // TODO: the UX is slightly off, half second of seeing the
+                    // lists again before navigating away; rather it keep
+                    // showing 'loading'.. How to fix...
+                    if (state.createdGame != Game.emptyGame) {
+                      // print('creating game; have created game');
+                      context.read<GameBloc>().add(
+                            GameUpdated(game: state.createdGame),
+                          );
+                      context.read<GameBloc>().add(
+                            Subscribe(gameId: state.createdGame.id),
+                          );
+                      context.goNamed(
+                        'game',
+                        // extra: state.createdGame,
                       );
-                  context.read<GameBloc>().add(
-                        Subscribe(gameId: state.createdGame.id),
-                      );
-                  context.goNamed(
-                    'game',
-                    // extra: state.createdGame,
-                  );
-                }
-              },
+                    }
+                  },
+                ),
+              ],
+              child: _buildScaffold(),
             ),
-          ],
-          child: _buildScaffold(),
+          ),
         ),
       ),
     );

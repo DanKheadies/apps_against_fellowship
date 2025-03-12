@@ -7,7 +7,6 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
-// import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -33,8 +32,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         super(const AuthState()) {
     on<AuthUserChanged>(_onAuthUserChanged);
     on<AuthGoogleUserChanged>(_onAuthGoogleUserChanged);
+    on<DeleteAccount>(_onDeleteAccount);
     on<LoginWithApple>(_onLoginWithApple);
-    on<LoginWithLink>(_onLoginWithLink);
     on<LoginWithEmailAndPassword>(_onLoginWithEmailAndPassword);
     on<LoginWithGoogle>(_onLoginWithGoogle);
     on<RegisterAnonymously>(_onRegisterAnonymously);
@@ -57,6 +56,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       state.copyWith(
         status: status,
       ),
+    );
+  }
+
+  void _clearUserAndReset(
+    Emitter<AuthState> emit,
+  ) {
+    _userBloc.add(
+      ClearUser(),
+    );
+    _userSubscription?.cancel();
+
+    _settingsBloc.add(
+      CheckForUser(
+        haveUser: false,
+      ),
+    );
+
+    emit(
+      state.initialize().copyWith(
+            errorMessage: '',
+            status: AuthStatus.unauthenticated,
+          ),
     );
   }
 
@@ -90,13 +111,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                 ),
               );
             }
-
-            // TODO: call settings and intialize audio
-            // _userBloc.
-            // _settingsBloc.
-            // Note: don't want to have to add settingsBloc as a requirement here
-            // but can.
-            // Only want to do this once, i.e. stick up with auth check above.
           }
         });
       } else if (authUser == null && state.status == AuthStatus.authenticated) {
@@ -150,14 +164,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     _checkAndEmit(emit, AuthStatus.submitting);
-    // if (state.status == AuthStatus.submitting) return;
-    // print('auth google user changed: authenticating');
-
-    // emit(
-    //   state.copyWith(
-    //     status: AuthStatus.submitting,
-    //   ),
-    // );
 
     try {
       var googleUser = await _authRepository.getGoogleUser(
@@ -190,6 +196,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  void _onDeleteAccount(
+    DeleteAccount event,
+    Emitter<AuthState> emit,
+  ) async {
+    _checkAndEmit(emit, AuthStatus.submitting);
+
+    try {
+      await _authRepository.deleteAccount();
+      _clearUserAndReset(emit);
+      // TODO: clear out the games subcollection in the user's RIP'd profile
+      // Should be able to do w/ the Delete extension in Firebase
+      // Note: there's some wonkiness w/ state, i.e. not seeing Past Games or
+      // seeing another account's Past Games, that would be good to clean up.
+    } catch (err) {
+      print('delete error: $err');
+      emit(
+        state.initialize().copyWith(
+              errorMessage: err.toString(),
+              status: AuthStatus.unknown,
+            ),
+      );
+    }
+  }
+
   void _onLoginWithApple(
     LoginWithApple event,
     Emitter<AuthState> emit,
@@ -197,16 +227,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _checkAndEmit(emit, AuthStatus.submitting);
 
     try {
-      // final credential = await SignInWithApple.getAppleIDCredential(
-      //   scopes: [
-      //     AppleIDAuthorizationScopes.email,
-      //     AppleIDAuthorizationScopes.fullName,
-      //   ],
-      //   webAuthenticationOptions: WebAuthenticationOptions(
-      //     clientId: clientId,
-      //     redirectUri: redirectUri,
-      //   ),
-      // );
+      // TODO: finish authorization; see if we can setup a Sub/Stream
+      await _authRepository.loginWithApple();
+      print('huzzah');
     } catch (err) {
       print('login (apple) error: $err');
       emit(
@@ -223,13 +246,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     _checkAndEmit(emit, AuthStatus.submitting);
-    // if (state.status == AuthStatus.submitting) return;
-
-    // emit(
-    //   state.copyWith(
-    //     status: AuthStatus.submitting,
-    //   ),
-    // );
 
     try {
       var authUser = await _authRepository.loginWithEmailAndPassword(
@@ -277,25 +293,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     _checkAndEmit(emit, AuthStatus.submitting);
-    // if (state.status == AuthStatus.submitting) return;
-    // print('login w/ google');
-    // if (event.isSilent) {
-    //   print('SILENTLY...');
-    // }
 
-    // emit(
-    //   state.copyWith(
-    //     status: AuthStatus.submitting,
-    //   ),
-    // );
-
-    // TODO: handle kIsWeb
-    // if (!kIsWeb) {
-    //   add(
-    //     LoginWithGoogle(isSilent: true),
-    //   );
-    // }
-    // Not sure where tho..
     try {
       await _authRepository.loginWithGoogle(
         isSilently: event.isSilent,
@@ -318,55 +316,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void _onLoginWithLink(
-    LoginWithLink event,
-    Emitter<AuthState> emit,
-  ) async {
-    print('TODO: login w/ link');
-    // if (state.status == AuthStatus.submitting) return;
-
-    // emit(
-    //   state.copyWith(
-    //     status: AuthStatus.submitting,
-    //   ),
-    // );
-
-    // try {
-    //   var authUser = await _authRepository.loginWithEmail(
-    //     email: event.email,
-    //     emailLink: event.emailLink,
-    //   );
-
-    //   emit(
-    //     state.copyWith(
-    //       authUser: authUser,
-    //       status: AuthStatus.authenticated,
-    //     ),
-    //   );
-    // } catch (err) {
-    //   print('login (EwL) error: $err');
-    //   emit(
-    //     state.copyWith(
-    //       authUser: null,
-    //       errorMessage: err.toString(),
-    //       status: AuthStatus.unauthenticated,
-    //     ),
-    //   );
-    // }
-  }
-
   void _onRegisterAnonymously(
     RegisterAnonymously event,
     Emitter<AuthState> emit,
   ) async {
     _checkAndEmit(emit, AuthStatus.submitting);
-    // if (state.status == AuthStatus.submitting) return;
-
-    // emit(
-    //   state.copyWith(
-    //     status: AuthStatus.submitting,
-    //   ),
-    // );
 
     try {
       var anonUser = await _authRepository.registerAnonymous();
@@ -393,13 +347,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     _checkAndEmit(emit, AuthStatus.submitting);
-    // if (state.status == AuthStatus.submitting) return;
-
-    // emit(
-    //   state.copyWith(
-    //     status: AuthStatus.submitting,
-    //   ),
-    // );
 
     try {
       var authUser = await _authRepository.registerUserWithFirebase(
@@ -464,41 +411,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     _checkAndEmit(emit, AuthStatus.submitting);
-    // if (state.status == AuthStatus.submitting) return;
-
-    // emit(
-    //   state.copyWith(
-    //     status: AuthStatus.submitting,
-    //   ),
-    // );
 
     try {
       await _authRepository.signOut();
-
-      _userBloc.add(
-        ClearUser(),
-      );
-      _userSubscription?.cancel();
-      _userSubscription = null;
-
-      _settingsBloc.add(
-        CheckForUser(
-          haveUser: false,
-        ),
-      );
-
-      // TODO: close out the HomeBloc's stream
-      // Might be able to do it via the Sign Out button
-      // Yup, that did it. Should make sure all sign out options include closing
-      // the Home Sub/Stream, but I could bake it into this SignOut handler.
-      // _homeBloc.close();
-
-      emit(
-        state.initialize().copyWith(
-              errorMessage: '',
-              status: AuthStatus.unauthenticated,
-            ),
-      );
+      _clearUserAndReset(emit);
     } catch (err) {
       print('sign out error: $err');
       emit(

@@ -1,15 +1,16 @@
 import 'package:apps_against_fellowship/blocs/blocs.dart';
 import 'package:apps_against_fellowship/cubits/cubits.dart';
+import 'package:apps_against_fellowship/helpers/helpers.dart';
 import 'package:apps_against_fellowship/models/models.dart';
-// import 'package:apps_against_fellowship/repositories/repositories.dart';
 import 'package:apps_against_fellowship/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -19,90 +20,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  Future<void> deleteAccount(BuildContext context) async {
-    var authBloc = context.read<AuthBloc>();
-
-    bool result = await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Text(
-              'Delete account?',
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Colors.redAccent,
-                  ),
-            ),
-            content: Text(
-              'Are you sure you want to delete your account? This is permenant and cannot be undone.',
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.surface,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            actions: [
-              TextButton(
-                child: const Text(
-                  'CANCEL',
-                  style: TextStyle(
-                    color: Colors.white70,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-              ),
-              TextButton(
-                child: const Text(
-                  'DELETE ACCOUNT',
-                  style: TextStyle(
-                    color: Colors.redAccent,
-                  ),
-                ),
-                onPressed: () {
-                  // TODO: actually delete the account (Auth, Firebase, & Storage)
-                  Navigator.of(context).pop(true);
-                },
-              ),
-            ],
-          );
-        });
-
-    if (result) {
-      print('result was true, so delete');
-      // Analytics > setting - delete account
-      try {
-        // TODO
-        // await authRepository.deleteAccount();
-
-        if (context.mounted) {
-          context.read<HomeBloc>().close(); // TODO: move to authBloc
-        } else {
-          print('derp');
-        }
-        authBloc.add(
-          SignOut(),
-        );
-      } catch (err) {
-        print('settings delete err: $err');
-        if (err is PlatformException) {
-          print('is platform exception, so probably google');
-          if (err.code == 'ERROR_REQUIRES_RECENT_LOGIN') {}
-          // await authRepository.deleteAccount();
-          if (context.mounted) {
-            context.read<HomeBloc>().close(); // TODO: move to authBloc
-          } else {
-            print('derp');
-          }
-          authBloc.add(
-            SignOut(),
-          );
-        }
-      }
-    }
-  }
+  late WebViewController webViewCont;
 
   @override
   Widget build(BuildContext context) {
@@ -139,14 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   MdiIcons.logout,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                // onTap: () => signOut(context),
-                onTap: () {
-                  print('sign out');
-                  context.read<HomeBloc>().close(); // TODO: move to authBloc
-                  context.read<AuthBloc>().add(
-                        SignOut(),
-                      );
-                },
+                onTap: () => fullSignOut(context),
               ),
               Preference(
                 title: 'Delete Account',
@@ -223,8 +134,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                         BlocBuilder<AudioCubit, AudioState>(
                           builder: (context, state) {
-                            // print('audio state update');
-                            // print(state.playlist.first.name);
                             return Text(
                               state.currentSongTitle,
                               style: TextStyle(
@@ -256,9 +165,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   MdiIcons.shieldSearch,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                onTap: () {
+                onTap: () async {
                   // Analytics > settings - privacy policy
-                  print('TODO: show privacy policy');
+                  final Uri url = Uri.parse(
+                    'https://apps-against-fellowship.web.app/privacy.html',
+                  );
+                  if (!await launchUrl(url)) {
+                    throw Exception('Could not launch $url');
+                  }
                 },
               ),
               Preference(
@@ -267,9 +181,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   MdiIcons.clipboard,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                onTap: () {
+                onTap: () async {
                   // Analytics > settings - terms of service
-                  print('TODO: show tos');
+                  final Uri url = Uri.parse(
+                    'https://apps-against-fellowship.web.app/tos.html',
+                  );
+                  if (!await launchUrl(url)) {
+                    throw Exception('Could not launch $url');
+                  }
                 },
               ),
               Preference(
@@ -278,9 +197,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   MdiIcons.sourceBranch,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                onTap: () {
+                onTap: () async {
                   // Analytics > settings - open source licenses
-                  print('TODO: show open source licenses');
+                  //
+                  final Uri url = Uri.parse(
+                    'https://opensource.org/license/gpl-3-0',
+                  );
+                  if (!await launchUrl(url)) {
+                    throw Exception('Could not launch $url');
+                  }
                 },
               ),
             ],
@@ -297,7 +222,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 onTap: () {
                   // Analytics > settings - feedback
-                  print('TODO: open wiredash & feedback');
+                  HelpDialog.openHelpDialog(context);
                 },
               ),
               Preference(
@@ -307,9 +232,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   MdiIcons.github,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                onTap: () {
+                onTap: () async {
                   // Analytics > settings - contribute
-                  print('TODO: show github');
+                  final Uri url = Uri.parse(
+                    'https://github.com/DanKheadies/apps_against_fellowship',
+                  );
+                  if (!await launchUrl(url)) {
+                    throw Exception('Could not launch $url');
+                  }
                 },
               ),
               Preference(
@@ -318,10 +248,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Icons.people,
                   color: Theme.of(context).colorScheme.primary,
                 ),
-                onTap: () {
-                  // Analytics > settings - author
-                  print('TODO: show author');
-                },
+                onTap: () {},
               ),
               StreamBuilder<PackageInfo>(
                 stream: PackageInfo.fromPlatform().asStream(),
@@ -342,14 +269,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                   ),
                                 );
-                            // setState(() {});
                             ScaffoldMessenger.of(context)
                               ..clearSnackBars()
                               ..showSnackBar(
                                 SnackBar(
                                   duration: const Duration(seconds: 3),
-                                  content:
-                                      const Text('Developer Packs Unlocked!'),
+                                  content: const Text(
+                                    'Developer Packs Unlocked!',
+                                  ),
                                   behavior: SnackBarBehavior.floating,
                                   action: SnackBarAction(
                                     label: 'VIEW',
@@ -441,8 +368,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     print('TODO: go to cards against humanity');
+                    final Uri url = Uri.parse(
+                      'https://www.cardsagainsthumanity.com/',
+                    );
+                    if (!await launchUrl(url)) {
+                      throw Exception('Could not launch $url');
+                    }
                   },
                   child: SizedBox(
                     child: Text(
@@ -459,9 +392,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     top: 16,
                   ),
                   child: GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       print('TODO: go to CC');
-                      // https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+                      final Uri url = Uri.parse(
+                        'https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode',
+                      );
+                      if (!await launchUrl(url)) {
+                        throw Exception('Could not launch $url');
+                      }
                     },
                     child: Image.asset(
                       'assets/images/cc_by_nc_sa.png',
@@ -475,5 +413,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> deleteAccount(BuildContext context) async {
+    bool result = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              'Delete account?',
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+            ),
+            content: Text(
+              'Are you sure you want to delete your account? This is permenant and cannot be undone.',
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            actions: [
+              TextButton(
+                child: Text(
+                  'CANCEL',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              TextButton(
+                child: Text(
+                  'DELETE ACCOUNT',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          );
+        });
+
+    if (result) {
+      // Analytics > setting - delete account
+      if (context.mounted) {
+        fullSignOut(context, isDeletion: true);
+      } else {
+        print('delete account error; context not mounted');
+      }
+    }
   }
 }

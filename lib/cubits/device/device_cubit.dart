@@ -100,7 +100,7 @@ class DeviceCubit extends HydratedCubit<DeviceState> {
 
   @override
   DeviceState? fromJson(Map<String, dynamic> json) {
-    print('device cubit hydrated fromJson');
+    // print('device cubit hydrated fromJson');
     return DeviceState.fromJson(json);
   }
 
